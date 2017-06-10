@@ -18,8 +18,7 @@ import javax.swing.JLabel;
 
 public class JDisappearingFriends extends JFrame implements MouseListener
 {
-	
-	/*************
+	/*^***********
 	 * Variables *
 	 *************/
 	
@@ -31,10 +30,15 @@ public class JDisappearingFriends extends JFrame implements MouseListener
 			new ImageIcon("friend5.jpeg")
 			};
 	JLabel friend1, friend2, friend3, friend4, friend5;
+	/**
+	 * WOHOOOO, more poorly understood requirements
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	/****************
+	/*^**************
 	 * Constructors *
 	 ****************/
+	 
 	public JDisappearingFriends()
 	{
 		super("Click here for a list of my IRL friends.");
@@ -75,7 +79,7 @@ public class JDisappearingFriends extends JFrame implements MouseListener
 		friend5.addMouseListener(this);
 	}
 	
-	/***********
+	/*^*********
 	 * Methods *
 	 ***********/
 	
@@ -87,10 +91,7 @@ public class JDisappearingFriends extends JFrame implements MouseListener
 	
 	// Other
 
-	/**
-	 * WOHOOOO, more poorly understood requirements
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -147,4 +148,13 @@ public class JDisappearingFriends extends JFrame implements MouseListener
 		
 	}
 	
+	/*^***************
+	 * Main Function *
+	 *****************/
+	
+	public static void main(String[] args)
+	{
+		JDisappearingFriends window = new JDisappearingFriends();
+		window.setVisibility(true);
+	}
 }
