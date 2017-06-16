@@ -82,6 +82,7 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 	{
 		super();
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setTitle("WISP-T \u00A9 2017");
 		this.setContentPane(contentPane);
 		
 		contentPane.add(northPane, BorderLayout.NORTH);
@@ -178,7 +179,13 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 
 }
 
-
+/*
+ * I need to create a root DefaultMutableTreeNode, then branches, with branches, and soon, adding each to each other
+ * as expected with a tree, and then pass that node to the tree's constructor. For the builder, I'll have to have
+ * the interface of the edit tree directly modify the "root" DMTN and then re-build the tree after every alteration.
+ * For the builder, each branch should have "add", "remove", and "edit" leaves, which upon double clicking will do what 
+ * they suggest. Only branches will have the add leaves, leaves will have remove and edit only.
+ */
 class TroubleshootingTree extends JPanel
 {
 
@@ -194,7 +201,8 @@ class TroubleshootingTree extends JPanel
 		"Connectivity",
 		
 		//speed
-		"PPPoE Logs Incrementing", "PPPoE Logs Normal",
+		"PPPoE Logs Incrementing", 
+		"PPPoE Logs Normal",
 		
 			//PPPoE incrementing
 				"Incrementing Regularly", 
@@ -263,7 +271,7 @@ class TroubleshootingTree extends JPanel
 							+ "D-Link router bugging out on PPPoE. We have a nice workaround, but it "
 							+ "requires the customer to be able to log into the router and change a setting.",
 						//incrementing irregularly
-							"TODO",
+							"When PPPoE logs increment irregularly, it can be a few things",
 					//PPPoE normal
 					"Let's take a look at the SU. The signal should be > -72 ideally, "
 						+ "and the airMax should be above 70%, both ways. Alignment shouldn't"
