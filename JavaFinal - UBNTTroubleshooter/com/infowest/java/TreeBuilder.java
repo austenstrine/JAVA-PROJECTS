@@ -121,6 +121,9 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			switch(answer)
 			{
 				case 0:
+					getNode(nodeS);
+					exeEdit();
+					break;
 				case 1:
 				case 2:
 				default:
@@ -189,6 +192,10 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		this.revalidate();
 	}
 	public void exeEdit()
-	{}
+	{
+		Stringable s = (Stringable)asideNode.getUserObject();
+		selectedNode.setUserObject(s);
+		model.nodeChanged(selectedNode);
+	}
 
 }
