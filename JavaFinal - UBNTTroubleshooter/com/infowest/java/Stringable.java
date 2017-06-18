@@ -1,7 +1,14 @@
 package com.infowest.java;
 
-public class Stringable 
+import java.io.Serializable;
+
+public class Stringable implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9875955166960066L;
+	
 	private String titleString = "Seed";
 	private String contentString = "Seed";
 	
@@ -28,6 +35,6 @@ public class Stringable
 	
 	public String toString()
 	{
-		return ("Title: "+ titleString + "\nContent: " + contentString);
+		return ("Title: "+ titleString + "  Content: " + contentString);
 	}
 }
