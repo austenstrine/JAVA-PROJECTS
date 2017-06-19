@@ -199,8 +199,13 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 		Object source = e.getSource();
 		if(source == newTree)
 		{
-			tree = getTree("defaultTree");
+			TreeModel model = getTree("defaultTree").getModel();
+			tree.setModel(model);
 		}
+		treeScroll.repaint();
+		tree.repaint();
+		Dimension d = new Dimension(400, 200);
+		tree.setMaximumSize(d);
 
 	}
 	
@@ -269,9 +274,9 @@ class TroubleshootingTree extends JPanel
 					"Router Accessible", 
 					"Router Inacessible",
 					
-					//incrementing irregularly
-					"SU Logs show LAN0 cycling", 
-					"No LAN0 activity in logs",
+				//incrementing irregularly
+				"SU Logs show LAN0 cycling", 
+				"No LAN0 activity in logs",
 
 			//PPPoE normal
 			"SU signal/quality good", 
@@ -301,7 +306,7 @@ class TroubleshootingTree extends JPanel
 		"No PPPoE IP, SU Access", 
 		"No PPPoE IP, No SU Access",
 			
-			//PPPoE, no SU
+			//no PPPoE, SU
 			"LAN0 unplugged", 
 			"LAN0 < 100mbps full", 
 			"LAN0 100mbps full",
