@@ -24,9 +24,12 @@ public class Node extends JDialog implements ActionListener
 	JTextArea titleTxt, 
 			contentTxt;
 	JButton acceptChanges,
-			cancel;
-	JPanel center,
-			south;
+			cancel,
+			packer;
+	JPanel contentPane,
+			center,
+			south,
+			north;
 	JScrollPane centerScroll,
 			southScroll;
 	
@@ -58,7 +61,19 @@ public class Node extends JDialog implements ActionListener
 		this.setIconImages(icons);
 		this.setTitle("Node");
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.getContentPane().setLayout(new BorderLayout());
+		
+		contentPane = new JPanel();
+		this.setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout());
+		packer = new JButton();
+		packer.addActionListener(this);
+		north = new JPanel(new FlowLayout());
+		Dimension packerD = new Dimension(10,10);
+		packer.setPreferredSize(packerD);
+		packer.setMaximumSize(packerD);
+		packer.setMinimumSize(packerD);
+		contentPane.add(north, BorderLayout.NORTH);
+		north.add(packer);
 		titleTxt = new JTextArea("title");
 		titleTxt.setBorder(BorderFactory.createTitledBorder("Node Title"));
 		contentTxt = new JTextArea("content");
@@ -75,8 +90,8 @@ public class Node extends JDialog implements ActionListener
 		center.add(contentTxt);
 		south.add(acceptChanges);
 		south.add(cancel);
-		this.getContentPane().add(centerScroll, BorderLayout.CENTER);
-		this.getContentPane().add(southScroll, BorderLayout.SOUTH);
+		contentPane.add(centerScroll, BorderLayout.CENTER);
+		contentPane.add(southScroll, BorderLayout.SOUTH);
 		pack();
 		
 	}
@@ -115,6 +130,14 @@ public class Node extends JDialog implements ActionListener
 			//this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); //This closes both windows?
 			this.setVisible(false);
 			this.dispose();
+		}
+		else if(source == cancel)
+		{
+			
+		}
+		else if (source == packer)
+		{
+			pack();
 		}
 	}
 
