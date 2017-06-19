@@ -2,8 +2,11 @@ package com.infowest.java;
 
 import java.util.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.awt.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.tree.*;
 
@@ -13,6 +16,7 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
  *	Variables 
  */
 	private static final long serialVersionUID = -1079398159072533776L;
+	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	private JPanel contentPane = new JPanel(new BorderLayout()),
 					northPane = new JPanel(new GridLayout(2,1)),
 					westPane = new JPanel(new GridLayout(1,1)),
@@ -28,7 +32,7 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 	private String	username = "User";
 	private JLabel	processingLabel = new JLabel("Done"),
 					userLabel = new JLabel(username); 
-	private TroubleshootingTree tree = new TroubleshootingTree();
+	private SerializeableTree tree = new SerializeableTree(new DefaultMutableTreeNode("(empty)"));
 	private JScrollPane treeScroll = new JScrollPane(tree),
 			westSouthScroll = new JScrollPane(westSouthPane),
 			centerSouthScroll = new JScrollPane(centerSouthPane),
@@ -50,6 +54,8 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 			private JMenu toggle = new JMenu("Toggle");
 				private JMenuItem	tTooltips = new JMenuItem("Tooltips (ON)"),
 									tCallHandling = new JMenuItem("Call Handling Suggestions (ON)");
+			private JMenuItem	loadTree = new JMenuItem("Load Saved Tree"),
+								newTree = new JMenuItem("Create New Tree");
 				
 		private JMenu navigate = new JMenu("Navigate");
 			private JMenuItem	previous = new JMenuItem("Previous Step"),
@@ -81,6 +87,28 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 	public UBNTTroubleshooter()
 	{
 		super();
+		
+		try
+		{
+			File img = new File("wisp-t 20.png");
+			BufferedImage bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 250.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 500.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 750.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		this.setIconImages(icons);
+		
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("WISP-T \u00A9 2017");
 		this.setContentPane(contentPane);
@@ -97,6 +125,11 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 					edit.add(toggle);
 						toggle.add(tTooltips);
 						toggle.add(tCallHandling);
+					edit.addSeparator();
+					edit.add(newTree);
+					newTree.addActionListener(this);
+					edit.add(loadTree);
+					loadTree.addActionListener(this);
 				menu.add(navigate);
 					navigate.add(previous);
 					navigate.add(next);
@@ -161,9 +194,33 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
  */
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+	public void actionPerformed(ActionEvent e) 
+	{
+		Object source = e.getSource();
+		if(source == newTree)
+		{
+			tree = getTree("defaultTree");
+		}
 
+	}
+	
+	public SerializeableTree getTree(String fileName)
+	{
+		SerializeableTree inTree = new SerializeableTree(new DefaultMutableTreeNode("(empty)"));
+		try 
+		{
+	         FileInputStream fileIn = new FileInputStream((fileName+".ser"));
+	         ObjectInputStream in = new ObjectInputStream(fileIn);
+	         inTree = (SerializeableTree)in.readObject();
+	         in.close();
+	         fileIn.close();
+	         System.out.println("Object read from "+fileName+".ser");
+	    }
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return inTree;
 	}
 
 

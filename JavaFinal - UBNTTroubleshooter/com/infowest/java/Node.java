@@ -1,13 +1,16 @@
 package com.infowest.java;
 
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.awt.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 //import javax.swing.tree.DefaultMutableTreeNode.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import java.io.*;
+import java.util.ArrayList;
 
 public class Node extends JDialog implements ActionListener
 {
@@ -15,6 +18,8 @@ public class Node extends JDialog implements ActionListener
 	 * 
 	 */
 	private static final long serialVersionUID = -4089171883331980678L;
+	
+	ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	
 	JTextArea titleTxt, 
 			contentTxt;
@@ -29,6 +34,26 @@ public class Node extends JDialog implements ActionListener
 	public Node()
 	{
 		super();
+		try
+		{
+			File img = new File("wisp-t 20.png");
+			BufferedImage bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 250.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 500.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+			img = new File("wisp-t 750.png");
+			bufferedImage = ImageIO.read(img);
+			icons.add(bufferedImage);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		this.setIconImages(icons);
 		this.setTitle("Node");
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.getContentPane().setLayout(new BorderLayout());
@@ -74,7 +99,7 @@ public class Node extends JDialog implements ActionListener
 			DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(new Stringable(titleTxt.getText(), contentTxt.getText()));
 			try 
 			{
-		         FileOutputStream fileOut = new FileOutputStream("/node.ser");
+		         FileOutputStream fileOut = new FileOutputStream("node.ser");
 		         ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		         out.writeObject(savedNode);
 		         out.close();
