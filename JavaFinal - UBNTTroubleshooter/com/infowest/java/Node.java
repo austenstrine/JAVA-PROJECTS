@@ -34,6 +34,8 @@ public class Node extends JDialog implements ActionListener
 	public Node()
 	{
 		super();
+		Dimension d = new Dimension(800,400);
+		this.setPreferredSize(d);
 		try
 		{
 			File img = new File("wisp-t 20.png");
@@ -119,7 +121,6 @@ public class Node extends JDialog implements ActionListener
 	public static void main(String[] args) 
 	{
 		Node node = new Node();
-		node.setAlwaysOnTop(true);
 		node.setModalityType(ModalityType.APPLICATION_MODAL);
 		
 		try 

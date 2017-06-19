@@ -8,9 +8,11 @@ import java.awt.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
-public class UBNTTroubleshooter extends JFrame implements ActionListener {
+public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener, ActionListener {
 
 /*
  *	Variables 
@@ -18,7 +20,7 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -1079398159072533776L;
 	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	private JPanel contentPane = new JPanel(new BorderLayout()),
-					northPane = new JPanel(new GridLayout(2,1)),
+					northPane = new JPanel(new GridLayout(1,1)),
 					westPane = new JPanel(new GridLayout(1,1)),
 						westSouthPane = new JPanel(new FlowLayout()),
 					centerPane = new JPanel(new BorderLayout()),
@@ -112,8 +114,10 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("WISP-T \u00A9 2017");
 		this.setContentPane(contentPane);
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		
 		contentPane.add(northPane, BorderLayout.NORTH);
+		contentPane.setBackground(Color.white);
 			northPane.add(menu);
 			northPane.setBackground(Color.white);
 				menu.add(file);
@@ -141,15 +145,26 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 					
 		contentPane.add(westPane, BorderLayout.WEST);
 			westPane.add(westSplit);
+				westSplit.setBackground(Color.white);
+				westSplit.setForeground(Color.white);
+				westSouthScroll.setBackground(Color.white);
 			westPane.setBackground(Color.white);
+			Dimension westD = new Dimension(150, 450);
+			treeScroll.setMaximumSize(westD);
+			treeScroll.setPreferredSize(westD);
+			treeScroll.setMinimumSize(westD);
 			
 			
 		contentPane.add(centerPane, BorderLayout.CENTER);
 			centerPane.add(centerSouthScroll, BorderLayout.SOUTH);
 				radioButtons.add(radio1);
+				radio1.setBackground(Color.white);
 				radioButtons.add(radio2);
+				radio2.setBackground(Color.white);
 				radioButtons.add(radio3);
+				radio3.setBackground(Color.white);
 				radioButtons.add(radio4);
+				radio4.setBackground(Color.white);
 				centerSouthPane.add(radio1);
 				centerSouthPane.add(radio2);
 				centerSouthPane.add(radio3);
@@ -158,16 +173,24 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 			centerPane.add(centerCenterPane, BorderLayout.CENTER);
 				centerCenterPane.add(mainTxtArea);
 				centerCenterPane.setBackground(Color.white);
+				centerCenterPane.setBorder(BorderFactory.createEtchedBorder());
 			centerPane.setBackground(Color.white);
 		
 				
-		contentPane.add(eastPane, BorderLayout.EAST);
+		contentPane.add(eastScroll, BorderLayout.EAST);
 			eastPane.add(check1);
+			check1.setBackground(Color.white);
 			eastPane.add(check2);
+			check2.setBackground(Color.white);
 			eastPane.add(check3);
+			check3.setBackground(Color.white);
 			eastPane.add(check4);
+			check4.setBackground(Color.white);
 			eastPane.add(check5);
+			check5.setBackground(Color.white);
 			eastPane.add(check6);
+			check6.setBackground(Color.white);
+			eastScroll.setBackground(Color.white);
 			eastPane.setBackground(Color.white);
 			//check6.setVisible(false);
 			
@@ -201,11 +224,10 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 		{
 			TreeModel model = getTree("defaultTree").getModel();
 			tree.setModel(model);
+			tree.addTreeSelectionListener(this);
 		}
 		treeScroll.repaint();
 		tree.repaint();
-		Dimension d = new Dimension(400, 200);
-		tree.setMaximumSize(d);
 
 	}
 	
@@ -239,119 +261,13 @@ public class UBNTTroubleshooter extends JFrame implements ActionListener {
 
 	}
 
-}
 
-/*
- * I need to create a root DefaultMutableTreeNode, then branches, with branches, and soon, adding each to each other
- * as expected with a tree, and then pass that node to the tree's constructor. For the builder, I'll have to have
- * the interface of the edit tree directly modify the "root" DMTN and then re-build the tree after every alteration.
- * For the builder, each branch should have "add", "remove", and "edit" leaves, which upon double clicking will do what 
- * they suggest. Only branches will have the add leaves, leaves will have remove and edit only.
- */
-class TroubleshootingTree extends JPanel
-{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4550247919337161261L;
-	
-	public String[] stringOfTree = {
-		"UBNT",
+	@Override
+	public void valueChanged(TreeSelectionEvent arg0) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+		Stringable selectedStringable = (Stringable)node.getUserObject();
+		mainTxtArea.setText(selectedStringable.getContent());
 		
-		"Speed", 
-		"Connectivity",
-		
-		//speed
-		"PPPoE Logs Incrementing", 
-		"PPPoE Logs Normal",
-		
-			//PPPoE incrementing
-				"Incrementing Regularly", 
-				"Incrementing Irregularly",
-	
-				//incrementing regularly
-					"Router Accessible", 
-					"Router Inacessible",
-					
-				//incrementing irregularly
-				"SU Logs show LAN0 cycling", 
-				"No LAN0 activity in logs",
-
-			//PPPoE normal
-			"SU signal/quality good", 
-			"SU signal/quality poor",
-			
-				//SU signal good
-				"Wireless Only", 
-				"Wired and Wireless", 
-				"Bypassed, Wired, and Wireless",
-				
-					//Wireless only
-					"Standard Router", 
-					"Dual-Band Router",
-					
-					//Wired AND Wireless
-					"TODO",
-					
-					//Bypassed, Wired, and Wireless
-					"TODO",
-					
-				//SU signal poor
-				"Good signal, Bad quality", 
-				"Bad signal, Bad quality",
-				
-		//connectivity
-		"PPPoE IP, SU Access", 
-		"No PPPoE IP, SU Access", 
-		"No PPPoE IP, No SU Access",
-			
-			//no PPPoE, SU
-			"LAN0 unplugged", 
-			"LAN0 < 100mbps full", 
-			"LAN0 100mbps full",
-				
-				//LAN0 unplugged
-				"Router Lights ON", 
-				"Router Lights OFF"
-	};
-	
-	public String[] txtBodyStrings = {
-			//UBNT
-			"Is the customer calling in about speed concerns, or Connectivity in general?",
-				//speed
-				"Take a look at PPPoE logs. If there aren't a lot, they aren't incrementing. "
-						+ "It's not unusual to see 1-3 if the customer has been rebooting the router "
-						+ "to resolve their issues. But if it's more like 10-100, PPPoE is incrementing.",
-					//PPPoE incrementing
-					"Since the logs are incrementing, we need to determine whether it's regular "
-						+ "or irregular. Regular would be, every 30 seconds, almost exactly, or every "
-						+ "60 seconds, almost exactly. Irregular will have random amounts of time "
-						+ "in-between", 
-						//incrementing regularly
-						"When PPPoE increments like this, it's almost definitely a TP-Link or "
-							+ "D-Link router bugging out on PPPoE. We have a nice workaround, but it "
-							+ "requires the customer to be able to log into the router and change a setting.",
-						//incrementing irregularly
-							"When PPPoE logs increment irregularly, it can be a few things",
-					//PPPoE normal
-					"Let's take a look at the SU. The signal should be > -72 ideally, "
-						+ "and the airMax should be above 70%, both ways. Alignment shouldn't"
-						+ "be farther than -3 db from each other. If all of this checks out,"
-						+ "the SU's signal/quality is good. Otherwise, it's poor.",
-			"TODO"
-	};
-	
-	private JTree ubnt;
-	
-	public TroubleshootingTree()
-	{
-		super();
-		this.setVisible(true);
-		ubnt = new JTree(stringOfTree);
-		this.add(ubnt);
-		//ubnt.add
-		//DefaultMutableTreeNode
 	}
-	
+
 }

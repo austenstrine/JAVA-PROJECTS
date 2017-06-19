@@ -50,6 +50,8 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		super("Tree Builder");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
+		Dimension d = new Dimension(800,400);
+		this.getContentPane().setPreferredSize(d);
 		
 		try
 		{
@@ -134,41 +136,13 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			}
 			if(source == newNodeBtn)
 			{
-				answer = JOptionPane.showConfirmDialog(null, "This will create a new Branch/Leaf as a child of the selected branch/leaf, \'" 
-						+ nodeS.getTitle() 
-						+ "\'! Are you sure you want to proceed?",
-						"New Branch/Leaf",
-						JOptionPane.OK_CANCEL_OPTION);
-				switch(answer)
-				{
-					case 0:
-						getNode(nodeS);
-						exeNew();
-						break;
-					case 1:
-					case 2:
-					default:
-						break;
-				}//end switch
+				getNode(nodeS);
+				exeNew();
 			}
 			else if(source == editNodeBtn)
 			{
-				answer = JOptionPane.showConfirmDialog(null, "This will edit the selected branch/leaf " 
-						+ nodeS.getTitle()
-						+ "! Are you sure you want to proceed?",
-						"Edit Branch/Leaf",
-						JOptionPane.OK_CANCEL_OPTION);
-				switch(answer)
-				{
-					case 0:
-						getNode(nodeS);
-						exeEdit();
-						break;
-					case 1:
-					case 2:
-					default:
-						break;
-				} //end switch	
+				getNode(nodeS);
+				exeEdit();
 			}
 			else if(source == deleteNodeBtn)
 			{
