@@ -30,12 +30,15 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	private static final long serialVersionUID = -5870411020614345178L;
 	
 	ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
-	SerializeableTree tree;
+	JTree tree;
 	String treeSaveName = "name";
 	JButton newNodeBtn = new JButton("New Branch/Leaf"),
 			editNodeBtn = new JButton("Edit Branch/Leaf"),
 			deleteNodeBtn = new JButton("Delete Branch/Leaf"),
-			saveTreeBtn = new JButton("Save Tree");
+			saveTreeBtn = new JButton("Save Tree"),
+			moveUpBtn = new JButton("\u2191"),
+			moveDownBtn = new JButton("\u2193"),
+			loadTree = new JButton("Load Saved tree");
 	JPanel buttons = new JPanel(new GridLayout(1,3)),
 			allButtons = new JPanel(new BorderLayout());
 	JScrollPane treeScroll,
@@ -48,8 +51,9 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	public TreeBuilder()
 	{
 		super("Tree Builder");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setVisible(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
 		Dimension d = new Dimension(800,400);
 		this.getContentPane().setPreferredSize(d);
 		
@@ -74,7 +78,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		}
 		this.setIconImages(icons);
 		root = new DefaultMutableTreeNode(new Stringable("root", "root"));
-		tree = new SerializeableTree(root);
+		tree = new JTree(root);
 		model = (DefaultTreeModel) tree.getModel();
 		treeScroll = new JScrollPane(tree);
 		this.getContentPane().setLayout(new BorderLayout());
@@ -88,9 +92,19 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		buttons.add(deleteNodeBtn);
 		allButtons.add(buttons, BorderLayout.NORTH);
 		allButtons.add(saveTreeBtn, BorderLayout.SOUTH);
+		JPanel upDownPane = new JPanel(new GridLayout(1,6));
+		allButtons.add(upDownPane, BorderLayout.CENTER);
+		upDownPane.add(new JPanel());
+		upDownPane.add(new JPanel());
+		upDownPane.add(moveUpBtn);
+		upDownPane.add(moveDownBtn);
+		upDownPane.add(new JPanel());
+		upDownPane.add(loadTree);
+		loadTree.addActionListener(this);
 		this.getContentPane().add(buttonsScroll, BorderLayout.SOUTH);
 		this.getContentPane().setVisible(true);
 		pack();	
+		//loadTree("defaultTree");
 	}
 
 	public static void main(String[] args) {
@@ -121,6 +135,15 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			saveTree();
 			
 			this.dispose();
+		}
+		else if(source == loadTree)
+		{
+			treeSaveName = JOptionPane.showInputDialog(null, 
+					"Please enter the filename of the pre-configured tree, without "
+					+ "\nextensions. (Ex. defaultTree rather than defaultTree.ser)",
+					"Load Tree",
+					JOptionPane.PLAIN_MESSAGE);	
+			loadTree(treeSaveName);
 		}
 		else
 		{
@@ -153,7 +176,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 				else if(source == deleteNodeBtn)
 				{
 					answer = JOptionPane.showConfirmDialog(null,
-							"This will delete the selected branch/leaf, " + nodeS.getTitle()
+							"This will delete the selected branch/leaf, " + nodeS.toString()
 									+ ", and all of its branches/leaves. This cannot be undone! Are you sure you want to proceed?",
 							"Delete Branch/Leaf", JOptionPane.OK_CANCEL_OPTION);
 					switch (answer) 
@@ -173,7 +196,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	
 	public void getNode(Stringable s)
 	{
-		String[] nodeStrings = {s.getTitle(), s.getContent()};
+		String[] nodeStrings = {s.toString(), s.getContent(), s.getTip(0), s.getTip(1), s.getTip(2), s.getTip(3), s.getTip(4), s.getTip(5)};
 		Node.main(nodeStrings);
 		asideNode = null;
 		
@@ -194,14 +217,11 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			e.printStackTrace();
 		}
 		System.out.println(asideNode.getUserObject().toString());
-		//Stringable sls = (Stringable)selectedNode.getUserObject();
-		//System.out.println(sls);
 	}
 	
 	public void exeNew()
 	{
-		model.insertNodeInto(asideNode, //(DefaultMutableTreeNode)tree.getLastSelectedPathComponent()
-				selectedNode, 0);
+		model.insertNodeInto(asideNode, selectedNode, 0);
 		this.repaint();
 		this.revalidate();
 	}
@@ -215,10 +235,10 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	public void saveTree()
 	{
 		try 
-		{
+		{//needs to trigger a warning if data will be overwritten
 	         FileOutputStream fileOut = new FileOutputStream((treeSaveName+".ser"));
 	         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-	         out.writeObject(tree);
+	         out.writeObject(tree.getModel());
 	         out.close();
 	         fileOut.close();
 	         System.out.println("Object saved in "+treeSaveName+".ser");
@@ -227,5 +247,25 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		{
 	         i.printStackTrace();
 		}//end read try/catch
+	}
+	
+	public void loadTree(String pathName)
+	{
+		try {
+			FileInputStream fileIn = new FileInputStream((pathName+".ser"));
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			tree.setModel((TreeModel)in.readObject());
+			in.close();
+			fileIn.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
