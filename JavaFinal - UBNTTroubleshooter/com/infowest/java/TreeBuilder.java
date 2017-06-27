@@ -196,7 +196,22 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	
 	public void getNode(Stringable s)
 	{
-		String[] nodeStrings = {s.toString(), s.getContent(), s.getTip(0), s.getTip(1), s.getTip(2), s.getTip(3), s.getTip(4), s.getTip(5)};
+		String[] nodeStrings = new String[8];
+		try
+		{
+			nodeStrings[0] = s.toString();
+			nodeStrings[1] = s.getContent();
+			nodeStrings[2] = s.getTip(0);
+			nodeStrings[3] = s.getTip(1);
+			nodeStrings[4] = s.getTip(2);
+			nodeStrings[5] = s.getTip(3);
+			nodeStrings[6] = s.getTip(4);
+			nodeStrings[7] = s.getTip(5);
+		}
+		catch(NullPointerException npe)
+		{
+			;
+		}
 		Node.main(nodeStrings);
 		asideNode = null;
 		

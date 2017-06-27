@@ -173,31 +173,31 @@ public class Node extends JDialog implements ActionListener
 		if(source == acceptChanges)
 		{
 			Stringable stringable = new Stringable(titleTxt.getText(), contentTxt.getText());
-			String[] stringTips = {null,null,null,null,null,null};
+			String[] stringTips = {"","","","","",""};
 			if(tip1.isVisible())
 				stringTips[0] = tip1.getText();
 			else
-				stringTips[0] = null;
+				stringTips[0] = "";
 			if(tip2.isVisible())
 				stringTips[1] = tip2.getText();
 			else
-				stringTips[1] = null;
+				stringTips[1] = "";
 			if(tip3.isVisible())
 				stringTips[2] = tip3.getText();
 			else
-				stringTips[2] = null;
+				stringTips[2] = "";
 			if(tip4.isVisible())
 				stringTips[3] = tip4.getText();
 			else
-				stringTips[3] = null;
+				stringTips[3] = "";
 			if(tip5.isVisible())
 				stringTips[4] = tip5.getText();
 			else
-				stringTips[4] = null;
+				stringTips[4] = "";
 			if(tip6.isVisible())
 				stringTips[5] = tip6.getText();
 			else
-				stringTips[5] = null;
+				stringTips[5] = "";
 			
 			stringable.setTips(stringTips);
 			DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(stringable);
@@ -247,7 +247,7 @@ public class Node extends JDialog implements ActionListener
 			node.setNodeContent(args[1]);
 			
 			node.tip1.setText(args[2]);
-			if(!(node.tip1.getText() == null))//I can't get this to detect when the string value is null or "null"
+			if(!(node.tip1.getText().equals("")))//I can't get this to detect when the string value is null or "null"
 			{
 				node.center.add(node.tip1);
 				node.tip1.setVisible(true);
@@ -255,7 +255,7 @@ public class Node extends JDialog implements ActionListener
 			}
 			
 			node.tip2.setText(args[3]);
-			if(!(node.tip2.getText() == null))
+			if(!(node.tip2.getText().equals("")))
 			{
 				node.center.add(node.tip2);
 				node.tip2.setVisible(true);
@@ -263,7 +263,7 @@ public class Node extends JDialog implements ActionListener
 			}
 			
 			node.tip3.setText(args[4]);
-			if(!(node.tip3.getText() == null))
+			if(!(node.tip3.getText().equals("")))
 			{
 				node.center.add(node.tip3);
 				node.tip3.setVisible(true);
@@ -271,7 +271,7 @@ public class Node extends JDialog implements ActionListener
 			}
 			
 			node.tip4.setText(args[5]);
-			if(!(node.tip4.getText() == null))
+			if(!(node.tip4.getText().equals("")))
 			{
 				node.center.add(node.tip4);
 				node.tip4.setVisible(true);
@@ -279,7 +279,7 @@ public class Node extends JDialog implements ActionListener
 			}
 			
 			node.tip5.setText(args[6]);
-			if(!(node.tip5.getText() == null))
+			if(!(node.tip5.getText().equals("")))
 			{
 				node.center.add(node.tip5);
 				node.tip5.setVisible(true);
@@ -287,7 +287,7 @@ public class Node extends JDialog implements ActionListener
 			}
 			
 			node.tip6.setText(args[7]);
-			if(!(node.tip6.getText() == null))
+			if(!(node.tip6.getText().equals("")))
 			{
 				node.center.add(node.tip6);
 				node.tip6.setVisible(true);

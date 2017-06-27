@@ -48,6 +48,9 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 					string6 = null;
 	private Stringable selectedStringable = null;
 	
+	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
+									previousSelectedNode = selectedNode;
+	
 	/*
 	 * menu stuff
 	 */
@@ -212,6 +215,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 					
 						tree.setBorder(pad);
 						tree.setBackground(white);
+						tree.setExpandsSelectedPaths(true);
 						
 				westPad.setBorder(pad);
 				westPad.setBackground(white);
@@ -250,6 +254,11 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 										radio3.setVisible(false);
 										radio4.setVisible(false);
 										
+										radio1.addActionListener(this);
+										radio2.addActionListener(this);
+										radio3.addActionListener(this);
+										radio4.addActionListener(this);
+										
 								centerSouthPane.setBorder(pad);
 								centerSouthPane.setBackground(white);
 								
@@ -261,6 +270,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 									mainTxtArea.setLineWrap(true);
 									mainTxtArea.setEditable(false);
 									mainTxtArea.setBorder(null);
+									mainTxtArea.setColumns(40);
 									
 								centerCenterPane.add(tipArea);
 
@@ -374,7 +384,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 		treeScroll.setMinimumSize(treeScroll.getSize());
 		eastScroll.setMinimumSize(eastScroll.getSize());
 		this.setMinimumSize(this.getSize());
-	}
+	}//end constructor
 	
 
 /*
@@ -398,6 +408,27 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 			e.printStackTrace();
 		}
 		return inTree;
+	}
+	
+	public void invisibleDeselectedButtons()
+	{
+		radio1.setVisible(false);
+		radio2.setVisible(false);
+		radio3.setVisible(false);
+		radio4.setVisible(false);
+		radioButtons.clearSelection();
+		check1.setVisible(false);
+		check1.setSelected(false);
+		check2.setVisible(false);
+		check2.setSelected(false);
+		check3.setVisible(false);
+		check3.setSelected(false);
+		check4.setVisible(false);
+		check4.setSelected(false);
+		check5.setVisible(false);
+		check5.setSelected(false);
+		check6.setVisible(false);
+		check6.setSelected(false);
 	}
 
 
@@ -432,6 +463,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 					+ "\nextensions. (Ex. defaultTree rather than defaultTree.ser)");
 			if(modelString.equals("") || modelString == null)
 			{
+				//I know.
 			}
 			else
 			{
@@ -479,59 +511,149 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 		}
 		else if(source == check1)
 		{
-			if(check1.isSelected())
+			tipTextAreaToggler(check1.isSelected(), 0);
+		}
+		else if(source == check2)
+		{
+			tipTextAreaToggler(check2.isSelected(), 1);
+		}
+		else if(source == check3)
+		{
+			tipTextAreaToggler(check3.isSelected(), 2);
+		}
+		else if(source == check4)
+		{
+			tipTextAreaToggler(check4.isSelected(), 3);
+		}
+		else if(source == check5)
+		{
+			tipTextAreaToggler(check5.isSelected(), 4);
+		}
+		else if(source == check6)
+		{
+			tipTextAreaToggler(check6.isSelected(), 5);
+		}	
+		else 
+		{
+			try
+			{
+				if(source == radio1)//////////////////////////////////////////////////////////////////needs completion
+				{
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
+					TreePath path = new TreePath(child.getPath());
+					tree.setSelectionPath(path);
+					tree.revalidate();
+					tree.repaint();
+				}	
+				else if(source == radio2)
+				{
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(1);
+					TreePath path = new TreePath(child.getPath());
+					tree.setSelectionPath(path);
+					tree.revalidate();
+					tree.repaint();
+					
+				}	
+				else if(source == radio3)
+				{
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(2);
+					TreePath path = new TreePath(child.getPath());
+					tree.setSelectionPath(path);
+					tree.revalidate();
+					tree.repaint();
+					
+				}	
+				else if(source == radio4)
+				{
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(3);
+					TreePath path = new TreePath(child.getPath());
+					tree.setSelectionPath(path);
+					tree.revalidate();
+					tree.repaint();
+					
+				}//end inner source if
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}//end try/catch
+		}//end source if
+	}
+	
+	public void tipTextAreaToggler(boolean selected,int index)
+	{
+		try
+		{
+			if(selected)
 			{
 				lastTxt = tipArea.getText();
-				tipArea.setText(lastTxt + "\n:\n" + selectedStringable.getTips()[0]);
+				tipArea.setText(lastTxt + "\n:\n" + selectedStringable.getTips()[index]);
 				
 				if(!centerCenterPane.isAncestorOf(tipArea))
 					centerCenterPane.add(tipArea);
 			}
 			else
 			{
-				tipArea.setText(tipArea.getText().replace(("\n:\n" + selectedStringable.getTips()[0]), " "));
+				String tat = tipArea.getText();
+				String replacement = tat.replace(("\n:\n" + selectedStringable.getTips()[index]), " ");
+				tipArea.setText(replacement);
+				/*
+				 * The above .replace() method does not function the first time the event calls this method.
+				 * No idea why since it works perfectly every subsequent time. Interestingly, immediately 
+				 * afterwards, the tipArea.setText() doesn't work either. But after that, it's all good.
+				 */
 				if(tipArea.getText().equals(" "))
 					centerCenterPane.remove(tipArea);
 			}
 			centerCenterPane.revalidate();
+			centerCenterPane.repaint();
 		}
-			
-		//end source if
+		catch(NullPointerException npe)
+		{
+			npe.printStackTrace();
+		}
 	}
 	
 	@Override
-	public void valueChanged(TreeSelectionEvent arg0) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-		selectedStringable = (Stringable)node.getUserObject();
+	public void valueChanged(TreeSelectionEvent arg0) 
+	{
+		previousSelectedNode = selectedNode;
+		selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+		selectedStringable = (Stringable)selectedNode.getUserObject();
 		mainTxtArea.setText(selectedStringable.getContent());
 		String[] tips = selectedStringable.getTips();
 		
 		DefaultMutableTreeNode child;
 		Stringable childObject;
 		
-		radio1.setVisible(false);
-		radio2.setVisible(false);
-		radio3.setVisible(false);
-		radio4.setVisible(false);
+		if(!selectedNode.getUserObject().equals(previousSelectedNode.getUserObject()))
+		{
+			invisibleDeselectedButtons();
+			System.out.println("IDR run");
+			tipArea.setText("");
+			centerCenterPane.remove(tipArea);
+			centerCenterPane.revalidate();
+			centerCenterPane.repaint();
+		}
 		
 		try
 		{
-			 child = (DefaultMutableTreeNode)node.getChildAt(0);
+			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
 			 childObject = (Stringable)child.getUserObject();
 			radio1.setText(childObject.toString());
 			radio1.setVisible(true);
 
-			 child = (DefaultMutableTreeNode)node.getChildAt(1);
+			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(1);
 			 childObject = (Stringable)child.getUserObject();
 			radio2.setText(childObject.toString());
 			radio2.setVisible(true);
 
-			 child = (DefaultMutableTreeNode)node.getChildAt(2);
+			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(2);
 			 childObject = (Stringable)child.getUserObject();
 			radio3.setText(childObject.toString());
 			radio3.setVisible(true);
 	
-			 child = (DefaultMutableTreeNode)node.getChildAt(3);
+			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(3);
 			 childObject = (Stringable)child.getUserObject();
 			radio4.setText(childObject.toString());
 			radio4.setVisible(true);
@@ -540,67 +662,47 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 		{
 			;
 		}
+		catch(ArrayIndexOutOfBoundsException aioobe)
+		{
+			;
+		}
 		
 		
 		
 		try {
-			if(tips[0] == null)
-			{
-				check1.setVisible(false);
-			}
-			else
+			if(!tips[0].equals(""))
 			{
 				check1.setVisible(true);
 				check1.setText(tips[0].split(":")[0]);
 			}
 
-			if(tips[1] == null)
-			{
-				check2.setVisible(false);
-			}
-			else
+			if(!tips[1].equals(""))
 			{
 				check2.setVisible(true);
 				check2.setText(tips[1].split(":")[0]);
 			}
 			
 
-			if(tips[2] == null)
-			{
-				check3.setVisible(false);
-			}
-			else
+			if(!tips[2].equals(""))
 			{
 				check3.setVisible(true);
 				check3.setText(tips[2].split(":")[0]);
 			}
 			
-			if(tips[3] == null)
-			{
-				check4.setVisible(false);
-			}
-			else
+			if(!tips[3].equals(""))
 			{
 				check4.setVisible(true);
 				check4.setText(tips[3].split(":")[0]);
 			}
 			
-			if(tips[4] == null)
-			{
-				check5.setVisible(false);
-			}
-			else
+			if(!tips[4].equals(""))
 			{
 				check5.setVisible(true);
 				check5.setText(tips[4].split(":")[0]);
 			}
 			
 
-			if(tips[5] == null)
-			{
-				check6.setVisible(false);
-			}
-			else
+			if(!tips[5].equals(""))
 			{
 				check6.setVisible(true);
 				check6.setText(tips[5].split(":")[0]);
