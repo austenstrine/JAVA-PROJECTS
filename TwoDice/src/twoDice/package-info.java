@@ -1,8 +1,0 @@
-/**
- * 
- */
-/**
- * @author student
- *
- */
-package twoDice;
