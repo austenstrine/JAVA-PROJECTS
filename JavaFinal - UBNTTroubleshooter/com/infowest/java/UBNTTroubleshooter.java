@@ -1,3 +1,19 @@
+/*
+ *    Copyright 2017 Austen Loren Strine
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.infowest.java;
 
 import java.util.*;
@@ -46,7 +62,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 					string4 = null,
 					string5 = null,
 					string6 = null;
-	private Stringable selectedStringable = null;
+	private WISPTNodeObject selectedWTNO = null;
 	
 	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
 									previousSelectedNode = selectedNode;
@@ -174,9 +190,16 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 			northPane.setBackground(white);
 				menu.add(file);
 					file.add(logIn);
+						logIn.addActionListener(this);
+						logIn.setEnabled(false);
 					file.add(logOut);
+						logOut.addActionListener(this);
+						logOut.setEnabled(false);
 					file.add(newUser);
+						newUser.addActionListener(this);
+						newUser.setEnabled(false);
 					file.add(exit);
+						exit.addActionListener(this);
 				menu.add(edit);
 					edit.add(toggle);
 						toggle.add(tTips);
@@ -190,11 +213,21 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 					loadTree.addActionListener(this);
 				menu.add(navigate);
 					navigate.add(previous);
+						previous.addActionListener(this);
+						previous.setEnabled(false);
 					navigate.add(next);
+						next.addActionListener(this);
+						next.setEnabled(false);
 					navigate.add(history);
+						history.addActionListener(this);
+						history.setEnabled(false);
 				menu.add(userPrefs);
 					userPrefs.add(setStartup);
+						setStartup.addActionListener(this);
+						setStartup.setEnabled(false);
 					userPrefs.add(editName);
+						editName.addActionListener(this);
+						editName.setEnabled(false);
 					
 		/*
 		 * TREE/WEST+CENTER_EAST	
@@ -587,7 +620,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 			if(selected)
 			{
 				lastTxt = tipArea.getText();
-				tipArea.setText(lastTxt + "\n:\n" + selectedStringable.getTips()[index]);
+				tipArea.setText(lastTxt + "\n:\n" + selectedWTNO.getTips()[index]);
 				
 				if(!centerCenterPane.isAncestorOf(tipArea))
 					centerCenterPane.add(tipArea);
@@ -595,7 +628,7 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 			else
 			{
 				String tat = tipArea.getText();
-				String replacement = tat.replace(("\n:\n" + selectedStringable.getTips()[index]), " ");
+				String replacement = tat.replace(("\n:\n" + selectedWTNO.getTips()[index]), " ");
 				tipArea.setText(replacement);
 				/*
 				 * The above .replace() method does not function the first time the event calls this method.
@@ -619,12 +652,16 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 	{
 		previousSelectedNode = selectedNode;
 		selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-		selectedStringable = (Stringable)selectedNode.getUserObject();
-		mainTxtArea.setText(selectedStringable.getContent());
-		String[] tips = selectedStringable.getTips();
+		selectedWTNO = (WISPTNodeObject)selectedNode.getUserObject();
+		if(selectedNode.getChildCount() <= 0)
+		{
+			//check to see if all the descendent leaves are "invisible". If not, start checking leaf parents for visibility. If so, check if those are a parent of those leaves. If not, do nothing. If so,
+		}
+		mainTxtArea.setText(selectedWTNO.getContent());
+		String[] tips = selectedWTNO.getTips();
 		
 		DefaultMutableTreeNode child;
-		Stringable childObject;
+		WISPTNodeObject childObject;
 		
 		if(!selectedNode.getUserObject().equals(previousSelectedNode.getUserObject()))
 		{
@@ -639,22 +676,22 @@ public class UBNTTroubleshooter extends JFrame implements TreeSelectionListener,
 		try
 		{
 			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
-			 childObject = (Stringable)child.getUserObject();
+			 childObject = (WISPTNodeObject)child.getUserObject();
 			radio1.setText(childObject.toString());
 			radio1.setVisible(true);
 
 			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(1);
-			 childObject = (Stringable)child.getUserObject();
+			 childObject = (WISPTNodeObject)child.getUserObject();
 			radio2.setText(childObject.toString());
 			radio2.setVisible(true);
 
 			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(2);
-			 childObject = (Stringable)child.getUserObject();
+			 childObject = (WISPTNodeObject)child.getUserObject();
 			radio3.setText(childObject.toString());
 			radio3.setVisible(true);
 	
 			 child = (DefaultMutableTreeNode)selectedNode.getChildAt(3);
-			 childObject = (Stringable)child.getUserObject();
+			 childObject = (WISPTNodeObject)child.getUserObject();
 			radio4.setText(childObject.toString());
 			radio4.setVisible(true);
 		}

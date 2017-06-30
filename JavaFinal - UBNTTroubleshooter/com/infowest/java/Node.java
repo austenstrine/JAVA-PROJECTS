@@ -1,3 +1,19 @@
+/*
+ *    Copyright 2017 Austen Loren Strine
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.infowest.java;
 
 import java.awt.event.*;
@@ -172,7 +188,7 @@ public class Node extends JDialog implements ActionListener
 		Object source = e.getSource();
 		if(source == acceptChanges)
 		{
-			Stringable stringable = new Stringable(titleTxt.getText(), contentTxt.getText());
+			WISPTNodeObject stringable = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
 			String[] stringTips = {"","","","","",""};
 			if(tip1.isVisible())
 				stringTips[0] = tip1.getText();

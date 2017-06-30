@@ -1,5 +1,17 @@
 /*
- * this class should allow users to 
+ *    Copyright 2017 Austen Loren Strine
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 
@@ -43,7 +55,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			allButtons = new JPanel(new BorderLayout());
 	JScrollPane treeScroll,
 				buttonsScroll = new JScrollPane(allButtons);
-	DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(new Stringable("root", "root")),
+	DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(new WISPTNodeObject("root", "root")),
 						root,
 						asideNode;
 	DefaultTreeModel model;
@@ -77,7 +89,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			e.printStackTrace();
 		}
 		this.setIconImages(icons);
-		root = new DefaultMutableTreeNode(new Stringable("root", "root"));
+		root = new DefaultMutableTreeNode(new WISPTNodeObject("root", "root"));
 		tree = new JTree(root);
 		model = (DefaultTreeModel) tree.getModel();
 		treeScroll = new JScrollPane(tree);
@@ -125,7 +137,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		Object source = e.getSource();
 		
 		int answer = 1;
-		Stringable nodeS = new Stringable("", "");
+		WISPTNodeObject nodeS = new WISPTNodeObject("", "");
 		if(source == saveTreeBtn)
 		{
 			treeSaveName = JOptionPane.showInputDialog(null, 
@@ -150,7 +162,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			try
 			{
 				selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-				nodeS = (Stringable)selectedNode.getUserObject();
+				nodeS = (WISPTNodeObject)selectedNode.getUserObject();
 			}
 			catch(NullPointerException npe)
 			{
@@ -194,19 +206,18 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		}//end save if
 	}//end actionPerformed
 	
-	public void getNode(Stringable s)
+	public void getNode(WISPTNodeObject s)
 	{
 		String[] nodeStrings = new String[8];
 		try
 		{
 			nodeStrings[0] = s.toString();
 			nodeStrings[1] = s.getContent();
-			nodeStrings[2] = s.getTip(0);
-			nodeStrings[3] = s.getTip(1);
-			nodeStrings[4] = s.getTip(2);
-			nodeStrings[5] = s.getTip(3);
-			nodeStrings[6] = s.getTip(4);
-			nodeStrings[7] = s.getTip(5);
+			String[] tipsArr = s.getTips();
+			for(int i = 0; i < tipsArr.length; ++i)
+			{
+				nodeStrings[i+2] = tipsArr[i];
+			}
 		}
 		catch(NullPointerException npe)
 		{
@@ -242,8 +253,8 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	}
 	public void exeEdit()
 	{
-		Stringable s = (Stringable)asideNode.getUserObject();
-		selectedNode.setUserObject(s);
+		WISPTNodeObject wtno = (WISPTNodeObject)asideNode.getUserObject();
+		selectedNode.setUserObject(wtno);
 		model.nodeChanged(selectedNode);
 	}
 	
