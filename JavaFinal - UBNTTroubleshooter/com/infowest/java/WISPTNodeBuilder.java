@@ -28,7 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Node extends JDialog implements ActionListener
+public class WISPTNodeBuilder extends JDialog implements ActionListener
 {
 	/**
 	 * 
@@ -61,7 +61,7 @@ public class Node extends JDialog implements ActionListener
 	private int switcher = 0;
 	
 	
-	public Node()
+	public WISPTNodeBuilder()
 	{
 		super();
 		Dimension d = new Dimension(800,400);
@@ -254,7 +254,7 @@ public class Node extends JDialog implements ActionListener
 
 	public static void main(String[] args) 
 	{
-		Node node = new Node();
+		WISPTNodeBuilder node = new WISPTNodeBuilder();
 		node.setModalityType(ModalityType.APPLICATION_MODAL);
 		System.out.println(java.util.Arrays.toString(args));
 		try 

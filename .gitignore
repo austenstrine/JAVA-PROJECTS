@@ -20,3 +20,5 @@ Aliens2/.metadata/.plugins/org.eclipse.jdt.core/externalFilesCache
 Aliens2/.metadata/.plugins/org.eclipse.jdt.core/assumedExternalFilesCache
 *.ini
 *.MF
+*.gen
+.metadata/.plugins/org.eclipse.epp.logging.aeri.ide/org.eclipse.epp.logging.aeri.ide.server/local-history/_0.tis

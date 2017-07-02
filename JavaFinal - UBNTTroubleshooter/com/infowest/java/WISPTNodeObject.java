@@ -28,21 +28,22 @@ public class WISPTNodeObject implements Serializable
 	private static final long 
 		serialVersionUID = -9875955166960066L;
 	
+	private static int
+	timesUserPassUsed = 0,
+	userMax = 5;
+	
+	private static String	
+	userPass = "password",
+	adminPass = "WISPadmin",
+	invisibleString = "";
+	
 	private String 
 		titleString = "Seed",
 		contentString = "Seed",
 		visibleString = "";
-	private static String	
-		userPass = "password",
-		adminPass = "WISPadmin",
-		invisibleString = "";
 	
 	private int 
 		counter = 0;
-	
-	private static int
-		timesUserPassUsed = 0,
-		userMax = 5;
 
 	private String[] 
 		tips = {null,null,null,null,null,null};
@@ -79,6 +80,11 @@ public class WISPTNodeObject implements Serializable
 	{
 		invisibleString = newInvisibleString;
 	}
+	public String
+	getInvisibleString()
+	{
+		return invisibleString;
+	}
 	
 	/*
 	 * Setters
@@ -105,12 +111,12 @@ public class WISPTNodeObject implements Serializable
 	{
 		++counter;
 	}
-	public void 
+	public static void 
 	setTimesUserPassUsed(int newTimesUserPassUsed)
 	{
 		timesUserPassUsed = newTimesUserPassUsed;
 	}
-	public void 
+	public static void 
 	setTimesUserPassUsed()
 	{
 		++timesUserPassUsed;
@@ -189,18 +195,37 @@ public class WISPTNodeObject implements Serializable
 	public void unlockNode()
 	{
 		String attempt = JOptionPane.showInputDialog("Please enter the unlock password:");
-		setContentVisible(true);
+		if(attempt == null)
+		{
+			attempt = "null";
+		}
 		if(attempt.equals(userPass))
 		{
-			setTimesUserPassUsed();
+			if(timesUserPassUsed < userMax)
+			{
+				setTimesUserPassUsed();
+				setContentVisible(true);
+				setCounter(-1);
+				System.out.println("Unlocked: content is " + contentString + "!");
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "You have exceeded the number of times you may use your User Password("+userMax+"). "
+						+ "\nPlease contact your superior to unlock with the Administrative Password.");
+				System.out.println("Locked: content is " + contentString + "!");
+			}
 		}
 		else if(attempt.equals(adminPass))
 		{
-			;
+			setContentVisible(true);
+			setCounter(-1);
+			System.out.println("Unlocked: content is " + contentString + "!");
 		}
 		else
 		{
 			setContentVisible(false);
+			JOptionPane.showMessageDialog(null, "Password Incorrect!");
+			System.out.println("Locked: content is " + contentString + "!");
 		}
 	}
 	
