@@ -29,6 +29,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class WISPTNodeBuilder extends JDialog implements ActionListener
+
 {
 	/**
 	 * 
@@ -59,8 +60,7 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 			southScroll;
 	JTextArea[] tips = {null,null,null,null,null,null};
 	private int switcher = 0;
-	
-	
+
 	public WISPTNodeBuilder()
 	{
 		super();

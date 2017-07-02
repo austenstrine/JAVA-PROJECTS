@@ -27,7 +27,6 @@ public class WISPTNodeObject implements Serializable
 	 */
 	private static final long 
 		serialVersionUID = -9875955166960066L;
-	
 	private static int
 	timesUserPassUsed = 0,
 	userMax = 5;
@@ -36,7 +35,6 @@ public class WISPTNodeObject implements Serializable
 	userPass = "password",
 	adminPass = "WISPadmin",
 	invisibleString = "";
-	
 	private String 
 		titleString = "Seed",
 		contentString = "Seed",
@@ -220,6 +218,7 @@ public class WISPTNodeObject implements Serializable
 			setContentVisible(true);
 			setCounter(-1);
 			System.out.println("Unlocked: content is " + contentString + "!");
+
 		}
 		else
 		{
