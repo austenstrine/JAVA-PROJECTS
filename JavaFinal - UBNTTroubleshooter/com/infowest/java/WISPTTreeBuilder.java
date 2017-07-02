@@ -27,14 +27,10 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import java.util.*;
-import java.util.List;
+//import java.util.List;
 import java.io.*;
 
-enum TreeType{
-BRANCH, LEAF
-}
-
-public class TreeBuilder extends JFrame implements TreeSelectionListener, ActionListener {
+public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, ActionListener {
 	
 	/**
 	 * 
@@ -44,31 +40,30 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 	ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	JTree tree;
 	String treeSaveName = "name";
-	JButton newNodeBtn = new JButton("New Branch/Leaf"),
-			editNodeBtn = new JButton("Edit Branch/Leaf"),
-			deleteNodeBtn = new JButton("Delete Branch/Leaf"),
-			saveTreeBtn = new JButton("Save Tree"),
-			moveUpBtn = new JButton("\u2191"),
-			moveDownBtn = new JButton("\u2193"),
-			loadTree = new JButton("Load Saved tree");
-	JPanel buttons = new JPanel(new GridLayout(1,3)),
-			allButtons = new JPanel(new BorderLayout());
+	JButton newNodeBtn,
+			editNodeBtn,
+			deleteNodeBtn,
+			saveTreeBtn,
+			moveUpBtn,
+			moveDownBtn,
+			loadTree;
+	JPanel contentPane,
+				allButtons,
+					upDownPane,
+					buttons;
 	JScrollPane treeScroll,
-				buttonsScroll = new JScrollPane(allButtons);
+				buttonsScroll;
 	DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(new WISPTNodeObject("root", "root")),
 						root,
 						asideNode;
 	DefaultTreeModel model;
 	
-	public TreeBuilder()
+	public WISPTTreeBuilder()
 	{
 		super("Tree Builder");
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setVisible(true);
-		JFrame.setDefaultLookAndFeelDecorated(false);
-		Dimension d = new Dimension(800,400);
-		this.getContentPane().setPreferredSize(d);
-		
 		try
 		{
 			File img = new File("wisp-t 20.png");
@@ -83,44 +78,79 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 			img = new File("wisp-t 750.png");
 			bufferedImage = ImageIO.read(img);
 			icons.add(bufferedImage);
+			this.setIconImages(icons);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		this.setIconImages(icons);
-		root = new DefaultMutableTreeNode(new WISPTNodeObject("root", "root"));
-		tree = new JTree(root);
-		model = (DefaultTreeModel) tree.getModel();
-		treeScroll = new JScrollPane(tree);
-		this.getContentPane().setLayout(new BorderLayout());
-		this.getContentPane().add(treeScroll, BorderLayout.CENTER);
-		newNodeBtn.addActionListener(this);
-		editNodeBtn.addActionListener(this);
-		deleteNodeBtn.addActionListener(this);
-		saveTreeBtn.addActionListener(this);
-		buttons.add(newNodeBtn);
-		buttons.add(editNodeBtn);
-		buttons.add(deleteNodeBtn);
-		allButtons.add(buttons, BorderLayout.NORTH);
-		allButtons.add(saveTreeBtn, BorderLayout.SOUTH);
-		JPanel upDownPane = new JPanel(new GridLayout(1,6));
-		allButtons.add(upDownPane, BorderLayout.CENTER);
-		upDownPane.add(new JPanel());
-		upDownPane.add(new JPanel());
-		upDownPane.add(moveUpBtn);
-		upDownPane.add(moveDownBtn);
-		upDownPane.add(new JPanel());
-		upDownPane.add(loadTree);
-		loadTree.addActionListener(this);
-		this.getContentPane().add(buttonsScroll, BorderLayout.SOUTH);
+		
+		
+			contentPane = new JPanel(new BorderLayout());
+		this.setContentPane(contentPane);
+			contentPane.setPreferredSize(new Dimension(800,400));
+		
+						root = new DefaultMutableTreeNode(new WISPTNodeObject("root", "root"));
+					tree = new JTree(root);
+					model = (DefaultTreeModel) tree.getModel();
+				treeScroll = new JScrollPane(tree);
+			contentPane.add(treeScroll, BorderLayout.CENTER);
+				
+						
+					allButtons = new JPanel(new BorderLayout());
+				buttonsScroll = new JScrollPane(allButtons);
+			contentPane.add(buttonsScroll, BorderLayout.SOUTH);
+					
+						buttons = new JPanel(new GridLayout(1,3));
+					allButtons.add(buttons, BorderLayout.NORTH);
+					
+							newNodeBtn = new JButton("New Branch/Leaf");
+						buttons.add(newNodeBtn);
+							newNodeBtn.addActionListener(this);
+							
+							editNodeBtn = new JButton("Edit Branch/Leaf");
+						buttons.add(editNodeBtn);
+							editNodeBtn.addActionListener(this);
+							
+							deleteNodeBtn = new JButton("Delete Branch/Leaf");
+						buttons.add(deleteNodeBtn);
+							deleteNodeBtn.addActionListener(this);
+						
+					
+						upDownPane = new JPanel(new GridLayout(1,6));
+					allButtons.add(upDownPane, BorderLayout.CENTER);
+						upDownPane.add(new JPanel());
+						upDownPane.add(new JPanel());
+						
+							moveUpBtn = new JButton("\u2191");
+						upDownPane.add(moveUpBtn);
+						
+							moveDownBtn = new JButton("\u2193");
+						upDownPane.add(moveDownBtn);
+						
+						upDownPane.add(new JPanel());
+						
+							loadTree = new JButton("Load Saved tree");
+						upDownPane.add(loadTree);
+							loadTree.addActionListener(this);
+					
+						saveTreeBtn = new JButton("Save Tree");
+					allButtons.add(saveTreeBtn, BorderLayout.SOUTH);
+						saveTreeBtn.addActionListener(this);
+			
+			
+			
+			
+			
+
+			
 		this.getContentPane().setVisible(true);
 		pack();	
 		//loadTree("defaultTree");
 	}
 
 	public static void main(String[] args) {
-		TreeBuilder tWindow = new TreeBuilder();
+		WISPTTreeBuilder tWindow = new WISPTTreeBuilder();
 		tWindow.setVisible(true);
 
 	}
@@ -223,7 +253,7 @@ public class TreeBuilder extends JFrame implements TreeSelectionListener, Action
 		{
 			;
 		}
-		Node.main(nodeStrings);
+		WISPTNodeBuilder.main(nodeStrings);
 		asideNode = null;
 		
 		try {
