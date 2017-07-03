@@ -61,9 +61,8 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 	public WISPTTreeBuilder()
 	{
 		super("Tree Builder");
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.setVisible(true);
 		try
 		{
 			File img = new File("wisp-t 20.png");
@@ -137,14 +136,7 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 						saveTreeBtn = new JButton("Save Tree");
 					allButtons.add(saveTreeBtn, BorderLayout.SOUTH);
 						saveTreeBtn.addActionListener(this);
-			
-			
-			
-			
-			
-
-			
-		this.getContentPane().setVisible(true);
+			contentPane.setVisible(true);
 		pack();	
 		//loadTree("defaultTree");
 	}

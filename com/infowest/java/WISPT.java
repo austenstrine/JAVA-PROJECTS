@@ -186,7 +186,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("WISP-T \u00A9 2017");
 		this.setContentPane(contentPane);
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(false);
 		
 		contentPane.addComponentListener(this);
 		
@@ -259,6 +259,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 						tree.setBorder(pad);
 						tree.setBackground(white);
 						tree.setExpandsSelectedPaths(true);
+						tree.setEnabled(false);
 						
 				westPad.setBorder(pad);
 				westPad.setBackground(white);
@@ -339,53 +340,53 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 				centerEastSplit.setBorder(null);
 				centerEastSplit.setBackground(white);
 				
-		westCenterEastSplit.setBorder(null);
-		westCenterEastSplit.setBackground(white);
+			westCenterEastSplit.setBorder(null);
+			westCenterEastSplit.setBackground(white);
 						
 		
 		/*
 		 * TIPS/EAST
-		 */
-					eastPane = new JPanel(new GridLayout(6,1));
-				eastScroll = new JScrollPane(eastPane);
-			eastPad.add(eastScroll);
-			
-					eastPane.add(check1);
-					eastPane.add(check2);
-					eastPane.add(check3);
-					eastPane.add(check4);
-					eastPane.add(check5);
-					eastPane.add(check6);
+				 */
+							eastPane = new JPanel(new GridLayout(6,1));
+						eastScroll = new JScrollPane(eastPane);
+					eastPad.add(eastScroll);
 					
-						check1.setVisible(true);
-						check2.setVisible(false);
-						check3.setVisible(false);
-						check4.setVisible(false);
-						check5.setVisible(false);
-						check6.setVisible(false);
+							eastPane.add(check1);
+							eastPane.add(check2);
+							eastPane.add(check3);
+							eastPane.add(check4);
+							eastPane.add(check5);
+							eastPane.add(check6);
+							
+								check1.setVisible(true);
+								check2.setVisible(false);
+								check3.setVisible(false);
+								check4.setVisible(false);
+								check5.setVisible(false);
+								check6.setVisible(false);
+								
+								check1.addActionListener(this);
+								check2.addActionListener(this);
+								check3.addActionListener(this);
+								check4.addActionListener(this);
+								check5.addActionListener(this);
+								check6.addActionListener(this);
+								
+								check1.setBackground(white);
+								check2.setBackground(white);
+								check3.setBackground(white);
+								check4.setBackground(white);
+								check5.setBackground(white);
+								check6.setBackground(white);
+								
+							eastPane.setBorder(pad);
+							eastPane.setBackground(white);
+							
+						eastScroll.setBorder(bevel);
+						eastScroll.setBackground(white);
 						
-						check1.addActionListener(this);
-						check2.addActionListener(this);
-						check3.addActionListener(this);
-						check4.addActionListener(this);
-						check5.addActionListener(this);
-						check6.addActionListener(this);
-						
-						check1.setBackground(white);
-						check2.setBackground(white);
-						check3.setBackground(white);
-						check4.setBackground(white);
-						check5.setBackground(white);
-						check6.setBackground(white);
-						
-					eastPane.setBorder(pad);
-					eastPane.setBackground(white);
-					
-				eastScroll.setBorder(bevel);
-				eastScroll.setBackground(white);
-				
-			eastPad.setBorder(pad);
-			eastPad.setBackground(white);
+					eastPad.setBorder(pad);
+					eastPad.setBackground(white);
 			
 		/*
 		 * CONSOLE/SOUTH
@@ -423,11 +424,15 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 							userLabel.setVisible(true);
 			
 		pack();
+		centerSouthPane.setSize(centerSouthPane.getWidth(), centerSouthPane.getHeight()*2);
+		centerSouthPane.setPreferredSize(centerSouthPane.getSize());
 		centerBevel.setMinimumSize(centerBevel.getSize());//this used to be a JScrollPane, but I needed it to shrink so I changed it to a JPanel
 		treeScroll.setMinimumSize(treeScroll.getSize());
 		eastScroll.setMinimumSize(eastScroll.getSize());
 		this.setMinimumSize(this.getSize());
 		this.setSize(800, 400);
+		check1.setVisible(false);
+		radio1.setVisible(false);
 	}//end constructor
 	
 
@@ -561,12 +566,21 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 	actionPerformed(ActionEvent e) 
 	{
 		Object source = e.getSource();
-		String sourceString = source.toString();
-		String[] sourceArray = sourceString.split(",");
-		sourceString = sourceArray[sourceArray.length-1];
-		sourceString = sourceString.replaceFirst("text=", "");
-		sourceString = sourceString.replaceFirst("]", "");
-		System.out.println(sourceString);
+		/*
+			String sourceString = source.toString();
+			String[] sourceArray = sourceString.split(",");
+			sourceString = sourceArray[sourceArray.length-1];
+			sourceString = sourceString.replaceAll("\u2610 ", "");
+			sourceString = sourceString.replaceAll("\u2611 ", "");
+			sourceString = sourceString.replaceFirst("text=", "");
+			sourceString = sourceString.replaceFirst("]", "");
+			System.out.println(sourceString);
+			
+			Here I was wanting to convert the object to something that a switch
+			statement could process (like an enum) but I realized there was no way
+			to convert the variable names for the radio buttons and tool tips into
+			a string with which to define an enum.
+		*/
 		try
 		{
 			if(source == openTreeBuilder)
@@ -579,6 +593,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 				tree.setModel(model);
 				tree.addTreeSelectionListener(this);
 				tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+				tree.setEnabled(true);
 				treeScroll.repaint();
 				tree.repaint();
 	
