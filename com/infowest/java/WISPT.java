@@ -33,7 +33,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.*;
 
-public class WISPT extends JFrame implements TreeSelectionListener, ActionListener, ComponentListener//, MouseListener 
+public class WISPT extends JFrame implements TreeSelectionListener, ActionListener//, ComponentListener, MouseListener 
 {
 
 /*
@@ -46,16 +46,17 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 			nineGray =  new Color(0.9f, 0.9f, 0.9f),
 			eightGray =  new Color(0.8f, 0.8f, 0.8f),
 			sevenGray =  new Color(0.7f, 0.7f, 0.7f),
-			sixGray =  new Color(0.6f, 0.6f, 0.6f)//,
-			//fiveGray =  new Color(0.5f, 0.5f, 0.5f),
-			//fourGray =  new Color(0.4f, 0.4f, 0.4f),
-			//threeGray =  new Color(0.3f, 0.3f, 0.3f),
-			//twoGray =  new Color(0.2f, 0.2f, 0.2f),
-			//oneGray =  new Color(0.1f, 0.1f, 0.1f),
-			//black =  new Color(0f, 0f, 0f)
+			sixGray =  new Color(0.6f, 0.6f, 0.6f),
+			fiveGray =  new Color(0.5f, 0.5f, 0.5f)/*,
+			fourGray =  new Color(0.4f, 0.4f, 0.4f),
+			threeGray =  new Color(0.3f, 0.3f, 0.3f),
+			twoGray =  new Color(0.2f, 0.2f, 0.2f),
+			oneGray =  new Color(0.1f, 0.1f, 0.1f),
+			black =  new Color(0f, 0f, 0f)*/
 			;
 	
-	private Border bevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
+	private Border bevelUp = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
+			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3);
 	
 	private String	username = "User",
@@ -67,10 +68,6 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 					//string5 = null,
 					//string6 = null
 					;
-	private WISPTNodeObject selectedWTNO = null;
-	
-	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
-									previousSelectedNode = selectedNode;
 	
 	/*
 	 * menu stuff
@@ -106,6 +103,13 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 	/*
 	 * end menu stuff
 	 */
+
+	private WISPTNodeObject selectedWTNO = null;
+	
+	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
+									previousSelectedNode = selectedNode;
+	
+	private JDialog setStartupDialog;
 	
 	private JPanel contentPane = new JPanel(new BorderLayout()),
 					northPane = new JPanel(new GridLayout(1,1)),
@@ -188,57 +192,85 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 		this.setContentPane(contentPane);
 		JFrame.setDefaultLookAndFeelDecorated(false);
 		
-		contentPane.addComponentListener(this);
+		//contentPane.addComponentListener(this);
 		
 		/*
 		 * MENU/NORTH
 		 */
 		contentPane.add(northPane, BorderLayout.NORTH);
 			northPane.add(menu);
-			northPane.setBackground(white);
+			
 				menu.add(file);
+				
 					file.add(loadTree);
 						loadTree.addActionListener(this);
+						
 					file.add(logIn);
 						logIn.addActionListener(this);
 						logIn.setEnabled(false);
+						
 					file.add(logOut);
 						logOut.addActionListener(this);
 						logOut.setEnabled(false);
+						
 					file.add(newUser);
 						newUser.addActionListener(this);
 						newUser.setEnabled(false);
+						
 					file.add(exit);
 						exit.addActionListener(this);
+						
 				menu.add(edit);
+				
 					edit.add(toggle);
+					
 						toggle.add(tTips);
 							tTips.addActionListener(this);
+							
 						toggle.add(tNavTree);
 							tNavTree.addActionListener(this);
+							
 					edit.addSeparator();
+					
 					edit.add(openTreeBuilder);
 						openTreeBuilder.addActionListener(this);
+						
 					edit.add(unlockTreeNode);
 						unlockTreeNode.addActionListener(this);
+						
 				menu.add(navigate);
+				
 					navigate.add(previous);
+					
 						previous.addActionListener(this);
 						previous.setEnabled(false);
+						
 					navigate.add(next);
 						next.addActionListener(this);
 						next.setEnabled(false);
+						
 					navigate.add(history);
 						history.addActionListener(this);
 						history.setEnabled(false);
+						
 				menu.add(userPrefs);
+				
 					userPrefs.add(setStartup);
 						setStartup.addActionListener(this);
-						setStartup.setEnabled(false);
+						setStartup.setEnabled(true);
+							setStartupDialog = new JDialog(this, "Set Startup Options");
+							setStartupDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+							setStartupDialog.setVisible(false);
+							
 					userPrefs.add(editName);
 						editName.addActionListener(this);
 						editName.setEnabled(false);
-					
+				
+				menu.setBackground(white);
+				menu.setBorder(bevelUp);
+
+			northPane.setBackground(white);	
+			northPane.setBorder(pad);
 		/*
 		 * TREE/WEST+CENTER_EAST	
 		 */
@@ -253,7 +285,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 					treeScroll = new JScrollPane(tree);
 				westPad.add(treeScroll);
 				
-					treeScroll.setBorder(bevel);
+					treeScroll.setBorder(bevelUp);
 					treeScroll.setBackground(white);
 					
 						tree.setBorder(pad);
@@ -324,14 +356,14 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 								
 								centerCenterPane.remove(tipArea);	
 									
-								centerCenterPane.addComponentListener(this);
+								//centerCenterPane.addComponentListener(this);
 								centerCenterPane.setBorder(pad);
 								centerCenterPane.setBackground(white);
 								
 							centerPane.setBorder(pad);
 							centerPane.setBackground(white);
 							
-						centerBevel.setBorder(bevel);
+						centerBevel.setBorder(bevelUp);
 						centerBevel.setBackground(white);
 						
 					centerPad.setBorder(pad);
@@ -382,7 +414,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 							eastPane.setBorder(pad);
 							eastPane.setBackground(white);
 							
-						eastScroll.setBorder(bevel);
+						eastScroll.setBorder(bevelUp);
 						eastScroll.setBackground(white);
 						
 					eastPad.setBorder(pad);
@@ -413,14 +445,15 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 					consoleMsgs.setBorder(null);
 					consoleMsgs.setBackground(white);
 					
-				southPane.setBorder(bevel);
+				southPane.setBorder(bevelUp);
 				southPane.setBackground(white);
 
 			southPadPane.setBorder(pad);
 			southPadPane.setBackground(white);
 			
-		contentPane.setBorder(pad);
+		contentPane.setBorder(bevel);
 		contentPane.setBackground(white);
+		this.setBackground(white);
 							userLabel.setVisible(true);
 			
 		pack();
@@ -665,6 +698,10 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 				tree.revalidate();
 				tree.repaint();
 			}
+			else if(source == setStartup)
+			{
+				setStartupDialog.setVisible(true);
+			}
 			else if(source == radio1)
 			{
 				DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
@@ -881,7 +918,7 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 		}
 	}
 
-
+/*
 	@Override
 	public void componentResized(ComponentEvent e) {
 		//Object source = e.getSource();
@@ -908,6 +945,6 @@ public class WISPT extends JFrame implements TreeSelectionListener, ActionListen
 	public void componentHidden(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		
-	}
+	}*/
 
 }
