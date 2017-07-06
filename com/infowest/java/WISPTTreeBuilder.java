@@ -255,13 +255,10 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 			in.close();
 			fileIn.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println(asideNode.getUserObject().toString());
@@ -306,13 +303,10 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 			in.close();
 			fileIn.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
