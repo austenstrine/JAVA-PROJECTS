@@ -68,7 +68,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 					//string5 = null,
 					//string6 = null
 					;
-	private boolean processingOn = false;
 	
 	private WISPTNodeObject selectedWTNO = null;
 	
@@ -81,9 +80,12 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 							changeAdminPassword,
 							changeInvisibleString;
 		
-		private String userPassword,
-						adminPassword,
-						invisibleString;
+		private JSpinner userUnlocksSpinner;
+		
+		private JCheckBox trainingModeCheckBox;
+		
+		private Boolean trainingModeOn = false,
+						processingOn = false;
 	
 		private JPanel settingsContentPane,
 						adminTab,
@@ -443,12 +445,16 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 											 */
 										adminTab.add(adminSettings);
 										// TODO Finish settings
-												adminSettingsCenter = new JPanel(new FlowLayout());
+												adminSettingsCenter = new JPanel();
 											adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
 											
+												adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
 													processingOnCheck = new JCheckBox("Detailed Process Tooltips");
 												adminSettingsCenter.add(processingOnCheck);
 													processingOnCheck.setSelected(false);
+													
+													trainingModeCheckBox = new JCheckBox("Toggle Training Mode");
+												adminSettingsCenter.add(trainingModeCheckBox);
 													
 													changeUserPassword = new JTextArea("password");
 												adminSettingsCenter.add(changeUserPassword);
@@ -458,6 +464,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 												
 													changeInvisibleString = new JTextArea("This Branch/Leaf has been locked!");
 												adminSettingsCenter.add(changeInvisibleString);
+												
+													userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
+												adminSettingsCenter.add(userUnlocksSpinner);
 												
 												adminSettingsSouth = new JPanel(new GridLayout(2,1));
 											adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
@@ -472,13 +481,19 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 																actionPerformed(ActionEvent e)
 																{
 																	processingOn = processingOnCheck.isSelected();
-																	userPassword = changeUserPassword.getText();
-																	adminPassword = changeAdminPassword.getText();
+																	trainingModeOn = trainingModeCheckBox.isSelected();
+																	WISPTNodeObject.setUserPass(changeUserPassword.getText());
+																	WISPTNodeObject.setAdminPass(changeAdminPassword.getText());;
+																	WISPTNodeObject.setInvisibleString(changeInvisibleString.getText());
+																	WISPTNodeObject.setUserMax((int)userUnlocksSpinner.getValue());
+																	processingLabel.setText(userUnlocksSpinner.getValue().toString());
 																	
 																	startupSettingsDialog.setVisible(false);
 																}//end actionPerformed
 															}//end ActionListener
-														);//actionListener added
+														);//actionListener added'
+													cancel = new JButton("Cancel");
+												adminSettingsSouth.add(cancel);
 											
 										userTab = new JPanel(new GridLayout(1,1));
 									settingsCenterTabbedPane.add("User Preferences", userTab);
@@ -1167,15 +1182,18 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	incrementCounter()
 	{
-		if(selectedWTNO.getCounter()<selectedWTNO.getUserMax())
+		if(trainingModeOn)
 		{
-			selectedWTNO.setCounter();
-		}
-		else
-		{
-			selectedWTNO.setContentVisible(false);
-			selectedNode.setUserObject(selectedWTNO);
-		}
+			if(selectedWTNO.getCounter()<WISPTNodeObject.getUserMax())
+			{
+				selectedWTNO.setCounter();
+			}
+			else
+			{
+				selectedWTNO.setContentVisible(false);
+				selectedNode.setUserObject(selectedWTNO);
+			}//end counter or hide if
+		}//end training mode if
 	}
 	
 
