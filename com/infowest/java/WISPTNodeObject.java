@@ -28,13 +28,15 @@ public class WISPTNodeObject implements Serializable
 	private static final long 
 		serialVersionUID = -9875955166960066L;
 	private static int
-	timesUserPassUsed = 0,
-	userMax = 5;
+		timesUserPassUsed = 0,
+		userMax = 5;
 	
 	private static String	
-	userPass = "password",
-	adminPass = "WISPadmin",
-	invisibleString = "";
+		userPass = "password",
+		adminPass = "WISPadmin",
+		invisibleString = "";
+	
+	
 	private String 
 		titleString = "Seed",
 		contentString = "Seed",
@@ -73,7 +75,7 @@ public class WISPTNodeObject implements Serializable
 			contentString = invisibleString;
 		}
 	}
-	public void
+	public static void
 	setInvisibleString(String newInvisibleString)
 	{
 		invisibleString = newInvisibleString;
@@ -88,7 +90,7 @@ public class WISPTNodeObject implements Serializable
 	 * Setters
 	 */
 
-	public void 
+	public static void 
 	setAdminPass(String newAdminPass)
 	{
 		adminPass = newAdminPass;
@@ -134,12 +136,12 @@ public class WISPTNodeObject implements Serializable
 	{
 		titleString = newTitle;
 	}
-	public void 
+	public static void 
 	setUserMax(int newUserMax)
 	{
 		userMax = newUserMax;
 	}
-	public void 
+	public static void 
 	setUserPass(String newUserPass)
 	{
 		userPass = newUserPass;
@@ -149,7 +151,7 @@ public class WISPTNodeObject implements Serializable
 	 * Getters
 	 */
 	
-	public String 
+	public static String 
 	getAdminPass()
 	{
 		return adminPass;
@@ -174,17 +176,17 @@ public class WISPTNodeObject implements Serializable
 	{
 		return tips;
 	}
-	public int 
+	public static int 
 	getTimesUserPassUsed()
 	{
 		return timesUserPassUsed;
 	}
-	public int 
+	public static int 
 	getUserMax()
 	{
 		return userMax;
 	}
-	public String 
+	public static String 
 	getUserPass()
 	{
 		return userPass;

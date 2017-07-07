@@ -81,9 +81,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 							changeAdminPassword,
 							changeInvisibleString;
 		
-		private String userPassword,
-						adminPassword,
-						invisibleString;
+		private JCheckBox trainingModeCheckBox;
+		
+		private boolean trainingModeOn;
 	
 		private JPanel settingsContentPane,
 						adminTab,
@@ -450,6 +450,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 												adminSettingsCenter.add(processingOnCheck);
 													processingOnCheck.setSelected(false);
 													
+													trainingModeCheckBox = new JCheckBox("Toggle Training Mode");
+												adminSettingsCenter.add(trainingModeCheckBox);
+													
 													changeUserPassword = new JTextArea("password");
 												adminSettingsCenter.add(changeUserPassword);
 												
@@ -472,8 +475,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 																actionPerformed(ActionEvent e)
 																{
 																	processingOn = processingOnCheck.isSelected();
-																	userPassword = changeUserPassword.getText();
-																	adminPassword = changeAdminPassword.getText();
+																	trainingModeOn = trainingModeCheckBox.isSelected();
+																	WISPTNodeObject.setUserPass(changeUserPassword.getText());
+																	WISPTNodeObject.setAdminPass(changeAdminPassword.getText());;
+																	WISPTNodeObject.setInvisibleString(changeInvisibleString.getText());
 																	
 																	startupSettingsDialog.setVisible(false);
 																}//end actionPerformed
@@ -1167,15 +1172,18 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	incrementCounter()
 	{
-		if(selectedWTNO.getCounter()<selectedWTNO.getUserMax())
+		if(trainingModeOn)
 		{
-			selectedWTNO.setCounter();
-		}
-		else
-		{
-			selectedWTNO.setContentVisible(false);
-			selectedNode.setUserObject(selectedWTNO);
-		}
+			if(selectedWTNO.getCounter()<WISPTNodeObject.getUserMax())
+			{
+				selectedWTNO.setCounter();
+			}
+			else
+			{
+				selectedWTNO.setContentVisible(false);
+				selectedNode.setUserObject(selectedWTNO);
+			}//end counter or hide if
+		}//end training mode if
 	}
 	
 
