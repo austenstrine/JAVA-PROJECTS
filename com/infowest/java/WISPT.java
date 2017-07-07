@@ -68,9 +68,84 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 					//string5 = null,
 					//string6 = null
 					;
+	private boolean processingOn = false;
+	
+	private WISPTNodeObject selectedWTNO = null;
+	
+	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
+									previousSelectedNode = selectedNode;
+	
+	private JDialog startupSettingsDialog;
+	//TODO finish settings
+		private JTextArea changeUserPassword,
+							changeAdminPassword,
+							changeInvisibleString;
+		
+		private String userPassword,
+						adminPassword,
+						invisibleString;
+	
+		private JPanel settingsContentPane,
+						adminTab,
+						userTab,
+							adminSettings,
+							userSettings,
+								adminSettingsCenter,
+								userSettingsCenter,
+								adminSettingsSouth;
+		private JButton save,
+						cancel;
+	
+	private JTabbedPane settingsCenterTabbedPane;
+	
+	private JPanel contentPane = new JPanel(new BorderLayout()),
+					northPane = new JPanel(new GridLayout(1,1)),
+					westPad,
+					centerPad,
+						centerBevel,
+							centerPane,
+								centerCenterPane,
+								centerSouthPane,
+					eastPad,
+						eastPane,
+					southPadPane,
+						southPane,
+							southUSplit,
+							southPSplit;
+	
+	private JLabel	processingLabel = new JLabel("Done"),
+					userLabel = new JLabel(username); 
+	
+	private JTree tree = new JTree(new DefaultMutableTreeNode(new WISPTNodeObject("(empty)","(empty)")));
+
+	private JTextArea mainTxtArea = new JTextArea("Welcome to WISP-T!\nPlease create or load a tree."),
+						tipArea = new JTextArea("");
+			
+	private JCheckBox	check1 = new JCheckBox("first"),
+	 					check2 = new JCheckBox("second"),
+	  					check3 = new JCheckBox("third"),
+	  					check4 = new JCheckBox("fourth"),
+	  					check5 = new JCheckBox("fifth"),
+	  					check6 = new JCheckBox("last"),
+	  					processingOnCheck;
+	
+	private JRadioButton	radio1,
+							radio2,
+							radio3,
+							radio4;
+	
+	private ButtonGroup radioButtons = new ButtonGroup();
+	
+	private JScrollPane treeScroll,
+			//centerBevel,
+			eastScroll;
+	
+	private JSplitPane	consoleMsgs,
+			centerEastSplit,
+			westCenterEastSplit;
 	
 	/*
-	 * TODO MENU DECLARATION START
+	 * TODO MENU DECLARATIONS
 	 */
 	private JMenuBar menu = new JMenuBar();
 	
@@ -98,76 +173,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		private JMenu userPrefs = new JMenu(username + " Preferences");
 			private JMenuItem startupSettings = new JMenuItem("Settings");
 			private JMenuItem editName = new JMenuItem("Change Username");
-			//private JMenuItem startupSettings = new JMenuItem("Startup Options");
-			
-	/*
-	 * TODO END MENU DECLARATIONS
-	 */
 
-	private WISPTNodeObject selectedWTNO = null;
-	
-	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
-									previousSelectedNode = selectedNode;
-	
-	private JDialog startupSettingsDialog;
-	
-	private JPanel settingsContentPane,
-					adminTab,
-					userTab,
-					adminSettings,
-					userSettings;
-	private JTabbedPane settingsCenterTabbedPane;
-	
-	private JPanel contentPane = new JPanel(new BorderLayout()),
-					northPane = new JPanel(new GridLayout(1,1)),
-					westPad,
-					centerPad,
-						centerBevel,
-							centerPane,
-								centerCenterPane,
-								centerSouthPane,
-					eastPad,
-						eastPane,
-					southPadPane,
-						southPane,
-							southUSplit,
-							southPSplit;
-	
-	private JLabel	processingLabel = new JLabel("Done"),
-					userLabel = new JLabel(username); 
-	
-	private JTree tree = new JTree(new DefaultMutableTreeNode(new WISPTNodeObject("(empty)","(empty)")));
 
-	private JTextArea mainTxtArea = new JTextArea("Welcome to WISP-T!\nPlease create or load a tree."),
-						tipArea = new JTextArea(""),
-						//TODO finish settings
-						changeUserPassword,
-						changeAdminPassword,
-						changeInvisibleString;
-	//private J
-			
-	private JCheckBox	check1 = new JCheckBox("first"),
-	 					check2 = new JCheckBox("second"),
-	  					check3 = new JCheckBox("third"),
-	  					check4 = new JCheckBox("fourth"),
-	  					check5 = new JCheckBox("fifth"),
-	  					check6 = new JCheckBox("last"),
-	  					processingOnCheck;
 	
-	private JRadioButton	radio1,
-							radio2 = new JRadioButton("second"),
-							radio3 = new JRadioButton("third"),
-							radio4 = new JRadioButton("fourth");
-	
-	private ButtonGroup radioButtons = new ButtonGroup();
-	
-	private JScrollPane treeScroll,
-			//centerBevel,
-			eastScroll;
-	
-	private JSplitPane	consoleMsgs,
-			centerEastSplit,
-			westCenterEastSplit;
 
 /*
  *	TODO Constructors
@@ -213,9 +221,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		this.setTitle("WISP-T \u00A9 2017");
 		this.setContentPane(contentPane);
 		JFrame.setDefaultLookAndFeelDecorated(false);
+		ToolTipManager.sharedInstance().setDismissDelay(60000);
 		
 		//contentPane.addComponentListener(this);
-		
 		/*
 		 * TODO MENU/NORTH
 		 */
@@ -331,7 +339,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								public void
 								actionPerformed(ActionEvent e)
 								{
-									//FIXME openTreeBuilder_actionPerformed(e);
+									openTreeBuilder_actionPerformed(e);
 								}//end actionPerformed
 							}//end ActionListener
 							);//ActionListener added
@@ -424,32 +432,53 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 										adminTab = new JPanel(new GridLayout(1,1));
 									settingsCenterTabbedPane.add("Administration", adminTab);
 									
-											adminSettings = new JPanel(new FlowLayout());
+											adminSettings = new JPanel(new BorderLayout());
+											/*
+											 * Save button need be the only element with a listener.
+											 * On action, it will set all settings according to what
+											 * is currently in the settings pane elements. If a check
+											 * box is checked, that setting becomes enabled. Whatever
+											 * resides in a text field becomes that setting's new text.
+											 * 
+											 */
 										adminTab.add(adminSettings);
-
 										// TODO Finish settings
-												processingOnCheck = new JCheckBox("Detailed Process Tooltips");
-											adminSettings.add(processingOnCheck);
-												processingOnCheck.setSelected(false);
-												/*processingOnCheck.addActionListener
-												(new ActionListener()
-													{
-														@Override
-														public void
-														actionPerformed(ActionEvent e)
-														{
-															processingOn = processingOnCheck.isSelected();
-															// is this too dirty? processingOnCheck (decided yes, it is)
-															/* Should I remove listener and have anything 
-															 * that needs a bool refer directly to
-															 * processingOnCheck.isSelected()?
-															 *
-														}//end actionPerform
-													}//end ActionListener
-												);//ActionListener added*/
+												adminSettingsCenter = new JPanel(new FlowLayout());
+											adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
+											
+													processingOnCheck = new JCheckBox("Detailed Process Tooltips");
+												adminSettingsCenter.add(processingOnCheck);
+													processingOnCheck.setSelected(false);
+													
+													changeUserPassword = new JTextArea("password");
+												adminSettingsCenter.add(changeUserPassword);
 												
-											adminSettings.add(new JCheckBox("check"));
-											adminSettings.add(new JCheckBox("check"));
+													changeAdminPassword = new JTextArea("WISPadmin");
+												adminSettingsCenter.add(changeAdminPassword);
+												
+													changeInvisibleString = new JTextArea("This Branch/Leaf has been locked!");
+												adminSettingsCenter.add(changeInvisibleString);
+												
+												adminSettingsSouth = new JPanel(new GridLayout(2,1));
+											adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
+												
+													save = new JButton("Save");
+												adminSettingsSouth.add(save);
+													save.addActionListener
+														(new ActionListener()
+															{
+																@Override
+																public void
+																actionPerformed(ActionEvent e)
+																{
+																	processingOn = processingOnCheck.isSelected();
+																	userPassword = changeUserPassword.getText();
+																	adminPassword = changeAdminPassword.getText();
+																	
+																	startupSettingsDialog.setVisible(false);
+																}//end actionPerformed
+															}//end ActionListener
+														);//actionListener added
 											
 										userTab = new JPanel(new GridLayout(1,1));
 									settingsCenterTabbedPane.add("User Preferences", userTab);
@@ -524,10 +553,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								centerSouthPane = new JPanel(new FlowLayout());
 							centerPane.add(centerSouthPane, BorderLayout.SOUTH);
 							
-								
-								
-								//FIXME correct radio blocking
-								
 										radio1 = new JRadioButton("first");
 									radioButtons.add(radio1);
 								centerSouthPane.add(radio1);
@@ -545,35 +570,27 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 											);//ActionListener added
 										radio1.setVisible(true);
 
+										radio2 = new JRadioButton("second");
 									radioButtons.add(radio2);
 								centerSouthPane.add(radio2);
+										radio2.setBackground(white);
 										radio2.addActionListener
-										(new ActionListener()
-										{
-											@Override
-											public void
-											actionPerformed(ActionEvent e)
+											(new ActionListener()
 											{
-												radio_actionPerformed(e, 1);
-											}//end actionPerformed
-										}//end ActionListener
-										);//ActionListener added
+												@Override
+												public void
+												actionPerformed(ActionEvent e)
+												{
+													radio_actionPerformed(e, 1);
+												}//end actionPerformed
+											}//end ActionListener
+											);//ActionListener added
+										radio2.setVisible(false);
 										
+										radio3 = new JRadioButton("third");
 									radioButtons.add(radio3);
 								centerSouthPane.add(radio3);
-								
-									radioButtons.add(radio4);
-								centerSouthPane.add(radio4);
-										
-										radio2.setBackground(white);
 										radio3.setBackground(white);
-										radio4.setBackground(white);
-										
-										radio2.setVisible(false);
-										radio3.setVisible(false);
-										radio4.setVisible(false);
-										
-										
 										radio3.addActionListener
 											(new ActionListener()
 											{
@@ -585,6 +602,12 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
+										radio3.setVisible(false);
+										
+										radio4 = new JRadioButton("fourth");
+									radioButtons.add(radio4);
+								centerSouthPane.add(radio4);
+										radio4.setBackground(white);
 										radio4.addActionListener
 											(new ActionListener()
 											{
@@ -596,7 +619,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
-										
+										radio4.setVisible(false);
+
 								centerSouthPane.setBorder(pad);
 								centerSouthPane.setBackground(white);
 								
@@ -645,6 +669,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						eastScroll = new JScrollPane(eastPane);
 					eastPad.add(eastScroll);
 					
+							//FIXME correct checkbox blocking
 							eastPane.add(check1);
 							eastPane.add(check2);
 							eastPane.add(check3);
@@ -788,6 +813,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		this.setSize(800, 400);
 		check1.setVisible(false);
 		radio1.setVisible(false);
+		
 	}//end constructor
 	
 /*
@@ -795,7 +821,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
  */
 	
 	public static void 
-	main(String[] args) {
+	main(String[] args) 
+	{
 		WISPT window = new WISPT();
 		window.setVisible(true);
 
@@ -808,57 +835,127 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	unlockTreeNode_actionPerformed(ActionEvent e)
 	{
-		WISPTTreeBuilder.main(new String[1]);
+		try
+		{
+			selectedWTNO.unlockNode();//dialog asking for PW
+			selectedNode.setUserObject(selectedWTNO);
+			tree.clearSelection();
+			tree.setSelectionPath(new TreePath(selectedNode.getPath()));
+			tree.revalidate();
+			tree.repaint();
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end unlockTreeNodeAP
 	
 	public void
 	tNavTree_actionPerformed(ActionEvent e)
 	{
-		if(tNavTreeOn)
+		try
 		{
-			tNavTree.setText("\u2610 Navigation Tree");
-			westPad.setVisible(false);
-			tNavTreeOn = false;
+			if(tNavTreeOn)
+			{
+				tNavTree.setText("\u2610 Navigation Tree");
+				westPad.setVisible(false);
+				tNavTreeOn = false;
+			}
+			else
+			{
+				tNavTree.setText("\u2611 Navigation Tree");
+				westPad.setVisible(true);
+				westCenterEastSplit.revalidate();
+				westCenterEastSplit.setDividerLocation(0.2);
+				tNavTreeOn = true;
+			}//end inner if
 		}
-		else
+		catch(Exception ex)
 		{
-			tNavTree.setText("\u2611 Navigation Tree");
-			westPad.setVisible(true);
-			westCenterEastSplit.revalidate();
-			westCenterEastSplit.setDividerLocation(0.2);
-			tNavTreeOn = true;
-		}//end inner if
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end tNavTreeAP
 	
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
-		TreeModel model = getTreeModel();
-		tree.setModel(model);
-		tree.addTreeSelectionListener(this);
-		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		tree.setEnabled(true);
-		treeScroll.repaint();
-		tree.repaint();
+		try
+		{
+			TreeModel model = getTreeModel();
+			tree.setModel(model);
+			tree.addTreeSelectionListener(this);
+			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+			tree.setEnabled(true);
+			treeScroll.repaint();
+			tree.repaint();
+
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end loadTree AP
 	
 	public void
 	tTips_actionPerformed(ActionEvent e)
 	{
-		if(tTipsOn)
+		try
 		{
-			tTips.setText("\u2610 Tips");
-			eastPad.setVisible(false);
-			tTipsOn = false;
+			if(tTipsOn)
+			{
+				tTips.setText("\u2610 Tips");
+				eastPad.setVisible(false);
+				tTipsOn = false;
+			}
+			else
+			{
+				tTips.setText("\u2611 Tips");
+				eastPad.setVisible(true);
+				centerEastSplit.revalidate();
+				centerEastSplit.setDividerLocation(0.75);
+				tTipsOn = true;
+			}//end if
 		}
-		else
+		catch(Exception ex)
 		{
-			tTips.setText("\u2611 Tips");
-			eastPad.setVisible(true);
-			centerEastSplit.revalidate();
-			centerEastSplit.setDividerLocation(0.75);
-			tTipsOn = true;
-		}//end if
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end tTips AP
 	
 	public void
@@ -893,34 +990,113 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			centerCenterPane.revalidate();
 			centerCenterPane.repaint();
 		}
-		catch(NullPointerException npe)
+		catch(Exception ex)
 		{
-			npe.printStackTrace();
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
 		}//end try/catch
 	}//end check AP
 
 	public void
 	startupSettings_actionPerformed(ActionEvent e)
 	{
-		startupSettingsDialog.setVisible(true);
+		try
+		{
+			startupSettingsDialog.setVisible(true);
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end startupSettings AP
 	
 	public void
 	radio_actionPerformed(ActionEvent e, int index)
 	{
-		DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(index);
-		TreePath path = new TreePath(child.getPath());
-		tree.setSelectionPath(path);
-		tree.revalidate();
-		tree.repaint();
+		try
+		{
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(index);
+			TreePath path = new TreePath(child.getPath());
+			tree.setSelectionPath(path);
+			tree.revalidate();
+			tree.repaint();
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end radio AP
 	
 	public void
 	exit_actionPerformed(ActionEvent e)
 	{
+		try
+		{
 		//XXX there is a better way to do this, lookup
-		this.dispose();
+			this.dispose();
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
 	}//end exitAP
+	
+	public void
+	openTreeBuilder_actionPerformed(ActionEvent e)
+	{
+		try
+		{
+			WISPTTreeBuilder.main(new String[1]);
+		}
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processingOn)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+		}//end try/catch
+	}
 	
 	// TODO end of actionPerformed methods
 	public void
@@ -1285,45 +1461,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				
 			}//end source if
 		}
-		catch(ArrayIndexOutOfBoundsException aioobe)
-		{
-			processingLabel.setText("Array Index Out Of Bounds");
-			if(processingOnCheck.isSelected())
-			{
-				String trace = "";
-				for(StackTraceElement st : aioobe.getStackTrace())
-				{
-					trace += st.toString() + "\t";
-				}
-				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
-			}
-		}
-		catch(NullPointerException npe)
-		{
-			processingLabel.setText("Null Value");
-			if(processingOnCheck.isSelected())
-			{
-				String trace = "";
-				for(StackTraceElement st : npe.getStackTrace())
-				{
-					trace += st.toString() + "\t";
-				}
-				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
-			}
-		}
-		catch(Exception ex)
-		{
-			processingLabel.setText("Exception Ocurred!");
-			if(processingOnCheck.isSelected())
-			{
-				String trace = "";
-				for(StackTraceElement st : ex.getStackTrace())
-				{
-					trace += st.toString() + "\t";
-				}
-				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
-			}
-		}//end try/catch
 	}*/
 	// TODO end of old overrides, try/catch for future reference
 	
