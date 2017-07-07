@@ -3,8 +3,7 @@ Synopsis
 This is a program that uses a custom-built troubleshooting tree interface 
 to teach tech support representatives how to troubleshoot with customers 
 over the phone. It's 100% java, and was built with Eclipse.
-The primary program is currently called UBNTTroubleshooter.java - I have 
-yet to rename it to WISP-T. It uses a serialized TreeModel as the 
+The primary program is WISP-T.java. It uses a serialized TreeModel as the 
 troubleshooting tree. It has a built in TreeBuilder.java application that 
 allows you to create content for the JTree. It will allow users to create 
 profiles, and enable a "teaching mode" that limits the number of times a 
