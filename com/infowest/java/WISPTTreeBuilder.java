@@ -24,11 +24,14 @@ import java.awt.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.*;
 
 import java.util.*;
 //import java.util.List;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, ActionListener {
 	
@@ -123,9 +126,29 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 						
 							moveUpBtn = new JButton("\u2191");
 						upDownPane.add(moveUpBtn);
+							moveUpBtn.addActionListener
+							(new ActionListener()
+							{
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									moveBtn_actionPerformed(e, true);
+								}
+							}
+							);
 						
 							moveDownBtn = new JButton("\u2193");
 						upDownPane.add(moveDownBtn);
+							moveDownBtn.addActionListener
+							(new ActionListener()
+							{
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									moveBtn_actionPerformed(e, false);
+								}
+							}
+							);
 						
 						upDownPane.add(new JPanel());
 						
@@ -141,43 +164,109 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		//loadTree("defaultTree");
 	}
 
-	public static void main(String[] args) {
+	public static void 
+	main(String[] args) 
+	{
 		WISPTTreeBuilder tWindow = new WISPTTreeBuilder();
 		tWindow.setVisible(true);
-
 	}
 
 
 	@Override
-	public void valueChanged(TreeSelectionEvent e) {		
-		//selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-		//Object source = e.getSource();
+	public void 
+	valueChanged(TreeSelectionEvent e) 
+	{		
+		selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();	
 	}
 
+	public void
+	moveBtn_actionPerformed(ActionEvent event, boolean directionUp)
+	{
+		try
+		{
+			p("actionPerformed entered");
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode)selectedNode.getParent();
+			p("parent instantiated");
+			p("selectedNode is child of parent, "+parent.isNodeChild(selectedNode));
+			int selectedIndex = parent.getIndex((TreeNode)selectedNode);
+			p("selectedIndex instantiated");
+			if(directionUp && selectedIndex != 0)
+			{
+				p("upIf entered");
+				model = (DefaultTreeModel)tree.getModel();
+				p("model instantiated");
+				asideNode = selectedNode;
+				model.removeNodeFromParent(selectedNode);
+				p("selected node removed");
+				model.insertNodeInto(asideNode, parent, selectedIndex - 1);
+				selectedNode = asideNode;
+				p("selected node inserted");
+				tree.setModel(model);
+				p("model updated");
+				tree.revalidate();
+				p("tree revalidated");
+				tree.setSelectionPath(new TreePath(selectedNode.getPath()));
+				p("selection set");
+			}
+			else if(!directionUp && selectedIndex != parent.getChildCount()-1)
+			{
+				p("downIf entered");
+				model = (DefaultTreeModel)tree.getModel();
+				p("model instantiated");
+				asideNode = selectedNode;
+				model.removeNodeFromParent(selectedNode);
+				p("selected node removed");
+				model.insertNodeInto(asideNode, parent, selectedIndex + 1);
+				selectedNode = asideNode;
+				p("selected node inserted");
+				tree.setModel(model);
+				p("model updated");
+				tree.revalidate();
+				p("tree revalidated");
+				tree.setSelectionPath(new TreePath(selectedNode.getPath()));
+				p("selection set");
+			}
+		}
+		catch(NullPointerException npe)
+		{
+			npe.printStackTrace();
+		}
+	}
+	
+	public void
+	saveTreeBtn_actionPerformed(ActionEvent e)
+	{
+		treeSaveName = JOptionPane.showInputDialog(null, 
+				"Choose a name for the save file:",
+				"Save Tree",
+				JOptionPane.PLAIN_MESSAGE);	
+		saveTree();
+		this.dispose();
+	}
+	
+	public void
+	loadTreeBtn_actionPerformed(ActionEvent e)
+	{
+		loadTree();
+		tree.revalidate();
+	}
+	
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void 
+	actionPerformed(ActionEvent e) 
+	{
 		Object source = e.getSource();
 		
 		int answer = 1;
 		WISPTNodeObject nodeS = new WISPTNodeObject("", "");
 		if(source == saveTreeBtn)
 		{
-			treeSaveName = JOptionPane.showInputDialog(null, 
-					"Choose a name for the save file:",
-					"Save Tree",
-					JOptionPane.PLAIN_MESSAGE);	
 			saveTree();
-			
-			this.dispose();
 		}
 		else if(source == loadTree)
 		{
-			treeSaveName = JOptionPane.showInputDialog(null, 
-					"Please enter the filename of the pre-configured tree, without "
-					+ "\nextensions. (Ex. defaultTree rather than defaultTree.ser)",
-					"Load Tree",
-					JOptionPane.PLAIN_MESSAGE);	
-			loadTree(treeSaveName);
+			loadTree();
+			tree.revalidate();
 		}
 		else
 		{
@@ -217,6 +306,8 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 					{
 					case 0:
 						model.removeNodeFromParent(selectedNode);
+						tree.setModel(model);
+						tree.revalidate();
 						break;
 					case 1:
 					case 2:
@@ -228,7 +319,8 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		}//end save if
 	}//end actionPerformed
 	
-	public void getNode(WISPTNodeObject s)
+	public void 
+	getNode(WISPTNodeObject s)
 	{
 		String[] nodeStrings = new String[8];
 		try
@@ -248,7 +340,8 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		WISPTNodeBuilder.main(nodeStrings);
 		asideNode = null;
 		
-		try {
+		try 
+		{
 			FileInputStream fileIn = new FileInputStream("node.ser");
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			asideNode = (DefaultMutableTreeNode)in.readObject();
@@ -261,32 +354,52 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(asideNode.getUserObject().toString());
+		p(asideNode.getUserObject().toString());
 	}
 	
-	public void exeNew()
+	public void 
+	exeNew()
 	{
 		model.insertNodeInto(asideNode, selectedNode, 0);
-		this.repaint();
-		this.revalidate();
+		tree.setModel(model);
+		tree.revalidate();
 	}
-	public void exeEdit()
+	public void 
+	exeEdit()
 	{
 		WISPTNodeObject wtno = (WISPTNodeObject)asideNode.getUserObject();
 		selectedNode.setUserObject(wtno);
 		model.nodeChanged(selectedNode);
+		tree.setModel(model);
+		tree.revalidate();
 	}
 	
-	public void saveTree()
+	public void 
+	saveTree()
 	{
 		try 
 		{//needs to trigger a warning if data will be overwritten
-	         FileOutputStream fileOut = new FileOutputStream((treeSaveName+".ser"));
-	         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-	         out.writeObject(tree.getModel());
-	         out.close();
-	         fileOut.close();
-	         System.out.println("Object saved in "+treeSaveName+".ser");
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString());//creates a empty file in that directory
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Files", "ser");
+			fc.setFileFilter(filter);
+			int val = fc.showSaveDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				String fileName = fc.getSelectedFile().toString();
+				if(fc.getSelectedFile().toString().contains(".ser"))
+				{
+					fileName = fileName.split(".ser")[0];
+				}
+				FileOutputStream fileOut = new FileOutputStream(fileName+".ser");
+		        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		        out.writeObject(tree.getModel());
+		        out.close();
+		        fileOut.close();
+		        p("Object saved in "+fc.getSelectedFile().getName()+".ser");
+				this.dispose();
+			}
 	    }
 		catch(IOException i) 
 		{
@@ -294,14 +407,31 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		}//end read try/catch
 	}
 	
-	public void loadTree(String pathName)
+	public void 
+	loadTree()
 	{
-		try {
-			FileInputStream fileIn = new FileInputStream((pathName+".ser"));
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			tree.setModel((TreeModel)in.readObject());
-			in.close();
-			fileIn.close();
+		try 
+		{
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString());//creates a empty file in that directory
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Files", "ser");
+			fc.setFileFilter(filter);
+			int val = fc.showOpenDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				FileInputStream fileIn = new FileInputStream(fc.getSelectedFile());
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				tree.setModel((DefaultTreeModel)in.readObject());
+				tree.addTreeSelectionListener(this);
+				tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+				model = (DefaultTreeModel)tree.getModel();
+				tree.setEnabled(true);
+				treeScroll.repaint();
+				tree.repaint();
+				in.close();
+				fileIn.close();
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -309,5 +439,11 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void
+	p(String p)
+	{
+		System.out.println(p);
 	}
 }

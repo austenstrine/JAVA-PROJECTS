@@ -467,6 +467,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 												
 													userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
 												adminSettingsCenter.add(userUnlocksSpinner);
+													userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
 												
 												adminSettingsSouth = new JPanel(new GridLayout(2,1));
 											adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
