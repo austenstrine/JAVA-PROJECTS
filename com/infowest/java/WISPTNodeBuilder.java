@@ -125,19 +125,6 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 						
 						contentTxt.setBorder(BorderFactory.createTitledBorder("Node Content"));
 						
-
-						centerTipBtns = new JPanel(new GridLayout(1,2));
-					center.add(centerTipBtns);
-					
-							addTip = new JButton("Add Tip");
-						centerTipBtns.add(addTip);
-					
-							addTip.addActionListener(this);
-						
-							removeTip = new JButton("Remove Tip");
-						centerTipBtns.add(removeTip);
-						
-							removeTip.addActionListener(this);
 						
 						for(int i = 0; i < tips.length; ++i)
 						{
@@ -154,18 +141,24 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 						tip6 = tips[5];
 						
 			//south
-					south = new JPanel(new GridLayout(1,2));
+					south = new JPanel(new GridLayout(2,2));
 				southScroll = new JScrollPane(south);
 			contentPane.add(southScroll, BorderLayout.SOUTH);
+			
+						addTip = new JButton("Add Tip");
+					south.add(addTip);
+						addTip.addActionListener(this);
+					
+						removeTip = new JButton("Remove Tip");
+					south.add(removeTip);
+						removeTip.addActionListener(this);
 
 						acceptChanges = new JButton("Accept Changes");
 					south.add(acceptChanges);
-					
 						acceptChanges.addActionListener(this);
 		
 						cancel = new JButton("Cancel");
 					south.add(cancel);
-					
 						cancel.addActionListener(this);
 		pack();
 		
