@@ -28,17 +28,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.*;
 import java.util.ArrayList;
 
-public class WISPTNodeBuilder extends JDialog implements ActionListener
+public class WISPTNodeBuilder extends JDialog
 
 {
 	/**
-	 * 
+	 * This class is designed for serializing a DefaultMutableTreeNode filled with user data.
+	 * It uses another class, WISPTNodeObject, which is serialized with it.
 	 */
 	private static final long serialVersionUID = -4089171883331980678L;
 	
-	ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
+	private static boolean savedClose = false;
 	
-	JTextArea titleTxt, 
+	private JTextArea titleTxt, 
 			contentTxt,
 			tip1,
 			tip2,
@@ -46,28 +47,49 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 			tip4,
 			tip5,
 			tip6;
-	JButton acceptChanges,
+	private JButton acceptChanges,
 			cancel,
 			packer,
 			addTip,
 			removeTip;
-	JPanel contentPane,
+	private JPanel contentPane,
 			center,
-				centerTipBtns,
+				//centerTipBtns,
 			south,
 			north;
-	JScrollPane centerScroll,
+	private JScrollPane centerScroll,
 			southScroll;
-	JTextArea[] tips = {null,null,null,null,null,null};
+	private JTextArea[] tips = {null,null,null,null,null,null};
 	private int switcher = 0;
 
-	public WISPTNodeBuilder()
+	/*
+	 * TODO Constructor
+	 */
+	
+	public 
+	WISPTNodeBuilder()
 	{
 		super();
-		Dimension d = new Dimension(800,400);
-		this.setPreferredSize(d);
+		this.addComponentListener
+		(new ComponentListener()
+		{
+				@Override
+				public void componentHidden(ComponentEvent e){/*do nothing*/}
+				@Override
+				public void componentMoved(ComponentEvent e){/*do nothing*/}
+				@Override
+				public void componentResized(ComponentEvent e){/*do nothing*/}
+			@Override
+			public void 
+			componentShown(ComponentEvent arg0) 
+			{
+				savedClose = false;
+			}
+		}
+		);
 		try
 		{
+			ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 			File img = new File("wisp-t 20.png");
 			BufferedImage bufferedImage = ImageIO.read(img);
 			icons.add(bufferedImage);
@@ -80,35 +102,43 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 			img = new File("wisp-t 750.png");
 			bufferedImage = ImageIO.read(img);
 			icons.add(bufferedImage);
+			this.setIconImages(icons);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		this.setIconImages(icons);
+		this.setPreferredSize(new Dimension(800,400));
 		this.setTitle("Node");
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
-			contentPane = new JPanel();
-		this.setContentPane(contentPane);
 		
+			contentPane = new JPanel();
 			contentPane.setLayout(new BorderLayout());
+		this.setContentPane(contentPane);
 			
-			//north
+			//TODO north
 				north = new JPanel(new FlowLayout());
 			contentPane.add(north, BorderLayout.NORTH);
 			
 					packer = new JButton();
+					packer.setPreferredSize(new Dimension(10,10));
+					packer.setMaximumSize(new Dimension(10,10));
+					packer.addActionListener
+					(new ActionListener()
+					{
+						@Override
+						public void
+						actionPerformed(ActionEvent e)
+						{
+							packer_actionPerformed(e);
+						}
+					}
+					);
 				north.add(packer);
-				
-					packer.addActionListener(this);
-					Dimension packerD = new Dimension(10,10);
-					packer.setPreferredSize(packerD);
-					packer.setMaximumSize(packerD);
-					packer.setMinimumSize(packerD);
 					
 					
-			//center
+			//TODO center
 					center = new JPanel();
 				centerScroll = new JScrollPane(center);
 			contentPane.add(centerScroll, BorderLayout.CENTER);
@@ -141,122 +171,83 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 						tip6 = tips[5];
 						
 			//south
-					south = new JPanel(new GridLayout(2,2));
-				southScroll = new JScrollPane(south);
+				southScroll = new JScrollPane(new JPanel());
 			contentPane.add(southScroll, BorderLayout.SOUTH);
-			
+
+					south = new JPanel(new GridLayout(2,2));
+				southScroll.setViewportView(south);
+				
 						addTip = new JButton("Add Tip");
+						addTip.addActionListener
+							(new ActionListener()
+							{
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									addTip_actionPerformed(e);
+								}//end action performed
+							}//end action listener
+							);//action listener added
 					south.add(addTip);
-						addTip.addActionListener(this);
 					
 						removeTip = new JButton("Remove Tip");
+						removeTip.addActionListener
+							(new ActionListener()
+							{
+								@Override
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									removeTip_actionPerformed(e);
+								}//end action performed
+							}//end action listener
+							);//action listener added
 					south.add(removeTip);
-						removeTip.addActionListener(this);
 
 						acceptChanges = new JButton("Accept Changes");
+						acceptChanges.addActionListener
+							(new ActionListener()
+							{
+								@Override
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									acceptChanges_actionPerformed(e);
+								}//end action performed
+							}//end action listener
+							);//action listener added
 					south.add(acceptChanges);
-						acceptChanges.addActionListener(this);
 		
 						cancel = new JButton("Cancel");
+						cancel.addActionListener
+							(new ActionListener()
+							{
+								@Override
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									cancel_actionPerformed(e);
+								}//end action performed
+							}//end action listener
+							);//action listener added
 					south.add(cancel);
-						cancel.addActionListener(this);
 		pack();
 		
 	}
 	
-
-
-	public void setNodeTitle(String t)
-	{
-		titleTxt.setText(t);
-	}
-	public void setNodeContent(String c)
-	{
-		contentTxt.setText(c);
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) 
-	{
-		Object source = e.getSource();
-		if(source == acceptChanges)
-		{
-			WISPTNodeObject wtno = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
-			String[] stringTips = {"","","","","",""};
-			if(tip1.isVisible())
-				stringTips[0] = tip1.getText();
-			else
-				stringTips[0] = "";
-			if(tip2.isVisible())
-				stringTips[1] = tip2.getText();
-			else
-				stringTips[1] = "";
-			if(tip3.isVisible())
-				stringTips[2] = tip3.getText();
-			else
-				stringTips[2] = "";
-			if(tip4.isVisible())
-				stringTips[3] = tip4.getText();
-			else
-				stringTips[3] = "";
-			if(tip5.isVisible())
-				stringTips[4] = tip5.getText();
-			else
-				stringTips[4] = "";
-			if(tip6.isVisible())
-				stringTips[5] = tip6.getText();
-			else
-				stringTips[5] = "";
-			
-			wtno.setTips(stringTips);
-			DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(wtno);
-			
-			try 
-			{
-		         FileOutputStream fileOut = new FileOutputStream("node.ser");
-		         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-		         out.writeObject(savedNode);
-		         out.close();
-		         fileOut.close();
-		         System.out.println("Object saved in node.ser");
-		    }
-			catch(IOException i) 
-			{
-		         i.printStackTrace();
-			}
-			this.setVisible(false);
-			this.dispose();
-		}
-		else if(source == cancel)
-		{
-			this.dispose();
-		}
-		else if (source == packer)
-		{
-			pack();
-		}
-		else if(source == addTip)
-		{
-			addTip(true);
-		}
-		else if(source == removeTip)
-		{
-			addTip(false);
-		}
-	}
-
-	public static void main(String[] args) 
+	public static void 
+	main(String[] args) 
 	{
 		WISPTNodeBuilder node = new WISPTNodeBuilder();
 		node.setModalityType(ModalityType.APPLICATION_MODAL);
 		System.out.println(java.util.Arrays.toString(args));
-		try 
+		try //XXX this needs to happen through the constructor - pass args to it.
 		{
 			node.setNodeTitle(args[0]);
 			node.setNodeContent(args[1]);
 			
 			node.tip1.setText(args[2]);
-			if(!(node.tip1.getText().equals("")))//I can't get this to detect when the string value is null or "null"
+			if(!(node.tip1.getText().equals("")))
 			{
 				node.center.add(node.tip1);
 				node.tip1.setVisible(true);
@@ -313,78 +304,160 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 		node.setVisible(true);
 	}
 	
-	public void addTip(boolean add)
-	{ 
-		if(add)
+	public static boolean
+	isClosedWithSave()
+	{
+		return savedClose;
+	}
+	
+	public void
+	packer_actionPerformed(ActionEvent e)
+	{
+		this.pack();
+	}
+	
+	public void
+	addTip_actionPerformed(ActionEvent e)
+	{
+		switch(switcher)
 		{
-			switch(switcher)
-			{
-			case 0:
-				center.add(tip1);
-				tip1.setVisible(true);
-				break;
-			case 1:
-				center.add(tip2);
-				tip2.setVisible(true);
-				break;
-			case 2:
-				center.add(tip3);
-				tip3.setVisible(true);
-				break;
-			case 3:
-				center.add(tip4);
-				tip4.setVisible(true);
-				break;
-			case 4:
-				center.add(tip5);
-				tip5.setVisible(true);
-				break;
-			case 5:
-				center.add(tip6);
-				tip6.setVisible(true);
-				break;
-			default:
-				JOptionPane.showMessageDialog(null, "Only six tips per branch/leaf are allowed!");	
-				--switcher;
-			}
-			++switcher;
-			System.out.println(switcher);
-		}
-		else
-		{
-			switch(switcher)
-			{
-			case 1:
-				center.remove(tip1);
-				tip1.setVisible(false);
-				break;
-			case 2:
-				center.remove(tip2);
-				tip2.setVisible(false);
-				break;
-			case 3:
-				center.remove(tip3);
-				tip3.setVisible(false);
-				break;
-			case 4:
-				center.remove(tip4);
-				tip4.setVisible(false);
-				break;
-			case 5:
-				center.remove(tip5);
-				tip5.setVisible(false);
-				break;
-			case 6:
-				center.remove(tip6);
-				tip6.setVisible(false);
-				break;
-			default:
-				JOptionPane.showMessageDialog(null, "There are no more tips to remove!");
-				++switcher;
-			}
+		case 0:
+			center.add(tip1);
+			tip1.setVisible(true);
+			break;
+		case 1:
+			center.add(tip2);
+			tip2.setVisible(true);
+			break;
+		case 2:
+			center.add(tip3);
+			tip3.setVisible(true);
+			break;
+		case 3:
+			center.add(tip4);
+			tip4.setVisible(true);
+			break;
+		case 4:
+			center.add(tip5);
+			tip5.setVisible(true);
+			break;
+		case 5:
+			center.add(tip6);
+			tip6.setVisible(true);
+			break;
+		default:
+			JOptionPane.showMessageDialog(null, "Only six tips per branch/leaf are allowed!");	
 			--switcher;
-			System.out.println(switcher);
 		}
+		++switcher;
+		System.out.println(switcher);
 		this.revalidate();
+	}
+	
+	public void
+	removeTip_actionPerformed(ActionEvent e)
+	{
+		switch(switcher)
+		{
+		case 1:
+			center.remove(tip1);
+			tip1.setVisible(false);
+			break;
+		case 2:
+			center.remove(tip2);
+			tip2.setVisible(false);
+			break;
+		case 3:
+			center.remove(tip3);
+			tip3.setVisible(false);
+			break;
+		case 4:
+			center.remove(tip4);
+			tip4.setVisible(false);
+			break;
+		case 5:
+			center.remove(tip5);
+			tip5.setVisible(false);
+			break;
+		case 6:
+			center.remove(tip6);
+			tip6.setVisible(false);
+			break;
+		default:
+			JOptionPane.showMessageDialog(null, "There are no more tips to remove!");
+			++switcher;
+		}
+		--switcher;
+		System.out.println(switcher);
+		this.revalidate();
+	}
+	
+	public void
+	acceptChanges_actionPerformed(ActionEvent e)
+	{
+		WISPTNodeObject wtno = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
+		String[] stringTips = {"","","","","",""};
+		if(tip1.isVisible())
+			stringTips[0] = tip1.getText();
+		else
+			stringTips[0] = "";
+		if(tip2.isVisible())
+			stringTips[1] = tip2.getText();
+		else
+			stringTips[1] = "";
+		if(tip3.isVisible())
+			stringTips[2] = tip3.getText();
+		else
+			stringTips[2] = "";
+		if(tip4.isVisible())
+			stringTips[3] = tip4.getText();
+		else
+			stringTips[3] = "";
+		if(tip5.isVisible())
+			stringTips[4] = tip5.getText();
+		else
+			stringTips[4] = "";
+		if(tip6.isVisible())
+			stringTips[5] = tip6.getText();
+		else
+			stringTips[5] = "";
+		
+		wtno.setTips(stringTips);
+		DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(wtno);
+		
+		try 
+		{
+	         FileOutputStream fileOut = new FileOutputStream("node.ser");
+	         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+	         out.writeObject(savedNode);
+	         out.close();
+	         fileOut.close();
+	         System.out.println("Object saved in node.ser");
+	    }
+		catch(IOException i) 
+		{
+	         i.printStackTrace();
+		}
+		this.setVisible(false);
+		savedClose = true;
+		this.dispose();
+	}
+
+	public void
+	cancel_actionPerformed(ActionEvent e)
+	{
+		savedClose = false;
+		this.dispose();
+	}
+	
+	public void 
+	setNodeTitle(String t)
+	{
+		titleTxt.setText(t);
+	}
+	public void 
+	setNodeContent(String c)
+	{
+		contentTxt.setText(c);
 	}
 }

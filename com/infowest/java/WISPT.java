@@ -58,6 +58,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3);
 	
+	private boolean isAdmin = false;
+	
 	private String	username = "User",
 					lastTxt = "";
 	
@@ -1497,23 +1499,25 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			npe.printStackTrace();
 		}
 		WISPTNodeBuilder.main(nodeStrings);
-		asideNode = null;
-		
-		try 
+		if(WISPTNodeBuilder.isClosedWithSave())
 		{
-			FileInputStream fileIn = new FileInputStream("node.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			asideNode = (DefaultMutableTreeNode)in.readObject();
-			in.close();
-			fileIn.close();
-		} catch (FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			asideNode = null;
+			try 
+			{
+				FileInputStream fileIn = new FileInputStream("node.ser");
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				asideNode = (DefaultMutableTreeNode)in.readObject();
+				in.close();
+				fileIn.close();
+			} catch (FileNotFoundException fnfe) {
+				fnfe.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+			p(asideNode.getUserObject().toString());
 		}
-		p(asideNode.getUserObject().toString());
 		
 	}
 	
