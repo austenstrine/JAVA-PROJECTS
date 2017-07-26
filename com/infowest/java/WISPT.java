@@ -35,11 +35,6 @@ import javax.swing.tree.*;
 
 public class WISPT extends JFrame implements TreeSelectionListener//, ActionListener, ComponentListener, MouseListener 
 {
-
-	private enum N_E 
-	{
-		NEW_NODE, EDIT_NODE, REMOVE_NODE;
-	}
 /*
  *	TODO Variables 
  */
@@ -1135,10 +1130,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	{
 		try
 		{
-			TreeModel model = getTreeModel();
+			model = (DefaultTreeModel)getTreeModel();
 			tree.setModel(model);
 			tree.addTreeSelectionListener(this);
 			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+			tree.setEnabled(true);
 			treeScroll.repaint();
 			tree.repaint();
 
@@ -1498,7 +1494,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		}
 		catch(NullPointerException npe)
 		{
-			;
+			npe.printStackTrace();
 		}
 		WISPTNodeBuilder.main(nodeStrings);
 		asideNode = null;

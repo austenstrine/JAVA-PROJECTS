@@ -181,7 +181,7 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 		Object source = e.getSource();
 		if(source == acceptChanges)
 		{
-			WISPTNodeObject stringable = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
+			WISPTNodeObject wtno = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
 			String[] stringTips = {"","","","","",""};
 			if(tip1.isVisible())
 				stringTips[0] = tip1.getText();
@@ -208,8 +208,8 @@ public class WISPTNodeBuilder extends JDialog implements ActionListener
 			else
 				stringTips[5] = "";
 			
-			stringable.setTips(stringTips);
-			DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(stringable);
+			wtno.setTips(stringTips);
+			DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(wtno);
 			
 			try 
 			{
