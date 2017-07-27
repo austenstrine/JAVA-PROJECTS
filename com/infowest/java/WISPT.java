@@ -23,6 +23,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.*;
+import java.awt.Dialog.ModalityType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -58,10 +59,28 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3);
 	
-	private boolean isAdmin = false;
+/*
+ * TODO current user info
+ */
 	
-	private String	username = "User",
-					lastTxt = "";
+	private boolean isAdmin,
+					editorModeEnabled,
+					processTooltipsEnabled,
+					trainingModeEnabled,
+					tipsVisible,
+					treeVisible;
+	
+	private String userName,
+					userPassword,
+					lockedMessage,
+					lastTreeUsedPath;
+	
+	private int userUnlocks;	
+/*
+ * end user info FIXME all need instantiation through a user login JOptionPane
+ */
+	
+	private String lastTxt = "";
 	
 	private WISPTNodeObject selectedWTNO = null;
 	
@@ -73,16 +92,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	//TODO finish settings
 		private JTextArea changeUserPassword,
 							changeAdminPassword,
-							changeInvisibleString;
+							changeLockedMessage;
 		
 		private JSpinner userUnlocksSpinner;
 		
 		private JCheckBox trainingModeCheckBox,
 							enableEditorMode,
 		  					processingOnCheck;
-		
-		private Boolean trainingModeOn = false,
-						processingOn = false;
 	
 		private JPanel settingsContentPane,
 						adminTab,
@@ -136,7 +152,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 					southPSplit;
 	
 	private JLabel	processingLabel = new JLabel("Done"),
-					userLabel = new JLabel(username); 
+					userLabel = new JLabel(userName); 
 	
 	private JTree tree;
 	
@@ -183,8 +199,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			private JMenu toggle;
 				private JMenuItem	tTips,
 									tNavTree;
-				private boolean tTipsOn,
-								tNavTreeOn;
 			private JMenuItem	openTreeBuilder,
 								unlockTreeNode;
 				
@@ -301,11 +315,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								@Override
 								public void actionPerformed(ActionEvent e)
 								{
-									//FIXME saveTree_actionPerformed(e);
+									saveTree_actionPerformed(e);
 								}//end actionPerformed
 							}//end listener	
 							);//listener added
-					file.add(newTree);
+					file.add(saveTree);
 						
 						
 						
@@ -378,7 +392,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						toggle = new JMenu("Toggle");
 					edit.add(toggle);
 					
-							tTipsOn = true;
+							tipsVisible = true;
 							
 							tTips = new JMenuItem("\u2611 Tips");
 							tTips.addActionListener
@@ -394,7 +408,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								);//ActionListener added
 						toggle.add(tTips);
 							
-							tNavTreeOn = true;
+								treeVisible = true;
 							
 							tNavTree = new JMenuItem("\u2611 Navigation Tree");
 							tNavTree.addActionListener
@@ -488,7 +502,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						history.setEnabled(false);
 					navigate.add(history);
 						
-					userPrefs = new JMenu(username + " Preferences");
+					userPrefs = new JMenu(userName + " Preferences");
 				menu.add(userPrefs);
 				
 						startupSettings = new JMenuItem("Settings");
@@ -540,23 +554,25 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 											adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
 											
 													processingOnCheck = new JCheckBox("Enable Detailed Process Tooltips");
-													processingOnCheck.setSelected(false);
+													processingOnCheck.setSelected(processTooltipsEnabled);
 												adminSettingsCenter.add(processingOnCheck);
 													
 													trainingModeCheckBox = new JCheckBox("Enable Training Mode");
+													trainingModeCheckBox.setSelected(trainingModeEnabled);
 												adminSettingsCenter.add(trainingModeCheckBox);
 												
 													enableEditorMode = new JCheckBox("Enable Editor Mode");
+													enableEditorMode.setSelected(editorModeEnabled);
 												adminSettingsCenter.add(enableEditorMode);
 													
-													changeUserPassword = new JTextArea("password");
+													changeUserPassword = new JTextArea(userPassword);
 												adminSettingsCenter.add(changeUserPassword);
 												
 													changeAdminPassword = new JTextArea("WISPadmin");
 												adminSettingsCenter.add(changeAdminPassword);
 												
-													changeInvisibleString = new JTextArea("This Branch/Leaf has been locked!");
-												adminSettingsCenter.add(changeInvisibleString);
+													changeLockedMessage = new JTextArea(lockedMessage);
+												adminSettingsCenter.add(changeLockedMessage);
 												
 													userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
 													userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
@@ -573,7 +589,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 														public void
 														actionPerformed(ActionEvent e)
 														{
-															save_actionPerformed(e);
+															saveSettings_actionPerformed(e);
 														}//end actionPerformed
 													}//end ActionListener
 													);//actionListener added'
@@ -1057,7 +1073,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1074,11 +1090,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	{
 		try
 		{
-			if(tNavTreeOn)
+			if(treeVisible)
 			{
 				tNavTree.setText("\u2610 Navigation Tree");
 				westPane.setVisible(false);
-				tNavTreeOn = false;
+				treeVisible = false;
 			}
 			else
 			{
@@ -1086,13 +1102,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				westPane.setVisible(true);
 				westCenterEastSplit.revalidate();
 				westCenterEastSplit.setDividerLocation(0.2);
-				tNavTreeOn = true;
+				treeVisible = true;
 			}//end inner if
 		}
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1130,9 +1146,43 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
+		DefaultTreeModel inTree = (DefaultTreeModel)tree.getModel();
+		try 
+		{
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString());//creates a empty file in that directory
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Files", "ser");
+			fc.setFileFilter(filter);
+			int val = fc.showOpenDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				File selectedFile = fc.getSelectedFile();//grabs the selected file
+				FileInputStream fileIn = new FileInputStream(selectedFile);
+		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
+		        inTree = (DefaultTreeModel)in.readObject();//grabs the TreeModel of that object and assigns to the returned variable
+		        in.close();
+		        fileIn.close();
+		        System.out.println("Object read from "+selectedFile.getName());
+			}//end if
+	    }
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processTooltipsEnabled)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}
+			inTree = (DefaultTreeModel)tree.getModel();
+		}
 		try
 		{
-			model = (DefaultTreeModel)getTreeModel();
+			model = inTree;
 			tree.setModel(model);
 			tree.addTreeSelectionListener(this);
 			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -1144,7 +1194,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1155,17 +1205,74 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			}
 		}//end try/catch
 	}//end loadTree AP
+
+	public void
+	saveTree_actionPerformed(ActionEvent e)
+	{
+		try 
+		{
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString()+"/Tree Saves");//creates a empty file in that directory
+			currentDirectoryFile.mkdirs();
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Tree Files", "tree");
+			fc.setFileFilter(filter);
+			int val = fc.showSaveDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				boolean continueSave = true;
+				try 
+				{
+					File selectedCurrentDirectoryFile = fc.getSelectedFile();//instantiates a file object by the name specified
+					FileInputStream fileIn = new FileInputStream(selectedCurrentDirectoryFile);//if successful, tries to open the location
+			        ObjectInputStream in = new ObjectInputStream(fileIn); //if opened, tries to processes it as a serialized object
+			        DefaultTreeModel inTree = (DefaultTreeModel)in.readObject();//if processed, tries to assign it to a variable
+			        inTree.setRoot((TreeNode)inTree.getRoot());
+			        in.close();
+			        fileIn.close();
+			        
+			        int continueSaveInt = JOptionPane.showConfirmDialog(this, "File already exists. Write over file?", "Existing File", JOptionPane.OK_CANCEL_OPTION);
+			        if(continueSaveInt != 0)
+			        {
+			        	continueSave = false;
+			        }
+				}
+				catch(Exception ex)
+				{
+					continueSave = true;
+				}
+			    if(continueSave)    	
+			    {
+			    	String fileName = fc.getSelectedFile().toString();
+					if(fc.getSelectedFile().toString().contains(".tree"))
+					{
+						fileName = fileName.split(".tree")[0];
+					}
+					FileOutputStream fileOut = new FileOutputStream(fileName+".tree");
+			        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			        out.writeObject(tree.getModel());
+			        out.close();
+			        fileOut.close();
+			        p("Object saved in "+fileName+".tree");
+			    }
+			}
+	    }
+		catch(IOException i) 
+		{
+	         i.printStackTrace();
+		}//end read try/catch
+	}
 	
 	public void
 	tTips_actionPerformed(ActionEvent e)
 	{
 		try
 		{
-			if(tTipsOn)
+			if(tipsVisible)
 			{
 				tTips.setText("\u2610 Tips");
 				eastPad.setVisible(false);
-				tTipsOn = false;
+				tipsVisible = false;
 			}
 			else
 			{
@@ -1173,13 +1280,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				eastPad.setVisible(true);
 				centerEastSplit.revalidate();
 				centerEastSplit.setDividerLocation(0.75);
-				tTipsOn = true;
+				tipsVisible = true;
 			}//end if
 		}
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1189,7 +1296,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}//end tTips AP
+	}//end tTips_AP
 	
 	public void
 	check_actionPerformed(ActionEvent e, boolean selected, int index)
@@ -1226,7 +1333,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1236,7 +1343,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}//end check AP
+	}//end check_AP
 
 	public void
 	startupSettings_actionPerformed(ActionEvent e)
@@ -1248,7 +1355,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1258,7 +1365,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}//end startupSettings AP
+	}//end startupSettings_AP
 	
 	public void
 	radio_actionPerformed(ActionEvent e, int index)
@@ -1274,7 +1381,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1284,7 +1391,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}//end radio AP
+	}//end radio_AP
 	
 	public void
 	exit_actionPerformed(ActionEvent e)
@@ -1297,7 +1404,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1307,7 +1414,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}//end exitAP
+	}//end exit_AP
 	
 	public void
 	openTreeBuilder_actionPerformed(ActionEvent e)
@@ -1319,7 +1426,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		catch(Exception ex)
 		{
 			processingLabel.setText("Exception Ocurred!");
-			if(processingOn)
+			if(processTooltipsEnabled)
 			{
 				String trace = "";
 				for(StackTraceElement st : ex.getStackTrace())
@@ -1329,23 +1436,24 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
 		}//end try/catch
-	}
+	}//end openTreeBuilder_AP
 	
 	public void
-	save_actionPerformed(ActionEvent e)
+	saveSettings_actionPerformed(ActionEvent e)
 	{
-		processingOn = processingOnCheck.isSelected();
-		trainingModeOn = trainingModeCheckBox.isSelected();
-		if(enableEditorMode.isSelected())
+		processTooltipsEnabled = processingOnCheck.isSelected();
+		trainingModeEnabled = trainingModeCheckBox.isSelected();
+		editorModeEnabled = enableEditorMode.isSelected();
+		if(editorModeEnabled)
 		{
 			westPane.setBottomComponent(westSouthPad);
 			westSouthPad.setVisible(true);
 			southUSplit.setBackground(new Color(255,180,180));
 			southPSplit.setBackground(new Color(255,180,180));
-			if(!username.contains(" (EDITOR MODE ACTIVE)"))
+			if(!userName.contains(" (EDITOR MODE ACTIVE)"))
 			{
-				username += " (EDITOR MODE ACTIVE)";
-				userLabel.setText(username);
+				userName += " (EDITOR MODE ACTIVE)";
+				userLabel.setText(userName);
 			}
 		}
 		else
@@ -1354,20 +1462,22 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			westPane.setBottomComponent(new JLabel());
 			southUSplit.setBackground(white);
 			southPSplit.setBackground(white);
-			if(username.contains(" (EDITOR MODE ACTIVE)"))
+			if(userName.contains(" (EDITOR MODE ACTIVE)"))
 			{
-				username = username.replace(" (EDITOR MODE ACTIVE)","") ;
-				userLabel.setText(username);
+				userName = userName.replace(" (EDITOR MODE ACTIVE)","") ;
+				userLabel.setText(userName);
 			}
 			westPane.setDividerLocation(westPane.getHeight()*2);
 		}
 		westPane.revalidate();
 		westPane.repaint();
-		WISPTNodeObject.setUserPass(changeUserPassword.getText());
-		WISPTNodeObject.setAdminPass(changeAdminPassword.getText());;
-		WISPTNodeObject.setInvisibleString(changeInvisibleString.getText());
-		WISPTNodeObject.setUserMax((int)userUnlocksSpinner.getValue());
-		processingLabel.setText(userUnlocksSpinner.getValue().toString());
+		userPassword = changeUserPassword.getText();
+		WISPTNodeObject.setUserPass(userPassword);
+		WISPTNodeObject.setAdminPass(changeAdminPassword.getText());
+		lockedMessage = changeLockedMessage.getText();
+		WISPTNodeObject.setInvisibleString(lockedMessage);
+		userUnlocks = (int)userUnlocksSpinner.getValue();
+		WISPTNodeObject.setUserMax(userUnlocks);
 		startupSettingsDialog.setVisible(false);
 	}//end save_AP
 	
@@ -1521,37 +1631,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		
 	}
 	
-	public TreeModel 
-	getTreeModel()
-	{
-		TreeModel inTree = tree.getModel();
-		try 
-		{
-			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString());//creates a empty file in that directory
-			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Files", "ser");
-			fc.setFileFilter(filter);
-			int val = fc.showOpenDialog(this);//opens an open file dialog
-			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
-			{
-				File selectedFile = fc.getSelectedFile();//grabs the selected file
-				FileInputStream fileIn = new FileInputStream(selectedFile);
-		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
-		        inTree = (TreeModel)in.readObject();//grabs the TreeModel of that object and assigns to the returned variable
-		        in.close();
-		        fileIn.close();
-		        System.out.println("Object read from "+selectedFile.getName());
-			}//end if
-	    }
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return tree.getModel();//when something goes wrong, returns the current model: no changes are made.
-		}
-		return inTree;
-	}
-	
 	public void 
 	invisibleDeselectedButtons()
 	{
@@ -1581,7 +1660,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	incrementCounter()
 	{
-		if(trainingModeOn)
+		if(trainingModeEnabled)
 		{
 			if(selectedWTNO.getCounter()<WISPTNodeObject.getUserMax())
 			{
@@ -1739,178 +1818,69 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	{
 		System.out.println(s);
 	}
-	
-	/* TODO beginning of old overrrides
-	@Override
-	public void 
-	actionPerformed(ActionEvent e) 
-	{
-		Object source = e.getSource();
-			String sourceString = source.toString();
-			String[] sourceArray = sourceString.split(",");
-			sourceString = sourceArray[sourceArray.length-1];
-			sourceString = sourceString.replaceAll("\u2610 ", "");
-			sourceString = sourceString.replaceAll("\u2611 ", "");
-			sourceString = sourceString.replaceFirst("text=", "");
-			sourceString = sourceString.replaceFirst("]", "");
-			System.out.println(sourceString);
-			
-			Here I was wanting to convert the object to something that a switch
-			statement could process (like an enum) but I realized there was no way
-			to convert the variable names for the radio buttons and tool tips into
-			a string with which to define an enum.
-		try
-		{
-			//if(source == openTreeBuilder)
-			{
-				WISPTTreeBuilder.main(new String[1]);
-			}
-			//else if(source == loadTree)
-			{
-				TreeModel model = getTreeModel();
-				tree.setModel(model);
-				tree.addTreeSelectionListener(this);
-				tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-				tree.setEnabled(true);
-				treeScroll.repaint();
-				tree.repaint();
-	
-			}
-			//else if(source == tTips)
-			{
-				if(tTipsOn)
-				{
-					tTips.setText("\u2610 Tips");
-					eastPad.setVisible(false);
-					tTipsOn = false;
-				}
-				else
-				{
-					tTips.setText("\u2611 Tips");
-					eastPad.setVisible(true);
-					centerEastSplit.revalidate();
-					centerEastSplit.setDividerLocation(0.75);
-					tTipsOn = true;
-				}//end inner if
-			}
-			//else if(source == tNavTree)
-			{
-				if(tNavTreeOn)
-				{
-					tNavTree.setText("\u2610 Navigation Tree");
-					westNorthPad.setVisible(false);
-					tNavTreeOn = false;
-				}
-				else
-				{
-					tNavTree.setText("\u2611 Navigation Tree");
-					westNorthPad.setVisible(true);
-					westCenterEastSplit.revalidate();
-					westCenterEastSplit.setDividerLocation(0.2);
-					tNavTreeOn = true;
-				}//end inner if
-			}
-			else if(source == check1)
-			{
-				tipTextAreaToggler(check1.isSelected(), 0);
-			}
-			else if(source == check2)
-			{
-				tipTextAreaToggler(check2.isSelected(), 1);
-			}
-			else if(source == check3)
-			{
-				tipTextAreaToggler(check3.isSelected(), 2);
-			}
-			else if(source == check4)
-			{
-				tipTextAreaToggler(check4.isSelected(), 3);
-			}
-			else if(source == check5)
-			{
-				tipTextAreaToggler(check5.isSelected(), 4);
-			}
-			else if(source == check6)
-			{
-				tipTextAreaToggler(check6.isSelected(), 5);
-			}	
-			else if(source == unlockTreeNode)
-			{
-				selectedWTNO.unlockNode();//dialog asking for PW
-				selectedNode.setUserObject(selectedWTNO);
-				tree.clearSelection();
-				tree.setSelectionPath(new TreePath(selectedNode.getPath()));
-				tree.revalidate();
-				tree.repaint();
-			}
-			else if(source == startupSettings)
-			{
-				startupSettingsDialog.setVisible(true);
-			}
-			else if(source == radio1)
-			{
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
-				TreePath path = new TreePath(child.getPath());
-				tree.setSelectionPath(path);
-				tree.revalidate();
-				tree.repaint();
-			}	
-			else if(source == radio2)
-			{
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(1);
-				TreePath path = new TreePath(child.getPath());
-				tree.setSelectionPath(path);
-				tree.revalidate();
-				tree.repaint();
-				
-			}	
-			else if(source == radio3)
-			{
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(2);
-				TreePath path = new TreePath(child.getPath());
-				tree.setSelectionPath(path);
-				tree.revalidate();
-				tree.repaint();
-				
-			}	
-			else if(source == radio4)
-			{
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(3);
-				TreePath path = new TreePath(child.getPath());
-				tree.setSelectionPath(path);
-				tree.revalidate();
-				tree.repaint();
-				
-			}//end source if
-		}
-	}*/
-	// TODO end of old overrides, try/catch for future reference
-	
+}
+
+class WISPTUserProfileBuilder
+{
 /*
-	@Override
-	public void componentResized(ComponentEvent e) {
-		//Object source = e.getSource();
+ * TODO variables
+ */
+	private JCheckBox isAdmin,
+						editorModeEnabled,
+						processTooltipsEnabled,
+						trainingModeEnabled,
+						tipsVisible,
+						treeVisible;
+	
+	private JTextArea userName,
+						userPassword,
+						invisibleString;
+	
+	private JSpinner userUnlocks;
+	
+	private JDialog builder;
+	
+	private JPanel contentPane,
+					southPane,
+					centerPane;
+	private JButton okayBtn,
+					cancelBtn;
+
+/*
+ *  TODO constructors
+ */
+	public WISPTUserProfileBuilder()
+	{
+		builder = new JDialog();
+		builder.setModalityType(ModalityType.APPLICATION_MODAL);
+		builder.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
+		contentPane = new JPanel(new BorderLayout());
+		builder.setContentPane(contentPane);
+		
+		centerPane = new JPanel(new GridLayout(4,3));
+		centerPane.setBorder(BorderFactory.createTitledBorder("User Profile"));
+		contentPane.add(centerPane, BorderLayout.CENTER);
+		
+		isAdmin = new JCheckBox("Is Administrator");
+		centerPane.add(isAdmin);
+		
+		//editorModeEnabled
 	}
 
+}
 
+class SaveFileChooser extends JFileChooser
+{
 	@Override
-	public void componentMoved(ComponentEvent e) {
-
-		//centerPane.setSize(3*(int)(contentPane.getWidth()/5), centerPane.getHeight());
-		
+	public void
+	approveSelection()
+	{
+		/*
+		 * need to add the safeguard here, I'm guessing that it disposes of the JDialog 
+		 * through this function, and I want the safeguard to come first, and only close/dispose
+		 * if the safeguard passes (if the user is sure they want to over write the file)
+		 * Internet died so I can't get the original JFileChooser.java to work with.
+		 */
 	}
-
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-		
-	}
-
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
-				
-	}*/
-
 }

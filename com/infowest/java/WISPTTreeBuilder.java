@@ -249,11 +249,7 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 	
 	public void
 	saveTreeBtn_actionPerformed(ActionEvent e)
-	{
-		treeSaveName = JOptionPane.showInputDialog(null, 
-				"Choose a name for the save file:",
-				"Save Tree",
-				JOptionPane.PLAIN_MESSAGE);	
+	{	
 		saveTree();
 		this.dispose();
 	}
@@ -273,64 +269,52 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		
 		int answer = 1;
 		WISPTNodeObject nodeS = new WISPTNodeObject("", "");
-		if(source == saveTreeBtn)
+		try
 		{
-			saveTree();
+			selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+			nodeS = (WISPTNodeObject)selectedNode.getUserObject();
 		}
-		else if(source == loadTreeBtn)
+		catch(NullPointerException npe)
 		{
-			loadTree();
-			tree.revalidate();
+			JOptionPane.showMessageDialog(null, "Please make a selection first.");
+			source = null;
 		}
-		else
+		if(source == newNodeBtn)
 		{
-			try
+			getNode(nodeS);
+			exeNew();
+		}
+		else if(source == editNodeBtn)
+		{
+			getNode(nodeS);
+			exeEdit();
+		}
+		else if(source == deleteNodeBtn)
+		{
+			if (root==selectedNode) 
 			{
-				selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-				nodeS = (WISPTNodeObject)selectedNode.getUserObject();
-			}
-			catch(NullPointerException npe)
-			{
-				JOptionPane.showMessageDialog(null, "Please make a selection first.");
-				source = null;
-			}
-			if(source == newNodeBtn)
-			{
-				getNode(nodeS);
-				exeNew();
-			}
-			else if(source == editNodeBtn)
-			{
-				getNode(nodeS);
-				exeEdit();
+				JOptionPane.showMessageDialog(null, "Root cannot be deleted!");
 			}
 			else if(source == deleteNodeBtn)
 			{
-				if (root==selectedNode) 
+				answer = JOptionPane.showConfirmDialog(null,
+						"This will delete the selected branch/leaf, " + nodeS.toString()
+								+ ", and all of its branches/leaves. This cannot be undone! Are you sure you want to proceed?",
+						"Delete Branch/Leaf", JOptionPane.OK_CANCEL_OPTION);
+				switch (answer) 
 				{
-					JOptionPane.showMessageDialog(null, "Root cannot be deleted!");
-				}
-				else if(source == deleteNodeBtn)
-				{
-					answer = JOptionPane.showConfirmDialog(null,
-							"This will delete the selected branch/leaf, " + nodeS.toString()
-									+ ", and all of its branches/leaves. This cannot be undone! Are you sure you want to proceed?",
-							"Delete Branch/Leaf", JOptionPane.OK_CANCEL_OPTION);
-					switch (answer) 
-					{
-					case 0:
-						model.removeNodeFromParent(selectedNode);
-						tree.setModel(model);
-						tree.revalidate();
-						break;
-					case 1:
-					case 2:
-					default:
-						break;
-					}//end switch
-				}//end selected if
-			}//end source if
-		}//end save if
+				case 0:
+					model.removeNodeFromParent(selectedNode);
+					tree.setModel(model);
+					tree.revalidate();
+					break;
+				case 1:
+				case 2:
+				default:
+					break;
+				}//end switch
+			}//end selected if
+		}//end source if
 	}//end actionPerformed
 	
 	public void 
@@ -396,7 +380,7 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
 			File currentDirectoryFile = new File(absolutePath.toString());//creates a empty file in that directory
 			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Files", "ser");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Tree Files", "tree");
 			fc.setFileFilter(filter);
 			int val = fc.showSaveDialog(this);//opens an open file dialog
 			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
@@ -406,12 +390,12 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 				{
 					fileName = fileName.split(".ser")[0];
 				}
-				FileOutputStream fileOut = new FileOutputStream(fileName+".ser");
+				FileOutputStream fileOut = new FileOutputStream("Saved Trees/"+fileName+".tree");
 		        ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		        out.writeObject(tree.getModel());
 		        out.close();
 		        fileOut.close();
-		        p("Object saved in "+fc.getSelectedFile().getName()+".ser");
+		        p("Object saved in "+fc.getSelectedFile().getName()+".tree");
 				this.dispose();
 			}
 	    }

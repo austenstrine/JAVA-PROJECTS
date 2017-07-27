@@ -16,17 +16,19 @@
 
 package com.infowest.java;
 
+import java.awt.Dialog.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.awt.*;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-//import javax.swing.tree.DefaultMutableTreeNode.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import java.io.*;
-import java.util.ArrayList;
+
+import java.util.*;
+
+import javax.imageio.*;
+
+import javax.swing.*;
+import javax.swing.tree.*;
 
 public class WISPTNodeBuilder extends JDialog
 
