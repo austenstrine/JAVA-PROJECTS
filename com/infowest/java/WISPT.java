@@ -221,6 +221,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public WISPT()
 	{
 		super();
+		//FIXME created a deafult profile from which to load XXX instantiation
+		WISPTUserProfile defaultUser = new WISPTUserProfile(false);
+		saveSerializedObject("/User Profiles", "User Profile", "user", defaultUser);
 		try 
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -1047,11 +1050,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	main(String[] args) 
 	{
 		WISPT window = new WISPT();
-		//window.setContentEnabled(false);
 		window.setVisible(true);
-		//FIXME loadUserProfile();
-		//window.setContentEnabled(true);
-
 	}
 
 /*
@@ -1146,7 +1145,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
-		DefaultTreeModel inTree = (DefaultTreeModel)tree.getModel();
+		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject("/Tree Saves", "Serialized Tree File", "tree");
+		/*
 		try 
 		{
 			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
@@ -1180,6 +1180,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			}
 			inTree = (DefaultTreeModel)tree.getModel();
 		}
+		*/
+		
 		try
 		{
 			model = inTree;
@@ -1580,14 +1582,130 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}
 	
 	
-	// TODO end of actionPerformed methods
-	public void
+	public void //TODO chassis for listener methods
 	y_actionPerformed(ActionEvent e)
 	{
 		//stuff happens
 	}//end AP
 	
 	// TODO end of actionPerformed methods
+	
+	/**This function is for loading any serialized java object that has been saved. It uses a JFileChooser dialog to do so.
+	 * 
+	 * @param folderPath
+	 * The path in the program's root folder that the dialog will start in, i.e. "/Documents"
+	 * @param fileType
+	 * The type of file that the dialog should be searching for, i.e. "Microsoft Word Document"
+	 * @param fileTypeExtension
+	 * The extension of the aforementioned file type, i.e. "doc" for .doc
+	 * @return
+	 * Will return a de-serialized Object, as selected in the dialog. If it was unable to do so, it returns null.
+	 */
+	public Object
+	loadSerializedObject(String folderPath, String fileType, String fileTypeExtension)
+	{
+		Object objectToReturn = null;
+		try 
+		{
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString()+folderPath);//creates a empty file in that directory
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(fileType, fileTypeExtension);
+			fc.setFileFilter(filter);
+			int val = fc.showOpenDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				File selectedFile = fc.getSelectedFile();//grabs the selected file
+				FileInputStream fileIn = new FileInputStream(selectedFile);
+		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
+		        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
+		        in.close();
+		        fileIn.close();
+		        System.out.println("Object read from "+selectedFile.getName());
+			}//end if
+			return objectToReturn;
+	    }//try
+		catch(Exception ex)
+		{
+			processingLabel.setText("Exception Ocurred!");
+			if(processTooltipsEnabled)
+			{
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+			}//end if
+			return null;
+		}//end try/catch
+	}//end loadSerializedObject()
+	
+	public void
+	saveSerializedObject(String folderPath, String fileType, String fileTypeExtension, Object serializeableObject)
+	{
+		try 
+		{
+			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
+			File currentDirectoryFile = new File(absolutePath.toString()+folderPath);//creates a empty file in that directory
+			currentDirectoryFile.mkdirs();
+			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(fileType, fileTypeExtension);
+			fc.setFileFilter(filter);
+			int val = fc.showSaveDialog(this);//opens an open file dialog
+			if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
+			{
+				boolean continueSave = true;
+				try //this tests to see if the file already exists and will be overwritten
+				{
+					File selectedCurrentDirectoryFile = fc.getSelectedFile();//instantiates a file object by the name specified
+					FileInputStream fileIn = new FileInputStream(selectedCurrentDirectoryFile);//if successful, tries to open the location
+			        ObjectInputStream in = new ObjectInputStream(fileIn); //if opened, tries to processes it as a serialized object
+			        Object testObject = in.readObject();//if processed, tries to assign it to a variable
+			        p(testObject.toString());
+			        in.close();
+			        fileIn.close();
+			        	//if the file does not exist, or is not a valid serialized java file, this point will not be reached
+			        int continueSaveInt = JOptionPane.showConfirmDialog(this, "File already exists. Write over file?", "Existing File", JOptionPane.OK_CANCEL_OPTION);
+			        if(continueSaveInt != 0)
+			        {
+			        	continueSave = false;
+			        }//end if
+				}//try
+				catch(Exception ex)
+				{
+					continueSave = true;
+				}//end inner try/catch
+				
+				try
+				{
+				    if(continueSave)//will only save if file does not already exist, or user is okay with overwriting	
+				    {
+				    	String fileName = fc.getSelectedFile().toString();
+						if(fc.getSelectedFile().toString().contains("."+fileTypeExtension))
+						{
+							fileName = fileName.split("."+fileTypeExtension)[0];
+						}
+						FileOutputStream fileOut = new FileOutputStream(fileName+"."+fileTypeExtension);
+				        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				        out.writeObject(serializeableObject);
+				        out.close();
+				        fileOut.close();
+				        p("Object saved in "+fileName+"."+fileTypeExtension);
+				    }//end inner if
+				}//try
+				catch(Exception ex)
+				{
+					JOptionPane.showMessageDialog(this, "Save Failed! Contact the administrator.");
+					p(ex.getStackTrace().toString());
+				}//end inner try/catch
+			}//end if
+		}//try
+		catch(Exception ex)
+		{
+			p(ex.getStackTrace().toString());
+		}//end outer try/catch
+	}//end saveSerializedObject()
 	
 	public void 
 	setAsideNodeProperties(WISPTNodeObject sourceWTNO)

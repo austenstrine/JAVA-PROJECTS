@@ -100,14 +100,131 @@ public class WISPTUserProfile implements Serializable
 	{
 		this.isAdmin = isAdmin;
 	}
+	public boolean
+	getAdminPrivelage()
+	{
+		return isAdmin;
+	}
+	
 	public void
 	setEditorModeEnabled(boolean editorModeEnabled)
 	{
 		this.editorModeEnabled = editorModeEnabled;
+	}	
+	public boolean
+	getEditorModeEnabled()
+	{
+		return editorModeEnabled;
 	}
+	
 	public void
 	setProcessTooltipsEnabled(boolean processTooltipsEnabled)
 	{
 		this.processTooltipsEnabled = processTooltipsEnabled;
+	}	
+	public boolean
+	getProcessTooltipsEnabled()
+	{
+		return processTooltipsEnabled;
 	}
+	
+	public void
+	setTrainingModeEnabled(boolean trainingModeEnabled)
+	{
+		this.trainingModeEnabled = trainingModeEnabled;
+	}	
+	public boolean
+	getTrainingModeEnabled()
+	{
+		return trainingModeEnabled;
+	}
+	
+	public void
+	setTipsVisible(boolean tipsVisible)
+	{
+		this.tipsVisible = tipsVisible;
+	}	
+	public boolean
+	getTipsVisible()
+	{
+		return tipsVisible;
+	}
+	
+	public void
+	setTreeVisible(boolean treeVisible)
+	{
+		this.treeVisible = treeVisible;
+	}	
+	public boolean
+	getTreeVisible()
+	{
+		return treeVisible;
+	}
+	
+	public void
+	setUserName(String userName)
+	{
+		this.userName = userName;
+	}	
+	public String
+	getUserName()
+	{
+		return userName;
+	}
+	
+	public void
+	setUserPassword(String userPassword)
+	{
+		this.userPassword = userPassword;
+	}	
+	public String
+	getUserPassword()
+	{
+		return userPassword;
+	}
+	
+	public void
+	setLockedMessage(String lockedMessage)
+	{
+		this.lockedMessage = lockedMessage;
+	}	
+	public String
+	getLockedMessage()
+	{
+		return lockedMessage;
+	}
+	
+	public void
+	setLastTreeUsedPath(String lastTreeUsedPath)
+	{
+		this.lastTreeUsedPath = lastTreeUsedPath;
+	}	
+	public String
+	getLastTreeUsedPath()
+	{
+		return lastTreeUsedPath;
+	}
+	
+	public void
+	setUserUnlocks(int userUnlocks)
+	{
+		this.userUnlocks = userUnlocks;
+	}	
+	public int
+	getUserUnlocks()
+	{
+		return userUnlocks;
+	}
+	
+	public void
+	setLastSelectedNode(DefaultMutableTreeNode lastSelectedNode)
+	{
+		this.lastSelectedNode = lastSelectedNode;
+	}	
+	public DefaultMutableTreeNode
+	getLastSelectedNode()
+	{
+		return lastSelectedNode;
+	}
+	
 }
