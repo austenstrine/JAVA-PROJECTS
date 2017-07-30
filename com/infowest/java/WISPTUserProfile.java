@@ -37,31 +37,16 @@ public class WISPTUserProfile implements Serializable
 	private String userName,
 						userPassword,
 						lockedMessage,
-						lastTreeUsedPath;
+						lastTreeUsedPath,
+						userProfilePath;
 	
 	private int userUnlocks;	
 	
-	private DefaultMutableTreeNode lastSelectedNode;
+	private DefaultMutableTreeNode lastUserSelectedNode;
 	/*
 	 *  TODO constructors
 	 */
-	public WISPTUserProfile(boolean isAdmin, boolean editorModeEnabled, boolean processTooltipsEnabled, boolean trainingModeEnabled, boolean tipsVisible, boolean treeVisible, String userName, String userPassword, String lockedMessage, String lastTreeUsedPath, int userUnlocks, DefaultMutableTreeNode lastSelectedNode)
-	{
-		 this.isAdmin = isAdmin;
-		 this.editorModeEnabled = editorModeEnabled;
-		 this.processTooltipsEnabled = processTooltipsEnabled;
-		 this.trainingModeEnabled = trainingModeEnabled;
-		 this.tipsVisible = tipsVisible;
-		 this.treeVisible = treeVisible;
-		 this.userName = userName;
-		 this.userPassword = userPassword;
-		 this.lockedMessage = lockedMessage;
-		 this.lastTreeUsedPath = lastTreeUsedPath;
-		 this.userUnlocks = userUnlocks;
-		 this.lastSelectedNode = lastSelectedNode;
-	}
-	
-	public WISPTUserProfile(boolean isDefaultRootAdmin)
+	public WISPTUserProfile(boolean isDefaultRootAdmin, String userProfilePath)
 	{
 		if(isDefaultRootAdmin)
 		{
@@ -84,12 +69,13 @@ public class WISPTUserProfile implements Serializable
 		 this.userPassword = "password";
 		 this.lockedMessage = "This step has been locked!";
 		 this.userUnlocks = 3;
-		 this.lastSelectedNode = new DefaultMutableTreeNode("null");
+		 this.lastUserSelectedNode = new DefaultMutableTreeNode("null");
 
 			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
 			File currentDirectoryFile = new File(absolutePath.toString()+"/Tree Saves");//creates a empty file in the tree saves folder of that directory
 			
 		 this.lastTreeUsedPath = currentDirectoryFile.toString()+"/dt.tree";
+		 this.userProfilePath = userProfilePath;
 	}
 	
 	/*
@@ -217,14 +203,20 @@ public class WISPTUserProfile implements Serializable
 	}
 	
 	public void
-	setLastSelectedNode(DefaultMutableTreeNode lastSelectedNode)
+	setLastSelectedNode(DefaultMutableTreeNode lastUserSelectedNode)
 	{
-		this.lastSelectedNode = lastSelectedNode;
+		this.lastUserSelectedNode = lastUserSelectedNode;
 	}	
 	public DefaultMutableTreeNode
 	getLastSelectedNode()
 	{
-		return lastSelectedNode;
+		return lastUserSelectedNode;
+	}
+
+	public void 
+	setUserProfilePath(String userProfilePath2) 
+	{
+		this.userProfilePath = userProfilePath;
 	}
 	
 }
