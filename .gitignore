@@ -21,3 +21,4 @@ Aliens2/.metadata/.plugins/org.eclipse.jdt.core/assumedExternalFilesCache
 *.ini
 *.MF
 *.gitignore
+*.class

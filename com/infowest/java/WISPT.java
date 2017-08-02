@@ -39,10 +39,12 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 /*
  *	TODO Variables 
  */
-	private static final long serialVersionUID = -1079398159072533776L;
-	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
+	protected static final long serialVersionUID = -1079398159072533776L;
+	protected ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	
-	private Color white =  new Color(1f, 1f, 1f),
+	protected Path rootProgramDirectory;
+	
+	protected Color white =  new Color(1f, 1f, 1f),
 			nineGray =  new Color(0.9f, 0.9f, 0.9f),
 			eightGray =  new Color(0.8f, 0.8f, 0.8f),
 			sevenGray =  new Color(0.7f, 0.7f, 0.7f),
@@ -55,59 +57,60 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			black =  new Color(0f, 0f, 0f)*/
 			;
 	
-	private Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
+	protected Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
 			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
-			pad = BorderFactory.createEmptyBorder(3,3,3,3);
+			pad = BorderFactory.createEmptyBorder(3,3,3,3),
+			matte = BorderFactory.createMatteBorder(5,5,5,5, eightGray);
 	
 /*
  * TODO current user info
  */
 	
-	private boolean isAdmin,
+	protected boolean isAdmin,
 					editorModeEnabled,
 					processTooltipsEnabled,
 					trainingModeEnabled,
 					tipsVisible,
 					treeVisible;
 	
-	private String userName,
+	protected String userName,
 					userPassword,
 					lockedMessage,
 					lastTreeUsedPath,
 					userProfilePath,
 					objectPath;
 	
-	private int userUnlocks;	
+	protected int userUnlocks;	
 	
-	private DefaultMutableTreeNode lastUserSelectedNode;
+	protected WISPTUserProfile userProfile;
 	
-	private WISPTUserProfile userProfile;
 /*
  * end user info FIXME all need instantiation through a user login JOptionPane
  */
-	private DefaultTreeModel loadedUserModel;
+	protected DefaultTreeModel loadedUserModel;
 	
-	private String lastTxt = "";
+	protected String lastTxt = "";
 	
-	private WISPTNodeObject selectedWTNO = null;
+	protected WISPTNodeObject selectedWTNO = null;
 	
-	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
+	protected DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
 									previousSelectedNode = selectedNode,
 									asideNode = previousSelectedNode;
 	
-	private JDialog startupSettingsDialog;
+	protected JDialog startupSettingsDialog;
+	
 	//TODO finish settings
-		private JTextArea changeUserPassword,
+		protected JTextField changeUserPassword,
 							changeAdminPassword,
 							changeLockedMessage;
 		
-		private JSpinner userUnlocksSpinner;
+		protected JSpinner userUnlocksSpinner;
 		
-		private JCheckBox trainingModeCheckBox,
+		protected JCheckBox trainingModeCheckBox,
 							enableEditorMode,
 		  					processingOnCheck;
 	
-		private JPanel settingsContentPane,
+		protected JPanel settingsContentPane,
 						adminTab,
 						userTab,
 							adminSettings,
@@ -115,29 +118,29 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								adminSettingsCenter,
 								userSettingsCenter,
 								adminSettingsSouth;
-		private JButton save,
+		protected JButton save,
 						cancel;
 	
-	private JTabbedPane settingsCenterTabbedPane;
+	protected JTabbedPane settingsCenterTabbedPane;
 	
-	private JPanel 
+	protected JPanel 
 	contentPane,
 		northPane;
 		
-		private JSplitPane
+		protected JSplitPane
 		westCenterEastSplit,
 			westPane;
-				private JPanel
+				protected JPanel
 				westNorthPad;
-					private JScrollPane 
+					protected JScrollPane 
 					treeScroll;
-				private JPanel
+				protected JPanel
 				westSouthPad,
 					westSouthEditorBtns;
 			
-			private JSplitPane	
+			protected JSplitPane	
 			centerEastSplit;	
-				private JPanel
+				protected JPanel
 				centerPad,
 					centerBevel,
 						centerPane,
@@ -145,44 +148,44 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 							centerSouthPane,
 							
 				eastPad;
-					private JScrollPane	
+					protected JScrollPane	
 					eastScroll;
-						private JPanel			
+						protected JPanel			
 						eastPane,
 			
 		southPadPane,
 			southPane;
-				private JSplitPane
+				protected JSplitPane
 				consoleMsgs;
-					private JPanel
+					protected JPanel
 					southUSplit,
 					southPSplit;
 	
-	private JLabel	processingLabel,
+	protected JLabel	processingLabel,
 					userLabel; 
 	
-	private JTree tree;
+	protected JTree tree;
 	
-	private DefaultTreeModel model;
+	protected DefaultTreeModel model;
 
-	private JTextArea mainTxtArea,
+	protected JTextArea mainTxtArea,
 						tipArea;
 			
-	private JCheckBox	check1,
+	protected JCheckBox	check1,
 	 					check2,
 	  					check3,
 	  					check4,
 	  					check5,
 	  					check6;
 	
-	private JRadioButton	radio1,
+	protected JRadioButton	radio1,
 							radio2,
 							radio3,
 							radio4;
 	
-	private ButtonGroup radioButtons;
+	protected ButtonGroup radioButtons;
 	
-	private JButton addNodeBtn,
+	protected JButton addNodeBtn,
 					removeNodeBtn,
 					editNodeBtn,
 					upNodeBtn,
@@ -191,10 +194,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	/*
 	 * TODO MENU DECLARATIONS
 	 */
-	private JMenuBar menu;
+	protected JMenuBar menu;
 	
-		private JMenu file;
-			private JMenuItem	newTree,
+		protected JMenu file;
+			protected JMenuItem	newTree,
 								loadTree,
 								saveTree,
 								logIn,
@@ -202,21 +205,21 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								newUser,
 								exit;
 			
-		private JMenu edit;
-			private JMenu toggle;
-				private JMenuItem	tTips,
+		protected JMenu edit;
+			protected JMenu toggle;
+				protected JMenuItem	tTips,
 									tNavTree;
-			private JMenuItem	openTreeBuilder,
+			protected JMenuItem	openTreeBuilder,
 								unlockTreeNode;
 				
-		private JMenu navigate;
-			private JMenuItem	previous,
+		protected JMenu navigate;
+			protected JMenuItem	previous,
 								next,//is only valid if previous step was just called.
 								history;
 			
-		private JMenu userPrefs;
-			private JMenuItem startupSettings;
-			private JMenuItem editName;
+		protected JMenu userPrefs;
+			protected JMenuItem startupSettings;
+			protected JMenuItem editName;
 
 
 	
@@ -228,7 +231,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public WISPT()
 	{
 		super();
-		userProfilePath = "/User Profiles/defaultUserProfile.user";
+		rootProgramDirectory = Paths.get("").toAbsolutePath();
+		userProfilePath = File.separator+"User Profiles"+File.separator+"defaultUserProfile.user";
 		userProfile = (WISPTUserProfile)loadSerializedObject(false, userProfilePath, "User Profile", "user");
 		userProfile.setUserProfilePath(userProfilePath);
 		setUser(userProfile);
@@ -285,7 +289,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		setDefaultLookAndFeelDecorated(true);
 		
 		 contentPane = new JPanel(new BorderLayout());
-		 contentPane.setBorder(null);
+		 contentPane.setBorder(matte);
 		 contentPane.setBackground(white);
 		this.setContentPane(contentPane);
 		
@@ -354,11 +358,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								public void
 								actionPerformed(ActionEvent e)
 								{
-									//FIXME logIn_actionPerformed(e);
+									logIn_actionPerformed(e);
 								}//end actionPerformed
 							}//end ActionListener
 							);//ActionListener added
-						logIn.setEnabled(false);
+						logIn.setEnabled(true);
 					file.add(logIn);
 						
 						
@@ -588,13 +592,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 													enableEditorMode.setSelected(editorModeEnabled);
 												adminSettingsCenter.add(enableEditorMode);
 													
-													changeUserPassword = new JTextArea(userPassword);
+													changeUserPassword = new JTextField(userPassword);
 												adminSettingsCenter.add(changeUserPassword);
 												
-													changeAdminPassword = new JTextArea("WISPadmin");
+													changeAdminPassword = new JTextField("WISPadmin");
 												adminSettingsCenter.add(changeAdminPassword);
 												
-													changeLockedMessage = new JTextArea(lockedMessage);
+													changeLockedMessage = new JTextField(lockedMessage);
 												adminSettingsCenter.add(changeLockedMessage);
 												
 													userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
@@ -675,19 +679,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						treeScroll.setBackground(white);
 					westNorthPad.add(treeScroll);
 				
-
-							model = loadedUserModel;
 							tree = new JTree();
 							tree.setModel(model);
-							try
-							{
-								tree.setSelectionPath(new TreePath(lastUserSelectedNode.getPath()));
-							}
-							catch(Exception ex)
-							{
-								p("Selection setting failed");
-								ex.printStackTrace();
-							}
+							tree.addTreeSelectionListener(this);
+							tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 							tree.setBorder(null);
 							tree.setBackground(white);
 							tree.setExpandsSelectedPaths(true);
@@ -1069,6 +1064,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		radio1.setVisible(false);
 		p(this.getWidth()+" width");
 		p(this.getHeight()+" height");
+		setUser(userProfile);
 		
 		
 	}//end constructor
@@ -1089,6 +1085,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 /*
  *	TODO Methods
  */
+	
+	public void
+	logIn_actionPerformed(ActionEvent e)
+	{
+		LID lid = new LID(this);
+		lid.setVisible(true);
+	}
 	
 	public void
 	unlockTreeNode_actionPerformed(ActionEvent e)
@@ -1161,10 +1164,14 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
-		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(true, "/Tree Saves", "Serialized Tree File", "tree");
+		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(true, File.separator+"Tree Saves", "Serialized Tree File", "tree");
 		lastTreeUsedPath = objectPath;
 		try
 		{
+			if(inTree == null)
+			{
+				throw new NullPointerException("M");
+			}
 			model = inTree;
 			tree.setModel(model);
 			tree.addTreeSelectionListener(this);
@@ -1185,8 +1192,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	{
 		try 
 		{
-			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString()+"/Tree Saves");//creates a empty file in that directory
+			File currentDirectoryFile = new File(rootProgramDirectory.toString()+File.separator+"Tree Saves");//creates a empty file in that directory
 			currentDirectoryFile.mkdirs();
 			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Tree Files", "tree");
@@ -1507,7 +1513,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}//end AP
 	
 	// TODO end of actionPerformed methods
-	private void setUser(WISPTUserProfile profile) 
+	protected void setUser(WISPTUserProfile profile) 
 	{
 		isAdmin = profile.getAdminPrivelage();
 		editorModeEnabled = profile.getEditorModeEnabled();
@@ -1522,14 +1528,20 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		lastTreeUsedPath = profile.getLastTreeUsedPath();
 
 		userUnlocks = profile.getUserUnlocks();
+		try
+		{
+			tree.setSelectionPath(new TreePath(profile.getLastSelectedNodePath()));
+		}
+		catch(Exception e)
+		{
+			p(e);
+		}
 
-		lastUserSelectedNode = profile.getLastSelectedNode();
-		
 		try 
 		{
 			FileInputStream fileIn = new FileInputStream(new File(lastTreeUsedPath));
 			ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-			loadedUserModel = (DefaultTreeModel)objectIn.readObject();
+			model = (DefaultTreeModel)objectIn.readObject();
 			fileIn.close();
 			objectIn.close();
 		} 
@@ -1569,8 +1581,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		Object objectToReturn = null;
 		try 
 		{
-			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString()+path);//creates a empty file in that directory
+			File currentDirectoryFile = new File(rootProgramDirectory.toString()+path);//creates a empty file in that directory
 			if(showUserDialog)
 			{
 				JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
@@ -1804,7 +1815,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			previousSelectedNode = selectedNode;
 			selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 			selectedWTNO = (WISPTNodeObject)selectedNode.getUserObject();
-			userProfile.setLastSelectedNode(selectedNode);
+			userProfile.setLastSelectedNodePath(new TreePath(selectedNode.getPath()));
+			p(userProfile.getLastSelectedNodePath().toString());
 			if(!selectedNode.isLeaf())
 			{
 				boolean allChildrenInvisible = true;
@@ -1935,18 +1947,142 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	p(Exception ex)
 	{
-		processingLabel.setText("Exception Ocurred!");
-		if(processTooltipsEnabled)
+		try
 		{
-			String trace = "";
-			for(StackTraceElement st : ex.getStackTrace())
+			processingLabel.setText("Exception Ocurred!");
+			if(processTooltipsEnabled)
 			{
-				trace += st.toString() + "\t";
+				String trace = "";
+				for(StackTraceElement st : ex.getStackTrace())
+				{
+					trace += st.toString() + "\t";
+				}
+				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
 			}
-			processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 		ex.printStackTrace();
 	}
+}
+
+class LID extends JDialog
+{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3139704254925565221L;
+	
+		protected JPanel 
+			LIDContentPane,
+			LIDCenterPane,
+			LIDSouthPane;
+			protected JButton 
+				LIDOkay,
+				LIDCancel;
+			protected JTextArea
+				LIDUsername,
+				LIDPassword;
+
+	public LID(WISPT mainWindow)
+	{
+		super();
+		
+			LIDContentPane = new JPanel(new BorderLayout());
+			LIDContentPane.setVisible(true);
+		this.setContentPane(LIDContentPane);
+		
+				LIDCenterPane = new JPanel(new GridLayout(2,1));
+				LIDCenterPane.setVisible(true);
+			LIDContentPane.add(LIDCenterPane, BorderLayout.CENTER);
+			
+					LIDUsername = new JTextArea("Enter Username");
+					LIDUsername.setBorder(BorderFactory.createTitledBorder("Username"));
+					LIDUsername.setColumns(40);
+					LIDUsername.setMinimumSize(new Dimension(120, 30));
+					LIDUsername.setVisible(true);
+				LIDCenterPane.add(LIDUsername);
+					
+					LIDPassword = new JTextArea("Enter Password");
+					LIDPassword.setBorder(BorderFactory.createTitledBorder("Password"));
+					LIDPassword.setColumns(40);
+					LIDPassword.setVisible(true);
+				LIDCenterPane.add(LIDPassword);
+				
+			
+				LIDSouthPane = new JPanel(new GridLayout(1,2));
+			LIDContentPane.add(LIDSouthPane, BorderLayout.SOUTH);
+			
+					LIDOkay = new JButton("OK");
+					LIDOkay.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent e)
+							{
+								LIDOkay_actionPerformed(e, mainWindow);
+							}
+						}
+						);
+				LIDSouthPane.add(LIDOkay);
+				
+					LIDCancel = new JButton("Cancel");
+					LIDCancel.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent e)
+							{
+								LIDCancel_actionPerformed(e);
+							}
+						}
+						);
+				LIDSouthPane.add(LIDCancel);
+			
+			this.revalidate();
+			this.repaint();
+			this.pack();
+			this.setVisible(true);
+	}
+	
+	public void
+	LIDOkay_actionPerformed(ActionEvent e, WISPT mainWindow)
+	{
+		String pathOfUserFile = mainWindow.rootProgramDirectory.toString()+File.separator+"User Profiles"+File.separator+LIDUsername.getText()+".user";
+		mainWindow.p(pathOfUserFile);
+		WISPTUserProfile profile = (WISPTUserProfile)mainWindow.loadSerializedObject(false, 
+				pathOfUserFile, 
+				"User Profile", 
+				".user");
+		try
+		{
+			if(profile == null)
+			{
+				throw new NullPointerException("The User Profile \""+LIDUsername.getText()+"\" does not exist!");
+			}
+			if(!LIDPassword.getText().equals(profile.getUserPassword()))
+			{
+				throw new IllegalArgumentException(LIDPassword.getText()+" is not the correct password!");
+			}
+			
+			mainWindow.setUser(profile);
+		}
+		catch(Exception ex)
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
+		}
+		
+	}//end LIDOkay_AP
+	
+	public void
+	LIDCancel_actionPerformed(ActionEvent e)
+	{
+		this.dispose();
+	}//end LIDCancel_AP
 }
 
 class WISPTUserProfileBuilder
@@ -1954,25 +2090,25 @@ class WISPTUserProfileBuilder
 /*
  * TODO variables
  */
-	private JCheckBox isAdmin,
+	protected JCheckBox isAdmin,
 						editorModeEnabled,
 						processTooltipsEnabled,
 						trainingModeEnabled,
 						tipsVisible,
 						treeVisible;
 	
-	private JTextArea userName,
+	protected JTextArea userName,
 						userPassword,
 						invisibleString;
 	
-	private JSpinner userUnlocks;
+	protected JSpinner userUnlocks;
 	
-	private JDialog builder;
+	protected JDialog builder;
 	
-	private JPanel contentPane,
+	protected JPanel contentPane,
 					southPane,
 					centerPane;
-	private JButton okayBtn,
+	protected JButton okayBtn,
 					cancelBtn;
 
 /*

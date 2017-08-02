@@ -42,7 +42,7 @@ public class WISPTUserProfile implements Serializable
 	
 	private int userUnlocks;	
 	
-	private DefaultMutableTreeNode lastUserSelectedNode;
+	private TreePath lastUserSelectedNode;
 	/*
 	 *  TODO constructors
 	 */
@@ -69,12 +69,12 @@ public class WISPTUserProfile implements Serializable
 		 this.userPassword = "password";
 		 this.lockedMessage = "This step has been locked!";
 		 this.userUnlocks = 3;
-		 this.lastUserSelectedNode = new DefaultMutableTreeNode("null");
+		 this.lastUserSelectedNode = new TreePath(null);
 
 			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString()+"/Tree Saves");//creates a empty file in the tree saves folder of that directory
+			File currentDirectoryFile = new File(absolutePath.toString()+File.separator+"Tree Saves");//creates a empty file in the tree saves folder of that directory
 			
-		 this.lastTreeUsedPath = currentDirectoryFile.toString()+"/dt.tree";
+		 this.lastTreeUsedPath = currentDirectoryFile.toString()+File.separator+"dt.tree";
 		 this.userProfilePath = userProfilePath;
 	}
 	
@@ -203,12 +203,12 @@ public class WISPTUserProfile implements Serializable
 	}
 	
 	public void
-	setLastSelectedNode(DefaultMutableTreeNode lastUserSelectedNode)
+	setLastSelectedNodePath(TreePath lastUserSelectedNode)
 	{
 		this.lastUserSelectedNode = lastUserSelectedNode;
 	}	
-	public DefaultMutableTreeNode
-	getLastSelectedNode()
+	public TreePath
+	getLastSelectedNodePath()
 	{
 		return lastUserSelectedNode;
 	}
