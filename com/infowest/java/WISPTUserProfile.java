@@ -16,6 +16,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 
+
 public class WISPTUserProfile implements Serializable
 {
 
@@ -38,15 +39,16 @@ public class WISPTUserProfile implements Serializable
 						userPassword,
 						lockedMessage,
 						lastTreeUsedPath,
-						userProfilePath;
+						userProfileFolderPath,
+						userProfileName;
 	
 	private int userUnlocks;	
 	
-	private TreePath lastUserSelectedNode;
+	private TreePath lastUserSelectedNodePath;
 	/*
 	 *  TODO constructors
 	 */
-	public WISPTUserProfile(boolean isDefaultRootAdmin, String userProfilePath)
+	public WISPTUserProfile(boolean isDefaultRootAdmin, String userProfileFolderPath, String userProfileName)
 	{
 		if(isDefaultRootAdmin)
 		{
@@ -69,13 +71,13 @@ public class WISPTUserProfile implements Serializable
 		 this.userPassword = "password";
 		 this.lockedMessage = "This step has been locked!";
 		 this.userUnlocks = 3;
-		 this.lastUserSelectedNode = new TreePath(null);
+		 //this.lastUserSelectedNodePath = new TreePath(null);
 
-			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString()+File.separator+"Tree Saves");//creates a empty file in the tree saves folder of that directory
+			File currentDirectoryFile = new File("Tree Saves"+File.separator);//creates a empty file in the tree saves folder of that directory
 			
-		 this.lastTreeUsedPath = currentDirectoryFile.toString()+File.separator+"dt.tree";
-		 this.userProfilePath = userProfilePath;
+		 this.lastTreeUsedPath = currentDirectoryFile.toString()+"dt.tree";
+		 this.userProfileFolderPath = userProfileFolderPath;
+		 this.userProfileName = userProfileName;
 	}
 	
 	/*
@@ -203,20 +205,35 @@ public class WISPTUserProfile implements Serializable
 	}
 	
 	public void
-	setLastSelectedNodePath(TreePath lastUserSelectedNode)
+	setLastSelectedNodePath(TreePath lastUserSelectedNodePath)
 	{
-		this.lastUserSelectedNode = lastUserSelectedNode;
+		this.lastUserSelectedNodePath = lastUserSelectedNodePath;
 	}	
 	public TreePath
 	getLastSelectedNodePath()
 	{
-		return lastUserSelectedNode;
+		return lastUserSelectedNodePath;
 	}
 
-	public void 
-	setUserProfilePath(String userProfilePath2) 
+	public String 
+	getUserProfileFolderPath() 
 	{
-		this.userProfilePath = userProfilePath;
+		return this.userProfileFolderPath;
+	}
+	public void 
+	setUserProfilePath(String userProfileFolderPath) 
+	{
+		this.userProfileFolderPath = userProfileFolderPath;
 	}
 	
+	public String 
+	getUserProfileName() 
+	{
+		return this.userProfileFolderPath;
+	}
+	public void 
+	setUserProfileName(String userProfileName) 
+	{
+		this.userProfileName = userProfileName;
+	}
 }

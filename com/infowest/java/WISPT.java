@@ -34,17 +34,19 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.*;
 
+
+//Ignore user profiles for now! Priority needs to be screenshot integration for tips. 
+//Without screenshot integration, this software will be irrelevant!
+
 public class WISPT extends JFrame implements TreeSelectionListener//, ActionListener, ComponentListener, MouseListener 
 {
 /*
  *	TODO Variables 
  */
-	protected static final long serialVersionUID = -1079398159072533776L;
-	protected ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
+	private static final long serialVersionUID = -1079398159072533776L;
+	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	
-	protected Path rootProgramDirectory;
-	
-	protected Color white =  new Color(1f, 1f, 1f),
+	private Color white =  new Color(1f, 1f, 1f),
 			nineGray =  new Color(0.9f, 0.9f, 0.9f),
 			eightGray =  new Color(0.8f, 0.8f, 0.8f),
 			sevenGray =  new Color(0.7f, 0.7f, 0.7f),
@@ -57,7 +59,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			black =  new Color(0f, 0f, 0f)*/
 			;
 	
-	protected Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
+	private Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
 			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3),
 			matte = BorderFactory.createMatteBorder(5,5,5,5, eightGray);
@@ -66,51 +68,53 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
  * TODO current user info
  */
 	
-	protected boolean isAdmin,
+	private boolean isAdmin,
 					editorModeEnabled,
 					processTooltipsEnabled,
 					trainingModeEnabled,
 					tipsVisible,
 					treeVisible;
+private static boolean successfulWrite;
 	
-	protected String userName,
+	private String userName,
 					userPassword,
 					lockedMessage,
 					lastTreeUsedPath,
-					userProfilePath,
-					objectPath;
+					userProfilePath;
+	private static String objectPath;
 	
-	protected int userUnlocks;	
+	private int userUnlocks;	
 	
-	protected WISPTUserProfile userProfile;
+	private WISPTUserProfile userProfile;
 	
 /*
  * end user info FIXME all need instantiation through a user login JOptionPane
  */
-	protected DefaultTreeModel loadedUserModel;
+	private DefaultTreeModel loadedUserModel;
 	
-	protected String lastTxt = "";
+	private String	lastTxt = "",
+					emptyTipLabelString;
 	
-	protected WISPTNodeObject selectedWTNO = null;
+	private WISPTNodeObject selectedWTNO = null;
 	
-	protected DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
-									previousSelectedNode = selectedNode,
-									asideNode = previousSelectedNode;
+	private DefaultMutableTreeNode selectedNode = new DefaultMutableTreeNode(),
+									previousSelectedNode = selectedNode;
+	private DefaultMutableTreeNode asideNode = new DefaultMutableTreeNode();
 	
-	protected JDialog startupSettingsDialog;
+	private JDialog startupSettingsDialog;
 	
 	//TODO finish settings
-		protected JTextField changeUserPassword,
+		private JTextField changeUserPassword,
 							changeAdminPassword,
 							changeLockedMessage;
 		
-		protected JSpinner userUnlocksSpinner;
+		private JSpinner userUnlocksSpinner;
 		
-		protected JCheckBox trainingModeCheckBox,
+		private JCheckBox trainingModeCheckBox,
 							enableEditorMode,
 		  					processingOnCheck;
 	
-		protected JPanel settingsContentPane,
+		private JPanel settingsContentPane,
 						adminTab,
 						userTab,
 							adminSettings,
@@ -118,29 +122,29 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								adminSettingsCenter,
 								userSettingsCenter,
 								adminSettingsSouth;
-		protected JButton save,
+		private JButton save,
 						cancel;
 	
-	protected JTabbedPane settingsCenterTabbedPane;
+	private JTabbedPane settingsCenterTabbedPane;
 	
-	protected JPanel 
+	private JPanel 
 	contentPane,
 		northPane;
 		
-		protected JSplitPane
+		private JSplitPane
 		westCenterEastSplit,
 			westPane;
-				protected JPanel
+				private JPanel
 				westNorthPad;
-					protected JScrollPane 
+					private JScrollPane 
 					treeScroll;
-				protected JPanel
+				private JPanel
 				westSouthPad,
 					westSouthEditorBtns;
 			
-			protected JSplitPane	
+			private JSplitPane	
 			centerEastSplit;	
-				protected JPanel
+				private JPanel
 				centerPad,
 					centerBevel,
 						centerPane,
@@ -148,44 +152,59 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 							centerSouthPane,
 							
 				eastPad;
-					protected JScrollPane	
+					private JScrollPane	
 					eastScroll;
-						protected JPanel			
+						private JPanel			
 						eastPane,
 			
 		southPadPane,
 			southPane;
-				protected JSplitPane
+				private JSplitPane
 				consoleMsgs;
-					protected JPanel
+					private JPanel
 					southUSplit,
 					southPSplit;
 	
-	protected JLabel	processingLabel,
+	private JLabel	processingLabel,
 					userLabel; 
 	
-	protected JTree tree;
+	private JTree tree;
 	
-	protected DefaultTreeModel model;
+	private DefaultTreeModel model;
 
-	protected JTextArea mainTxtArea,
+	private JTextArea mainTxtArea,
 						tipArea;
 			
-	protected JCheckBox	check1,
-	 					check2,
-	  					check3,
-	  					check4,
-	  					check5,
-	  					check6;
+	private JCheckBox	tipCheck1,
+	 					tipCheck2,
+	  					tipCheck3,
+	  					tipCheck4,
+	  					tipCheck5,
+	  					tipCheck6;
 	
-	protected JRadioButton	radio1,
-							radio2,
-							radio3,
-							radio4;
+	private JLabel	tipLabel1,
+						tipLabel2,
+						tipLabel3,
+						tipLabel4,
+						tipLabel5,
+						tipLabel6;
 	
-	protected ButtonGroup radioButtons;
+
+	private ImageIcon	labelIcon,
+						labelEmptyIcon; 
 	
-	protected JButton addNodeBtn,
+	private ImageIcon[]	tipPics;
+	
+	private int	lastPicOpened;
+	
+	private JRadioButton	navRadio1,
+							navRadio2,
+							navRadio3,
+							navRadio4;
+	
+	private ButtonGroup navRadioButtons;
+	
+	private JButton addNodeBtn,
 					removeNodeBtn,
 					editNodeBtn,
 					upNodeBtn,
@@ -194,10 +213,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	/*
 	 * TODO MENU DECLARATIONS
 	 */
-	protected JMenuBar menu;
+	private JMenuBar menu;
 	
-		protected JMenu file;
-			protected JMenuItem	newTree,
+		private JMenu file;
+			private JMenuItem	newTree,
 								loadTree,
 								saveTree,
 								logIn,
@@ -205,25 +224,25 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								newUser,
 								exit;
 			
-		protected JMenu edit;
-			protected JMenu toggle;
-				protected JMenuItem	tTips,
-									tNavTree;
-			protected JMenuItem	openTreeBuilder,
+		private JMenu edit;
+			private JMenu toggle;
+				private JMenuItem	toggleTips,
+									toggleNavTree;
+			private JMenuItem	openTreeBuilder,
 								unlockTreeNode;
 				
-		protected JMenu navigate;
-			protected JMenuItem	previous,
+		private JMenu navigate;
+			private JMenuItem	previous,
 								next,//is only valid if previous step was just called.
 								history;
 			
-		protected JMenu userPrefs;
-			protected JMenuItem startupSettings;
-			protected JMenuItem editName;
+		private JMenu userPrefs;
+			private JMenuItem startupSettings;
+			private JMenuItem editName;
 
 
 	
-
+	private String rootPath;
 /*
  *	TODO Constructors
  */
@@ -231,23 +250,30 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public WISPT()
 	{
 		super();
-		rootProgramDirectory = Paths.get("").toAbsolutePath();
-		userProfilePath = File.separator+"User Profiles"+File.separator+"defaultUserProfile.user";
-		userProfile = (WISPTUserProfile)loadSerializedObject(false, userProfilePath, "User Profile", "user");
-		userProfile.setUserProfilePath(userProfilePath);
-		setUser(userProfile);
+		rootPath = this.getClass().getClassLoader().getResource("").getPath();
+		userProfilePath = "User Profiles";
+		userProfile = (WISPTUserProfile)loadSerializedObject(false, userProfilePath, "defaultAdminUserProfile", "User Profile", "user");
+		try
+		{
+			userProfile.setUserProfilePath(userProfilePath);
+			setUser(userProfile);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 		this.addWindowListener
-		(new WindowAdapter()
-			{
-				@Override
-				public void
-				windowClosing(WindowEvent we)
+			(new WindowAdapter()
 				{
-					saveSerializedObject(false, userProfilePath, "User Profile", "user", userProfile);
-					System.exit(0);
+					@Override
+					public void
+					windowClosing(WindowEvent we)
+					{
+						//saveSerializedObject(false, userProfilePath, "defaultUserProfile", "User Profile", "user", userProfile);
+						System.exit(0);
+					}
 				}
-			}
-		);
+			);
 		try 
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -374,11 +400,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								public void
 								actionPerformed(ActionEvent e)
 								{
-									//FIXME logOut_actionPerformed(e);
+									logOut_actionPerformed(e);
 								}//end actionPerformed
 							}//end ActionListener
 							);//ActionListener added
-						logOut.setEnabled(false);
+						logOut.setEnabled(true);
 					file.add(logOut);
 						
 						
@@ -390,11 +416,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								public void
 								actionPerformed(ActionEvent e)
 								{
-									//FIXME newUser_actionPerformed(e);
+									newUser_actionPerformed(e);
 								}//end actionPerformed
 							}//end ActionListener
 							);//ActionListener added
-						newUser.setEnabled(false);
+						newUser.setEnabled(true);
 					file.add(newUser);
 						
 						
@@ -421,35 +447,35 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 					
 							tipsVisible = true;
 							
-							tTips = new JMenuItem("\u2611 Tips");
-							tTips.addActionListener
+							toggleTips = new JMenuItem("\u2611 Tips");
+							toggleTips.addActionListener
 								(new ActionListener()
 								{	
 									@Override
 									public void
 									actionPerformed(ActionEvent e)
 									{
-										tTips_actionPerformed(e);
+										toggleTips_actionPerformed(e);
 									}//end actionPerformed
 								}//end ActionListener
 								);//ActionListener added
-						toggle.add(tTips);
+						toggle.add(toggleTips);
 							
 								treeVisible = true;
 							
-							tNavTree = new JMenuItem("\u2611 Navigation Tree");
-							tNavTree.addActionListener
+							toggleNavTree = new JMenuItem("\u2611 Navigation Tree");
+							toggleNavTree.addActionListener
 								(new ActionListener()
 								{	
 									@Override
 									public void
 									actionPerformed(ActionEvent e)
 									{
-										tNavTree_actionPerformed(e);
+										toggleNavTree_actionPerformed(e);
 									}//end actionPerformed
 								}//end ActionListener
 								);//actionListener added
-						toggle.add(tNavTree);
+						toggle.add(toggleNavTree);
 							
 					edit.addSeparator();
 
@@ -465,6 +491,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								}//end actionPerformed
 							}//end ActionListener
 							);//ActionListener added
+						openTreeBuilder.setEnabled(false);
 					edit.add(openTreeBuilder);
 					
 						unlockTreeNode = new JMenuItem("Unlock Selected Branch/Leaf");
@@ -569,8 +596,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 											/*
 											 * Save button need be the only element with a listener.
 											 * On action, it will set all settings according to what
-											 * is currently in the settings pane elements. If a check
-											 * box is checked, that setting becomes enabled. Whatever
+											 * is currently in the settings pane elements. If a c_heck
+											 * box is c_hecked, that setting becomes enabled. Whatever
 											 * resides in a text field becomes that setting's new text.
 											 * 
 											 */
@@ -631,9 +658,9 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 											userSettings = new JPanel(new FlowLayout());
 										userTab.add(userSettings);
 											
-											userSettings.add(new JCheckBox("check"));
-											userSettings.add(new JCheckBox("check"));
-											userSettings.add(new JCheckBox("check"));
+											userSettings.add(new JCheckBox("cb"));
+											userSettings.add(new JCheckBox("cb"));
+											userSettings.add(new JCheckBox("cb"));
 									
 							
 						editName = new JMenuItem("Change Username");
@@ -804,76 +831,76 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 								centerSouthPane.setBackground(white);
 							centerPane.add(centerSouthPane, BorderLayout.SOUTH);
 							
-									radioButtons = new ButtonGroup();/*
+									navRadioButtons = new ButtonGroup();/*
 								centerSouthPane*/
 							
-										radio1 = new JRadioButton("first");
-										radio1.setBackground(white);
-										radio1.addActionListener
+										navRadio1 = new JRadioButton("first");
+										navRadio1.setBackground(white);
+										navRadio1.addActionListener
 											(new ActionListener()
 											{
 												@Override
 												public void
 												actionPerformed(ActionEvent e)
 												{
-													radio_actionPerformed(e, 0);
+													navRadio_actionPerformed(e, 0);
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
-									radioButtons.add(radio1);
-								centerSouthPane.add(radio1);
+									navRadioButtons.add(navRadio1);
+								centerSouthPane.add(navRadio1);
 										
 
-										radio2 = new JRadioButton("second");
-										radio2.setBackground(white);
-										radio2.addActionListener
+										navRadio2 = new JRadioButton("second");
+										navRadio2.setBackground(white);
+										navRadio2.addActionListener
 											(new ActionListener()
 											{
 												@Override
 												public void
 												actionPerformed(ActionEvent e)
 												{
-													radio_actionPerformed(e, 1);
+													navRadio_actionPerformed(e, 1);
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
-										radio2.setVisible(false);
-									radioButtons.add(radio2);
-								centerSouthPane.add(radio2);
+										navRadio2.setVisible(false);
+									navRadioButtons.add(navRadio2);
+								centerSouthPane.add(navRadio2);
 										
-										radio3 = new JRadioButton("third");
-										radio3.setBackground(white);
-										radio3.addActionListener
+										navRadio3 = new JRadioButton("third");
+										navRadio3.setBackground(white);
+										navRadio3.addActionListener
 											(new ActionListener()
 											{
 												@Override
 												public void
 												actionPerformed(ActionEvent e)
 												{
-													radio_actionPerformed(e, 2);
+													navRadio_actionPerformed(e, 2);
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
-										radio3.setVisible(false);
-									radioButtons.add(radio3);
-								centerSouthPane.add(radio3);
+										navRadio3.setVisible(false);
+									navRadioButtons.add(navRadio3);
+								centerSouthPane.add(navRadio3);
 										
-										radio4 = new JRadioButton("fourth");
-										radio4.setBackground(white);
-										radio4.addActionListener
+										navRadio4 = new JRadioButton("fourth");
+										navRadio4.setBackground(white);
+										navRadio4.addActionListener
 											(new ActionListener()
 											{
 												@Override
 												public void
 												actionPerformed(ActionEvent e)
 												{
-													radio_actionPerformed(e, 3);
+													navRadio_actionPerformed(e, 3);
 												}//end actionPerformed
 											}//end ActionListener
 											);//ActionListener added
-										radio4.setVisible(false);
-									radioButtons.add(radio4);
-								centerSouthPane.add(radio4);
+										navRadio4.setVisible(false);
+									navRadioButtons.add(navRadio4);
+								centerSouthPane.add(navRadio4);
 
 								
 								centerCenterPane = new JPanel();
@@ -911,107 +938,279 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						eastScroll.setBackground(white);
 					eastPad.add(eastScroll);
 
-							eastPane = new JPanel(new GridLayout(6,1));
+							eastPane = new JPanel(new GridLayout(6,2));
 							eastPane.setBorder(null);
 							eastPane.setBackground(white);
 						eastScroll.setViewportView(eastPane);
-					
-						 		check1 = new JCheckBox("first");
-								check1.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check1.isSelected(), 0);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check1.setBackground(white);
-							eastPane.add(check1);
-									
-								check2 = new JCheckBox("second");
-								check2.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check2.isSelected(), 1);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check2.setBackground(white);
-								check2.setVisible(false);
-							eastPane.add(check2);
-									
-								check3 = new JCheckBox("third");
-								check3.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check3.isSelected(), 2);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check3.setBackground(white);
-								check3.setVisible(false);
-							eastPane.add(check3);
-							
-								check4 = new JCheckBox("fourth");
-								check4.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check4.isSelected(), 3);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check4.setBackground(white);
-								check4.setVisible(false);
-							eastPane.add(check4);
-								
-								check5 = new JCheckBox("fifth");
-								check5.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check5.isSelected(), 4);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check5.setBackground(white);
-								check5.setVisible(false);
-							eastPane.add(check5);
-								
-								check6 = new JCheckBox("last");
-								check6.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											check_actionPerformed(e, check6.isSelected(), 5);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								check6.setBackground(white);
-								check6.setVisible(false);
-							eastPane.add(check6);
-								
 						
+								
+								BufferedImage bufferedImage;
+								try
+								{
+									bufferedImage = ImageIO.read(new File("picPlaceholder.png"));
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+									bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
+								}
+								
+								labelIcon = new ImageIcon(bufferedImage);
+								
+								try
+								{
+									bufferedImage = ImageIO.read(new File("picPlaceholderEmpty.png"));
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+									bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
+								}
+								
+								labelEmptyIcon = new ImageIcon(bufferedImage);
+								
+								JLabel[] tipLabels = new JLabel[6];
+								emptyTipLabelString = " (empty)";
+								tipPics = new ImageIcon[6];
+								
+								for(int i = 0; i < tipLabels.length; ++i)
+								{
+									tipLabels[i] = new JLabel("Pic " + (i+1) + emptyTipLabelString);
+									tipLabels[i].setVisible(false);
+									tipLabels[i].setIcon(labelEmptyIcon);
+									tipLabels[i].setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+								}//end for
+					
+						 		tipCheck1 = new JCheckBox("first");
+								tipCheck1.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck1.isSelected(), 0);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck1.setBackground(white);
+							eastPane.add(tipCheck1);
+							
+							
+							tipLabel1 = tipLabels[0];
+							tipLabel1.addMouseListener
+								(new MouseListener()
+								{
+									@Override
+									public void mouseClicked(MouseEvent me) 
+									{
+										tipLabel_mouseClicked(me, tipLabel1, 0);
+									}//mouseClicked
+		
+										@Override
+										public void mouseEntered(MouseEvent arg0) {}
+										@Override
+										public void mouseExited(MouseEvent arg0) {}
+										@Override
+										public void mousePressed(MouseEvent arg0) {}
+										@Override
+										public void mouseReleased(MouseEvent arg0) {}
+								}
+								);
+						eastPane.add(tipLabel1);
+									
+								tipCheck2 = new JCheckBox("second");
+								tipCheck2.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck2.isSelected(), 1);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck2.setBackground(white);
+								tipCheck2.setVisible(false);
+							eastPane.add(tipCheck2);
+							
+								tipLabel2 = tipLabels[1];
+								tipLabel2.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel2, 1);
+										}//mouseClicked
+			
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel2);
+			
+									
+								tipCheck3 = new JCheckBox("third");
+								tipCheck3.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck3.isSelected(), 2);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck3.setBackground(white);
+								tipCheck3.setVisible(false);
+							eastPane.add(tipCheck3);
+							
+								tipLabel3 = tipLabels[2];
+								tipLabel3.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel3, 2);
+										}//mouseClicked
+			
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel3);
+							
+								tipCheck4 = new JCheckBox("fourth");
+								tipCheck4.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck4.isSelected(), 3);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck4.setBackground(white);
+								tipCheck4.setVisible(false);
+							eastPane.add(tipCheck4);
+							
+
+								tipLabel4 = tipLabels[3];
+								tipLabel4.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel4, 3);
+										}//mouseClicked
+			
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel4);
+								
+								tipCheck5 = new JCheckBox("fifth");
+								tipCheck5.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck5.isSelected(), 4);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck5.setBackground(white);
+								tipCheck5.setVisible(false);
+							eastPane.add(tipCheck5);
+							
+								tipLabel5 = tipLabels[4];
+								tipLabel5.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel5, 4);
+										}//mouseClicked
+			
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel5);
+								
+								tipCheck6 = new JCheckBox("last");
+								tipCheck6.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											tipCheck_actionPerformed(e, tipCheck6.isSelected(), 5);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+								tipCheck6.setBackground(white);
+								tipCheck6.setVisible(false);
+							eastPane.add(tipCheck6);
+								
+
+								tipLabel6 = tipLabels[5];
+								tipLabel6.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel6, 5);
+										}//mouseClicked
+			
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel6);
 			
 		/*
 		 * TODO CONSOLE/SOUTH
@@ -1060,11 +1259,15 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		this.setMinimumSize(this.getSize());
 		this.setSize(1280, 600);
 		westPane.setDividerLocation(westPane.getHeight()*2);
-		check1.setVisible(false);
-		radio1.setVisible(false);
+		tipCheck1.setVisible(false);
+		navRadio1.setVisible(false);
 		p(this.getWidth()+" width");
 		p(this.getHeight()+" height");
-		setUser(userProfile);
+		saveSettings_actionPerformed(new ActionEvent(bufferedImage, lastPicOpened, emptyTipLabelString));
+		//setUser(userProfile);
+		
+		/*UserProfileBuilder builderWindow = new UserProfileBuilder(this);
+		builderWindow.setVisible(true);*/
 		
 		
 	}//end constructor
@@ -1086,10 +1289,132 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
  *	TODO Methods
  */
 	
+	public static BufferedImage
+	loadImage(boolean showDialog, String pathForFile, Component parent)
+	{
+		BufferedImage image;
+		if(showDialog)
+		{
+			File buildFolderIfNeeded = new File(pathForFile);
+			buildFolderIfNeeded.mkdirs();
+			JFileChooser jfc = new JFileChooser(pathForFile);
+			jfc.setAcceptAllFileFilterUsed(false);
+			jfc.addChoosableFileFilter(new WISPTImageFilter());
+			int choice = jfc.showOpenDialog(parent);
+			if(choice == JFileChooser.APPROVE_OPTION)
+			{
+				File selectedFile;
+				try
+				{
+					selectedFile = jfc.getSelectedFile();
+					image = ImageIO.read(selectedFile);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					return null;
+				}//read image try/catch
+				String fileName = "";
+				String extension = "";
+				try
+				{
+					fileName = selectedFile.getName();
+					int index = fileName.lastIndexOf(".");
+					extension = fileName.substring(index+1);
+					ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
+					System.out.println(pathForFile+File.separator+fileName+" successfully written. "+extension);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					System.out.println(pathForFile+File.separator+fileName+" write failed. "+extension);
+				}//write local image try/catch
+				return image;
+			}//choice/approve if
+		}//showDialog if
+		else
+		{
+			try
+			{
+				image = ImageIO.read(new File(pathForFile));
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+				return null;
+			}//imageread try/catch
+			String fileName = "";
+			String extension = "";
+			try
+			{
+				String[] splitPath = pathForFile.split(File.separator);
+				fileName = splitPath[splitPath.length-1];
+				int index = fileName.lastIndexOf(".");
+				extension = fileName.substring(index+1);
+				ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
+				System.out.println(pathForFile+File.separator+fileName+" successfully written. "+extension);
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+				System.out.println(pathForFile+File.separator+fileName+" write failed. "+extension);
+			}//write local image try/catch
+			return image;
+		}//showDialog else
+		return null;
+	}//end loadImage
+	
+	public static String
+	getObjectPath()
+	{
+		return objectPath;
+	}
+	
+	public void
+	tipLabel_mouseClicked(MouseEvent me, JLabel clickedTipLabel, int index)
+	{
+		lastPicOpened = index;
+		BufferedImage bufferedImage;
+		if(tipPics[index] != null)
+		{
+			if(WISPTScreenShotViewer.getNoInstanceOpen())
+			{
+				lastPicOpened = index;
+				WISPTScreenShotViewer ssv = new WISPTScreenShotViewer(tipPics[index], this);
+				ssv.setVisible(true);
+			}//if not already open
+		}//end if/else
+
+		String newText = clickedTipLabel.getText();
+		System.out.println(newText);
+
+		if(tipPics[index] != null)
+		{
+			if(newText.contains(emptyTipLabelString))
+				newText = newText.replace(emptyTipLabelString, "");
+			
+			System.out.println(newText + " isIcon");
+			clickedTipLabel.setText(newText);
+			System.out.println(newText);
+		}
+	}
+	
+	public void
+	logOut_actionPerformed(ActionEvent e)
+	{
+		//should be the same as logging into the default profile. Should only confirm.
+	}
+	public void
+	newUser_actionPerformed(ActionEvent e)
+	{
+		UserProfileBuilder builder = new UserProfileBuilder(this);
+		builder.setVisible(true);
+	}
+	
 	public void
 	logIn_actionPerformed(ActionEvent e)
 	{
-		LID lid = new LID(this);
+		LoginDialog lid = new LoginDialog(this);
 		lid.setVisible(true);
 	}
 	
@@ -1112,23 +1437,23 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}//end unlockTreeNodeAP
 	
 	public void
-	tNavTree_actionPerformed(ActionEvent e)
+	toggleNavTree_actionPerformed(ActionEvent e)
 	{
 		try
 		{
 			if(treeVisible)
 			{
-				tNavTree.setText("\u2610 Navigation Tree");
+				toggleNavTree.setText("\u2610 Navigation Tree");
 				treeVisible = false;
 				
 			}
 			else
 			{
-				tNavTree.setText("\u2611 Navigation Tree");
+				toggleNavTree.setText("\u2611 Navigation Tree");
 				treeVisible = true;
 			}//end inner if
 			westPane.setVisible(treeVisible);
-			userProfile.setTreeVisible(treeVisible);
+			//userProfile.setTreeVisible(treeVisible);
 			westCenterEastSplit.revalidate();
 			westCenterEastSplit.setDividerLocation(0.2);
 		}
@@ -1151,8 +1476,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 				tree.setModel(model);
 				tree.addTreeSelectionListener(this);
 				tree.setEnabled(true);
+				tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 				treeScroll.revalidate();
 				treeScroll.repaint();
+				invisibleDeselectedButtons();
 			}
 			catch(Exception ex)
 			{
@@ -1164,7 +1491,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
-		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(true, File.separator+"Tree Saves", "Serialized Tree File", "tree");
+		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(true, "Tree Saves", null, "Serialized Tree File", "tree");
 		lastTreeUsedPath = objectPath;
 		try
 		{
@@ -1175,11 +1502,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			model = inTree;
 			tree.setModel(model);
 			tree.addTreeSelectionListener(this);
-			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 			tree.setEnabled(true);
 			treeScroll.repaint();
 			tree.repaint();
-
+			invisibleDeselectedButtons();
 		}
 		catch(Exception ex)
 		{
@@ -1192,8 +1518,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	{
 		try 
 		{
-			File currentDirectoryFile = new File(rootProgramDirectory.toString()+File.separator+"Tree Saves");//creates a empty file in that directory
-			currentDirectoryFile.mkdirs();
+			File currentDirectoryFile = new File("Tree Saves"+File.separator);//creates a empty file in that directory
+			currentDirectoryFile.mkdir();
 			JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Serial Tree Files", "tree");
 			fc.setFileFilter(filter);
@@ -1244,19 +1570,19 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}
 	
 	public void
-	tTips_actionPerformed(ActionEvent e)
+	toggleTips_actionPerformed(ActionEvent e)
 	{
 		try
 		{
 			if(tipsVisible)
 			{
-				tTips.setText("\u2610 Tips");
+				toggleTips.setText("\u2610 Tips");
 				eastPad.setVisible(false);
 				tipsVisible = false;
 			}
 			else
 			{
-				tTips.setText("\u2611 Tips");
+				toggleTips.setText("\u2611 Tips");
 				eastPad.setVisible(true);
 				centerEastSplit.revalidate();
 				centerEastSplit.setDividerLocation(0.75);
@@ -1270,7 +1596,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}//end tTips_AP
 	
 	public void
-	check_actionPerformed(ActionEvent e, boolean selected, int index)
+	tipCheck_actionPerformed(ActionEvent e, boolean selected, int index)
 	{
 		try
 		{
@@ -1305,7 +1631,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		{
 			p(ex);
 		}//end try/catch
-	}//end check_AP
+	}//end tipCheck_AP
 
 	public void
 	startupSettings_actionPerformed(ActionEvent e)
@@ -1321,7 +1647,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}//end startupSettings_AP
 	
 	public void
-	radio_actionPerformed(ActionEvent e, int index)
+	navRadio_actionPerformed(ActionEvent e, int index)
 	{
 		try
 		{
@@ -1335,7 +1661,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		{
 			p(ex);
 		}//end try/catch
-	}//end radio_AP
+	}//end navRadio_AP
 	
 	public void
 	exit_actionPerformed(ActionEvent e)
@@ -1411,10 +1737,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void 
 	addNodeBtn_actionPerformed(ActionEvent e)
 	{
-		setAsideNodeProperties(selectedWTNO);
+		setAsideNodeWithWISPTNodeBuilder();
+		p(asideNode.toString());
 		
 		model.insertNodeInto(asideNode, selectedNode, 0);
-		tree.setModel(model);
+		
 		tree.revalidate();
 	}
 	
@@ -1441,12 +1768,13 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	public void
 	editNodeBtn_actionPerformed(ActionEvent e)
 	{
-		setAsideNodeProperties(selectedWTNO);
+		setAsideNodeWithWISPTNodeBuilder();
+		p(asideNode.toString());
 		
 		WISPTNodeObject wtno = (WISPTNodeObject)asideNode.getUserObject();
 		selectedNode.setUserObject(wtno);
 		model.nodeChanged(selectedNode);
-		tree.setModel(model);
+		//tree.setModel(model);
 		tree.revalidate();
 	}
 	
@@ -1513,9 +1841,48 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}//end AP
 	
 	// TODO end of actionPerformed methods
-	protected void setUser(WISPTUserProfile profile) 
+	
+	public void
+	setLastPicOpened(ImageIcon newPic)
 	{
-		isAdmin = profile.getAdminPrivelage();
+		tipPics[lastPicOpened] = newPic;
+		JLabel clickedTipLabel;
+		if(newPic == null)
+		{
+			switch(lastPicOpened)
+			{
+				case 0:
+					clickedTipLabel = tipLabel1;
+					break;
+				case 1:
+					clickedTipLabel = tipLabel2;
+					break;
+				case 2:
+					clickedTipLabel = tipLabel3;
+					break;
+				case 3:
+					clickedTipLabel = tipLabel4;
+					break;
+				case 4:
+					clickedTipLabel = tipLabel5;
+					break;
+				case 5:
+					clickedTipLabel = tipLabel6;
+					break;
+				default:
+					clickedTipLabel = new JLabel();
+					break;
+			}//switch
+			clickedTipLabel.setIcon(labelEmptyIcon);
+			System.out.println(clickedTipLabel.getText() + " isNullIcon");
+			clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
+			System.out.println(clickedTipLabel.getText());
+		}//if null
+	}//setLastPicOpened
+	
+	public void 
+	setUser(WISPTUserProfile profile) 
+	{
 		editorModeEnabled = profile.getEditorModeEnabled();
 		processTooltipsEnabled = profile.getProcessTooltipsEnabled();
 		trainingModeEnabled = profile.getTrainingModeEnabled();
@@ -1528,14 +1895,15 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		lastTreeUsedPath = profile.getLastTreeUsedPath();
 
 		userUnlocks = profile.getUserUnlocks();
-		try
+		/*try
 		{
 			tree.setSelectionPath(new TreePath(profile.getLastSelectedNodePath()));
+			tree.validate();
 		}
 		catch(Exception e)
 		{
 			p(e);
-		}
+		}*/
 
 		try 
 		{
@@ -1549,10 +1917,19 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 		{
 			e.printStackTrace();
 		}
+
+		isAdmin = profile.getAdminPrivelage();
+		if(!isAdmin)
+		{
+			editorModeEnabled = false;
+			enableEditorMode.setSelected(false);
+			enableEditorMode.setEnabled(false);
+			
+		}
 	}
 	
 	
-	/**This function is for loading any serialized java object that has been saved. 
+	/*This function is for loading any serialized java object that has been saved. 
 	 * It can use a JFileChooser dialog to do so.
 	 * 
 	 * @param showUserDialog
@@ -1575,19 +1952,29 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	 * Will return a de-serialized Object, as selected in the dialog. If it was 
 	 * unable to do so, it returns null.
 	 */
-	public Object
-	loadSerializedObject(boolean showUserDialog, String path, String fileType, String fileTypeExtension)
+	/**
+	 * 
+	 * @param showUserDialog
+	 * @param folderPath
+	 * @param fileName
+	 * @param fileNameExtensionFilterType
+	 * @param fileNameExtensionFilterExtension
+	 * @return
+	 */
+	public static Object
+	loadSerializedObject(boolean showUserDialog, String folderPath, String fileNameOnly, String fileNameExtensionFilterType, String fileNameExtensionFilterExtension)
 	{
 		Object objectToReturn = null;
 		try 
 		{
-			File currentDirectoryFile = new File(rootProgramDirectory.toString()+path);//creates a empty file in that directory
+			File currentDirectoryFile = new File(folderPath);//creates a empty file in that directory
+			objectPath = folderPath+File.separator+fileNameOnly+"."+fileNameExtensionFilterExtension;
 			if(showUserDialog)
 			{
 				JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
-				FileNameExtensionFilter filter = new FileNameExtensionFilter(fileType, fileTypeExtension);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(fileNameExtensionFilterType, fileNameExtensionFilterExtension);
 				fc.setFileFilter(filter);
-				int val = fc.showOpenDialog(this);//opens an open file dialog
+				int val = fc.showOpenDialog(null);//opens an open file dialog
 				if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
 				{
 					File selectedFile = fc.getSelectedFile();//grabs the selected file
@@ -1598,57 +1985,50 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			        fileIn.close();
 			        System.out.println("Object read from "+selectedFile.getName());
 				}//end if
-				objectPath = fc.getSelectedFile().toString();
+				objectPath = fc.getSelectedFile().toString();//FIXME might have broken something here
 			}
 			else
 			{
-				objectPath = currentDirectoryFile.toString();
-				FileInputStream fileIn = new FileInputStream(currentDirectoryFile);
+				System.out.println(objectPath);
+				FileInputStream fileIn = new FileInputStream(objectPath);
 		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
 		        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
 		        in.close();
 		        fileIn.close();
-		        System.out.println("Object read from "+currentDirectoryFile.getName());
+		        System.out.println("Object read from "+objectPath);
 			}
 			return objectToReturn;
 	    }//try
 		catch(Exception ex)
 		{
-			processingLabel.setText("Exception Ocurred!");
-			if(processTooltipsEnabled)
-			{
-				String trace = "";
-				for(StackTraceElement st : ex.getStackTrace())
-				{
-					trace += st.toString() + "\t";
-				}
-				processingLabel.setToolTipText("<html><p width=\"500\">"+trace+"</p></html>");
-			}//end if
+			ex.printStackTrace();
 			return null;
 		}//end try/catch
 	}//end loadSerializedObject()
 	
 	/**
 	 * 
+	 * @param showUserDialog
 	 * @param folderPath
+	 * @param fileName
 	 * @param fileType
 	 * @param fileTypeExtension
 	 * @param serializeableObject
 	 */
-	public void
-	saveSerializedObject(boolean showUserDialog, String folderPath, String fileType, String fileTypeExtension, Object serializeableObject)
+	public static void
+	saveSerializedObject(boolean showUserDialog, String folderPath, String fileName, String fileType, String fileTypeExtension, Object serializeableObject)
 	{
 		try 
 		{
-			Path absolutePath = Paths.get("").toAbsolutePath();//gets the path to the current directory(where the program is)
-			File currentDirectoryFile = new File(absolutePath.toString()+folderPath);//creates a empty file in that directory
-			currentDirectoryFile.mkdirs();
+			successfulWrite = true;
+			File currentDirectoryFile = new File(folderPath);//creates a empty file in that directory
+			currentDirectoryFile.mkdir();
 			if(showUserDialog)
 			{
 				JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(fileType, fileTypeExtension);
 				fc.setFileFilter(filter);
-				int val = fc.showSaveDialog(this);//opens an open file dialog
+				int val = fc.showSaveDialog(null);//opens an open file dialog
 				if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
 				{
 					boolean continueSave = true;
@@ -1658,11 +2038,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 						FileInputStream fileIn = new FileInputStream(selectedCurrentDirectoryFile);//if successful, tries to open the location
 				        ObjectInputStream in = new ObjectInputStream(fileIn); //if opened, tries to processes it as a serialized object
 				        Object testObject = in.readObject();//if processed, tries to assign it to a variable
-				        p(testObject.toString());
+				        System.out.println(testObject.toString());
 				        in.close();
 				        fileIn.close();
 				        	//if the file does not exist, or is not a valid serialized java file, this point will not be reached
-				        int continueSaveInt = JOptionPane.showConfirmDialog(this, "File already exists. Write over file?", "Existing File", JOptionPane.OK_CANCEL_OPTION);
+				        int continueSaveInt = JOptionPane.showConfirmDialog(null, "File already exists. Write over file?", "Existing File", JOptionPane.OK_CANCEL_OPTION);
 				        if(continueSaveInt != 0)
 				        {
 				        	continueSave = false;
@@ -1677,7 +2057,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 					{
 					    if(continueSave)//will only save if file does not already exist, or user is okay with overwriting	
 					    {
-					    	String fileName = fc.getSelectedFile().toString();
+					    	fileName = fc.getSelectedFile().toString();
 							if(fc.getSelectedFile().toString().contains("."+fileTypeExtension))
 							{
 								fileName = fileName.split("."+fileTypeExtension)[0];
@@ -1685,102 +2065,85 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 							FileOutputStream fileOut = new FileOutputStream(fileName+"."+fileTypeExtension);
 					        ObjectOutputStream out = new ObjectOutputStream(fileOut);
 					        out.writeObject(serializeableObject);
+					        out.flush();
 					        out.close();
+					        fileOut.flush();
 					        fileOut.close();
-					        p("Object saved in "+fileName+"."+fileTypeExtension);
+					        System.out.println("Object saved in "+fileName+"."+fileTypeExtension);
 					    }//end inner if
 					}//try
 					catch(Exception ex)
 					{
-						JOptionPane.showMessageDialog(this, "Save Failed! Contact the administrator.");
-						p(ex.getStackTrace().toString());
+						JOptionPane.showMessageDialog(null, "Save Failed! Contact the administrator.");
+						System.out.println(ex.getStackTrace().toString());
+						successfulWrite = false;
 					}//end inner try/catch
 				}//end if approve option
 			}//end if showUserDialog
 			else
 			{
-				FileOutputStream fileOut = new FileOutputStream(currentDirectoryFile);
+				FileOutputStream fileOut = new FileOutputStream(currentDirectoryFile+File.separator+fileName+"."+fileTypeExtension);
 		        ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		        out.writeObject(serializeableObject);
+		        out.flush();
 		        out.close();
+		        fileOut.flush();
 		        fileOut.close();
-		        p("Object saved in "+currentDirectoryFile.toString());
+		        System.out.println("Object saved in "+currentDirectoryFile.toString());
 			}
+			
 		}//try
 		catch(Exception ex)
 		{
-			p(ex.getStackTrace().toString());
+			ex.printStackTrace();
 		}//end outer try/catch
 	}//end saveSerializedObject()
 	
 	public void 
-	setAsideNodeProperties(WISPTNodeObject sourceWTNO)
+	setAsideNodeWithWISPTNodeBuilder()
 	{
-
-		String[] nodeStrings = new String[8];
-		try
-		{
-			nodeStrings[0] = sourceWTNO.toString();
-			nodeStrings[1] = sourceWTNO.getContent();
-			String[] tipsArr = sourceWTNO.getTips();
-			for(int i = 0; i < tipsArr.length; ++i)
-			{
-				nodeStrings[i+2] = tipsArr[i];
-			}
-		}
-		catch(NullPointerException npe)
-		{
-			npe.printStackTrace();
-		}
-		WISPTNodeBuilder.main(nodeStrings);
-		if(WISPTNodeBuilder.isClosedWithSave())
-		{
-			asideNode = null;
-			try 
-			{
-				FileInputStream fileIn = new FileInputStream("node.ser");
-				ObjectInputStream in = new ObjectInputStream(fileIn);
-				asideNode = (DefaultMutableTreeNode)in.readObject();
-				in.close();
-				fileIn.close();
-			} catch (FileNotFoundException fnfe) {
-				fnfe.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-			p(asideNode.getUserObject().toString());
-		}
+		successfulWrite = false;
 		
+		saveSerializedObject(false, "temp", "node", "Serial File", "ser", selectedNode);
+		
+		if(successfulWrite)
+		{
+			WISPTNodeBuilder.main(null);
+			System.out.println("WISPTNodeBuilder passed.");
+		}//if successful write
+		
+		asideNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(false, "temp", "node", "Serial File", "ser");
+		System.out.println("asideNode set");
 	}
 	
 	public void 
 	invisibleDeselectedButtons()
 	{
-		radio1.setVisible(false);
-		radio2.setVisible(false);
-		radio3.setVisible(false);
-		radio4.setVisible(false);
-		radioButtons.clearSelection();
-		check1.setVisible(false);
-		check1.setSelected(false);
-		check2.setVisible(false);
-		check2.setSelected(false);
-		check3.setVisible(false);
-		check3.setSelected(false);
-		check4.setVisible(false);
-		check4.setSelected(false);
-		check5.setVisible(false);
-		check5.setSelected(false);
-		check6.setVisible(false);
-		check6.setSelected(false);
+		navRadio1.setVisible(false);
+		navRadio2.setVisible(false);
+		navRadio3.setVisible(false);
+		navRadio4.setVisible(false);
+		navRadioButtons.clearSelection();
+		tipCheck1.setVisible(false);
+		tipCheck2.setVisible(false);
+		tipCheck3.setVisible(false);
+		tipCheck4.setVisible(false);
+		tipCheck5.setVisible(false);
+		tipCheck6.setVisible(false);
+		tipCheck1.setSelected(false);
+		tipCheck2.setSelected(false);
+		tipCheck3.setSelected(false);
+		tipCheck4.setSelected(false);
+		tipCheck5.setSelected(false);
+		tipCheck6.setSelected(false);
+		tipLabel1.setVisible(false);
+		tipLabel2.setVisible(false);
+		tipLabel3.setVisible(false);
+		tipLabel4.setVisible(false);
+		tipLabel5.setVisible(false);
+		tipLabel6.setVisible(false);
 	}
 
-	
-	
-	
-	
 	public void
 	incrementCounter()
 	{
@@ -1797,8 +2160,6 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			}//end counter or hide if
 		}//end training mode if
 	}
-	
-
 
 // TODO treeValueChaned override
 	@Override
@@ -1816,7 +2177,8 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 			selectedWTNO = (WISPTNodeObject)selectedNode.getUserObject();
 			userProfile.setLastSelectedNodePath(new TreePath(selectedNode.getPath()));
-			p(userProfile.getLastSelectedNodePath().toString());
+			//p(userProfile.getLastSelectedNodePath().toString());
+			//training mode if/else below
 			if(!selectedNode.isLeaf())
 			{
 				boolean allChildrenInvisible = true;
@@ -1839,9 +2201,11 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			{
 				incrementCounter();
 			}
+			
 			mainTxtArea.setText(selectedWTNO.getContent());
 			String[] tips = selectedWTNO.getTips();
-			
+			@SuppressWarnings("unused")
+			ImageIcon[] tipPics = selectedWTNO.getTipPics();
 			DefaultMutableTreeNode child;
 			WISPTNodeObject childObject;
 			
@@ -1859,23 +2223,23 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			{
 				 child = (DefaultMutableTreeNode)selectedNode.getChildAt(0);
 				 childObject = (WISPTNodeObject)child.getUserObject();
-				radio1.setText(childObject.toString());
-				radio1.setVisible(true);
+				navRadio1.setText(childObject.toString());
+				navRadio1.setVisible(true);
 	
 				 child = (DefaultMutableTreeNode)selectedNode.getChildAt(1);
 				 childObject = (WISPTNodeObject)child.getUserObject();
-				radio2.setText(childObject.toString());
-				radio2.setVisible(true);
+				navRadio2.setText(childObject.toString());
+				navRadio2.setVisible(true);
 	
 				 child = (DefaultMutableTreeNode)selectedNode.getChildAt(2);
 				 childObject = (WISPTNodeObject)child.getUserObject();
-				radio3.setText(childObject.toString());
-				radio3.setVisible(true);
+				navRadio3.setText(childObject.toString());
+				navRadio3.setVisible(true);
 		
 				 child = (DefaultMutableTreeNode)selectedNode.getChildAt(3);
 				 childObject = (WISPTNodeObject)child.getUserObject();
-				radio4.setText(childObject.toString());
-				radio4.setVisible(true);
+				navRadio4.setText(childObject.toString());
+				navRadio4.setVisible(true);
 			}
 			catch(NullPointerException npe)
 			{
@@ -1888,55 +2252,81 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			
 			
 			
-			try {
-				if(!tips[0].equals(""))
+			
+			if(!tips[0].equals(""))
+			{
+				tipCheck1.setVisible(true);
+				tipCheck1.setText(tips[0].split(":")[0]);
+				try
 				{
-					check1.setVisible(true);
-					check1.setText(tips[0].split(":")[0]);
+					if(tipPics[0] != null)
+						tipLabel1.setVisible(true);
 				}
-	
-				if(!tips[1].equals(""))
-				{
-					check2.setVisible(true);
-					check2.setText(tips[1].split(":")[0]);
-				}
-				
-	
-				if(!tips[2].equals(""))
-				{
-					check3.setVisible(true);
-					check3.setText(tips[2].split(":")[0]);
-				}
-				
-				if(!tips[3].equals(""))
-				{
-					check4.setVisible(true);
-					check4.setText(tips[3].split(":")[0]);
-				}
-				
-				if(!tips[4].equals(""))
-				{
-					check5.setVisible(true);
-					check5.setText(tips[4].split(":")[0]);
-				}
-				
-	
-				if(!tips[5].equals(""))
-				{
-					check6.setVisible(true);
-					check6.setText(tips[5].split(":")[0]);
-				}
-				
-			} catch (NullPointerException npe) {
-				//npe.printStackTrace();
-				check1.setVisible(false);
-				check2.setVisible(false);
-				check3.setVisible(false);
-				check4.setVisible(false);
-				check5.setVisible(false);
-				check6.setVisible(false);
-				//accounts for nodes that are pre "tips[]" implementation 
+				catch(Exception ex){}
 			}
+
+			if(!tips[1].equals(""))
+			{
+				tipCheck2.setVisible(true);
+				tipCheck2.setText(tips[1].split(":")[0]);
+				try
+				{
+					if(tipPics[1] != null)
+						tipLabel2.setVisible(true);
+				}
+				catch(Exception ex){}
+			}
+			
+
+			if(!tips[2].equals(""))
+			{
+				tipCheck3.setVisible(true);
+				tipCheck3.setText(tips[2].split(":")[0]);
+				try
+				{
+					if(tipPics[2] != null)
+						tipLabel3.setVisible(true);
+				}
+				catch(Exception ex){}
+			}
+			
+			if(!tips[3].equals(""))
+			{
+				tipCheck4.setVisible(true);
+				tipCheck4.setText(tips[3].split(":")[0]);
+				try
+				{
+					if(tipPics[3] != null)
+						tipLabel4.setVisible(true);
+				}
+				catch(Exception ex){}
+			}
+			
+			if(!tips[4].equals(""))
+			{
+				tipCheck5.setVisible(true);
+				tipCheck5.setText(tips[4].split(":")[0]);
+				try
+				{
+					if(tipPics[4] != null)
+						tipLabel5.setVisible(true);
+				}
+				catch(Exception ex){}
+			}
+			
+
+			if(!tips[5].equals(""))
+			{
+				tipCheck6.setVisible(true);
+				tipCheck6.setText(tips[5].split(":")[0]);
+				try
+				{
+					if(tipPics[5] != null)
+						tipLabel6.setVisible(true);
+				}
+				catch(Exception ex){}
+			}
+				
 		}
 	}
 	public void
@@ -1968,80 +2358,87 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	}
 }
 
-class LID extends JDialog
+
+/**Log In Dialog is a username/password test that will find the user file under the username specified, and load it to WISPT.
+ * 
+ * @author Austen
+ *
+ */
+class LoginDialog extends JDialog
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3139704254925565221L;
 	
-		protected JPanel 
-			LIDContentPane,
-			LIDCenterPane,
-			LIDSouthPane;
-			protected JButton 
-				LIDOkay,
-				LIDCancel;
-			protected JTextArea
-				LIDUsername,
-				LIDPassword;
+		private JPanel 
+			LID_contentPane,
+			LID_centerPane,
+			LID_southPane;
+			private JButton 
+				LID_okayBtn,
+				LID_cancelBtn;
+			private JTextArea
+				LID_username,
+				LID_password;
 
-	public LID(WISPT mainWindow)
+	public LoginDialog(WISPT mainWindow)
 	{
 		super();
+		this.setModalityType(ModalityType.APPLICATION_MODAL);
+		this.setDefaultCloseOperation(LoginDialog.DISPOSE_ON_CLOSE);
+			LID_contentPane = new JPanel(new BorderLayout());
+			LID_contentPane.setVisible(true);
+		this.setContentPane(LID_contentPane);
 		
-			LIDContentPane = new JPanel(new BorderLayout());
-			LIDContentPane.setVisible(true);
-		this.setContentPane(LIDContentPane);
-		
-				LIDCenterPane = new JPanel(new GridLayout(2,1));
-				LIDCenterPane.setVisible(true);
-			LIDContentPane.add(LIDCenterPane, BorderLayout.CENTER);
+				LID_centerPane = new JPanel(new GridLayout(2,1));
+				LID_centerPane.setVisible(true);
+			LID_contentPane.add(LID_centerPane, BorderLayout.CENTER);
 			
-					LIDUsername = new JTextArea("Enter Username");
-					LIDUsername.setBorder(BorderFactory.createTitledBorder("Username"));
-					LIDUsername.setColumns(40);
-					LIDUsername.setMinimumSize(new Dimension(120, 30));
-					LIDUsername.setVisible(true);
-				LIDCenterPane.add(LIDUsername);
+					LID_username = new JTextArea("Enter Username");
+					LID_username.setBorder(BorderFactory.createTitledBorder("Username"));
+					LID_username.setColumns(40);
+					LID_username.setMinimumSize(new Dimension(120, 30));
+					LID_username.setVisible(true);
+				LID_centerPane.add(LID_username);
 					
-					LIDPassword = new JTextArea("Enter Password");
-					LIDPassword.setBorder(BorderFactory.createTitledBorder("Password"));
-					LIDPassword.setColumns(40);
-					LIDPassword.setVisible(true);
-				LIDCenterPane.add(LIDPassword);
+					LID_password = new JTextArea("Enter Password");
+					LID_password.setBorder(BorderFactory.createTitledBorder("Password"));
+					LID_password.setColumns(40);
+					LID_password.setVisible(true);
+				LID_centerPane.add(LID_password);
 				
 			
-				LIDSouthPane = new JPanel(new GridLayout(1,2));
-			LIDContentPane.add(LIDSouthPane, BorderLayout.SOUTH);
+				LID_southPane = new JPanel(new GridLayout(1,2));
+			LID_contentPane.add(LID_southPane, BorderLayout.SOUTH);
 			
-					LIDOkay = new JButton("OK");
-					LIDOkay.addActionListener
+					LID_okayBtn = new JButton("OK");
+					LID_okayBtn.addActionListener
 						(new ActionListener()
 						{
 							@Override
 							public void
 							actionPerformed(ActionEvent e)
 							{
-								LIDOkay_actionPerformed(e, mainWindow);
+								LID_okayBtn_actionPerformed(e, mainWindow);
 							}
 						}
 						);
-				LIDSouthPane.add(LIDOkay);
+				LID_southPane.add(LID_okayBtn);
 				
-					LIDCancel = new JButton("Cancel");
-					LIDCancel.addActionListener
+					LID_cancelBtn = new JButton("Cancel");
+					LID_cancelBtn.addActionListener
 						(new ActionListener()
 						{
 							@Override
 							public void
 							actionPerformed(ActionEvent e)
 							{
-								LIDCancel_actionPerformed(e);
+								LID_cancelBtn_actionPerformed(e);
 							}
 						}
 						);
-				LIDSouthPane.add(LIDCancel);
+				LID_southPane.add(LID_cancelBtn);
 			
 			this.revalidate();
 			this.repaint();
@@ -2050,102 +2447,183 @@ class LID extends JDialog
 	}
 	
 	public void
-	LIDOkay_actionPerformed(ActionEvent e, WISPT mainWindow)
+	LID_okayBtn_actionPerformed(ActionEvent e, WISPT mainWindow)
 	{
-		String pathOfUserFile = mainWindow.rootProgramDirectory.toString()+File.separator+"User Profiles"+File.separator+LIDUsername.getText()+".user";
-		mainWindow.p(pathOfUserFile);
-		WISPTUserProfile profile = (WISPTUserProfile)mainWindow.loadSerializedObject(false, 
-				pathOfUserFile, 
+		String pathOfFolder = "User Profiles";
+		String fileName = LID_username.getText()+".user";
+		mainWindow.p(pathOfFolder+File.separator+fileName);
+		WISPTUserProfile profile = (WISPTUserProfile)WISPT.loadSerializedObject(false, 
+				pathOfFolder, 
+				fileName,
 				"User Profile", 
-				".user");
+				"user");
 		try
 		{
-			if(profile == null)
+			/*if(profile == null)
 			{
-				throw new NullPointerException("The User Profile \""+LIDUsername.getText()+"\" does not exist!");
+				throw new NullPointerException("The User Profile \""+LID_username.getText()+"\" does not exist!");
 			}
-			if(!LIDPassword.getText().equals(profile.getUserPassword()))
+			if(!LID_password.getText().equals(profile.getUserPassword()))
 			{
-				throw new IllegalArgumentException(LIDPassword.getText()+" is not the correct password!");
-			}
+				throw new IllegalArgumentException(LID_password.getText()+" is not the correct password!");
+			}*/
 			
 			mainWindow.setUser(profile);
 		}
 		catch(Exception ex)
 		{
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
+			ex.printStackTrace();
 		}
 		
-	}//end LIDOkay_AP
+	}//end LID_okayBtn_AP
 	
 	public void
-	LIDCancel_actionPerformed(ActionEvent e)
+	LID_cancelBtn_actionPerformed(ActionEvent e)
 	{
 		this.dispose();
-	}//end LIDCancel_AP
+	}//end LID_cancelBtn_AP
 }
 
-class WISPTUserProfileBuilder
+class UserProfileBuilder extends JDialog
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3380905246782845147L;
+
 /*
  * TODO variables
  */
-	protected JCheckBox isAdmin,
-						editorModeEnabled,
-						processTooltipsEnabled,
-						trainingModeEnabled,
-						tipsVisible,
-						treeVisible;
+	private JCheckBox UPB_isAdmin,
+						UPB_editorModeEnabled,
+						UPB_processTooltipsEnabled,
+						UPB_trainingModeEnabled,
+						UPB_tipsVisible,
+						UPB_treeVisible;
 	
-	protected JTextArea userName,
-						userPassword,
-						invisibleString;
+	private JTextField UPB_username,
+						UPB_userPassword,
+						UPB_lockedMessage;
 	
-	protected JSpinner userUnlocks;
+	private JSpinner UPB_userUnlocks;
 	
-	protected JDialog builder;
-	
-	protected JPanel contentPane,
-					southPane,
-					centerPane;
-	protected JButton okayBtn,
-					cancelBtn;
+	private JPanel UPB_contentPane,
+					UPB_southPane,
+					UPB_centerPane;
+	private JButton UPB_okayBtn,
+					UPB_cancelBtn;
 
 /*
  *  TODO constructors
  */
-	public WISPTUserProfileBuilder()
+	public UserProfileBuilder(WISPT mainWindow)
 	{
-		builder = new JDialog();
-		builder.setModalityType(ModalityType.APPLICATION_MODAL);
-		builder.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		super();
+		this.setModalityType(ModalityType.APPLICATION_MODAL);
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
-		contentPane = new JPanel(new BorderLayout());
-		builder.setContentPane(contentPane);
+			UPB_contentPane = new JPanel(new BorderLayout());
+		this.setContentPane(UPB_contentPane);
 		
-		centerPane = new JPanel(new GridLayout(4,3));
-		centerPane.setBorder(BorderFactory.createTitledBorder("User Profile"));
-		contentPane.add(centerPane, BorderLayout.CENTER);
-		
-		isAdmin = new JCheckBox("Is Administrator");
-		centerPane.add(isAdmin);
-		
-		//editorModeEnabled
+				UPB_centerPane = new JPanel(new GridLayout(4,3));
+				UPB_centerPane.setBorder(BorderFactory.createTitledBorder("User Profile"));
+			UPB_contentPane.add(UPB_centerPane, BorderLayout.CENTER);
+			
+					UPB_isAdmin = new JCheckBox("Is Administrator");
+				UPB_centerPane.add(UPB_isAdmin);
+				
+					UPB_editorModeEnabled = new JCheckBox("Enable Editor Mode");
+				UPB_centerPane.add(UPB_editorModeEnabled);
+					UPB_processTooltipsEnabled = new JCheckBox("Enable Tooltip Error Report");
+				UPB_centerPane.add(UPB_processTooltipsEnabled);
+					UPB_trainingModeEnabled = new JCheckBox("Enable Training Mode");
+				UPB_centerPane.add(UPB_trainingModeEnabled);
+					UPB_tipsVisible = new JCheckBox("Tips Pane Expanded");
+				UPB_centerPane.add(UPB_tipsVisible);
+					UPB_treeVisible = new JCheckBox("Tree Pane Expanded");
+				UPB_centerPane.add(UPB_treeVisible);
+					UPB_username = new JTextField("");
+					UPB_username.setBorder(BorderFactory.createTitledBorder("Username"));
+				UPB_centerPane.add(UPB_username);
+					UPB_userPassword = new JTextField("");
+					UPB_userPassword.setBorder(BorderFactory.createTitledBorder("Password"));
+				UPB_centerPane.add(UPB_userPassword);
+					UPB_lockedMessage = new JTextField("");
+					UPB_lockedMessage.setBorder(BorderFactory.createTitledBorder("Locked Tree/Branch Message"));
+				UPB_centerPane.add(UPB_lockedMessage);
+					UPB_userUnlocks = new JSpinner();
+					UPB_userUnlocks.setModel(new SpinnerNumberModel(1,1,12,1));
+				UPB_centerPane.add(UPB_userUnlocks);
+				
+				UPB_southPane = new JPanel(new GridLayout(1,2));
+			UPB_contentPane.add(UPB_southPane, BorderLayout.SOUTH);
+			
+					UPB_okayBtn = new JButton("OK");
+					UPB_okayBtn.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent e)
+							{
+								UPB_okayBtn_actionPerformed(e, mainWindow);
+							}
+						}
+						);
+				UPB_southPane.add(UPB_okayBtn);
+				
+					UPB_cancelBtn = new JButton("Cancel");
+					UPB_cancelBtn.addActionListener
+						(new ActionListener() 
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent e)
+							{
+								UPB_cancelBtn_actionPerformed(e);
+							}
+						}
+						);
+				UPB_southPane.add(UPB_cancelBtn);
+				
+		this.pack();
 	}
 
-}
-
-class SaveFileChooser extends JFileChooser
-{
-	@Override
+	/*
+	 * TODO UPB_Methods
+	 */
+	
 	public void
-	approveSelection()
+	UPB_okayBtn_actionPerformed(ActionEvent e, WISPT mainWindow)
 	{
-		/*
-		 * need to add the safeguard here, I'm guessing that it disposes of the JDialog 
-		 * through this function, and I want the safeguard to come first, and only close/dispose
-		 * if the safeguard passes (if the user is sure they want to over write the file)
-		 * Internet died so I can't get the original JFileChooser.java to work with.
-		 */
+		WISPTUserProfile profile = new WISPTUserProfile(UPB_isAdmin.isSelected(), "User Profiles", UPB_username.getText()+".user");
+		profile.setEditorModeEnabled(UPB_editorModeEnabled.isSelected());
+		
+		DefaultTreeModel model = (DefaultTreeModel)WISPT.loadSerializedObject(true, "Tree Saves", null, "Serialized Tree File", "tree");
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
+		TreePath rootChildPath = new TreePath(((DefaultMutableTreeNode)root.getChildAt(0)).getPath());
+		
+		profile.setLastTreeUsedPath(WISPT.getObjectPath());
+		profile.setLastSelectedNodePath(rootChildPath);
+		profile.setLockedMessage(UPB_lockedMessage.getText());
+		profile.setProcessTooltipsEnabled(UPB_processTooltipsEnabled.isSelected());
+		profile.setTipsVisible(UPB_tipsVisible.isSelected());
+		profile.setTrainingModeEnabled(UPB_trainingModeEnabled.isSelected());
+		profile.setTreeVisible(UPB_treeVisible.isSelected());
+		profile.setUserName(UPB_username.getText());
+		profile.setUserPassword(UPB_userPassword.getText());
+		profile.setUserUnlocks((int)UPB_userUnlocks.getValue());
+		
+		WISPT.saveSerializedObject(false, "User Profiles", UPB_username.getText()+".user", "User Profile", ".user", profile);
+		mainWindow.setUser(profile);
+		
+		this.dispose();
+	}
+	
+	public void
+	UPB_cancelBtn_actionPerformed(ActionEvent e)
+	{
+		this.dispose();
 	}
 }

@@ -18,6 +18,7 @@ package com.infowest.java;
 
 import java.io.Serializable;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 public class WISPTNodeObject implements Serializable
@@ -28,25 +29,25 @@ public class WISPTNodeObject implements Serializable
 	private static final long 
 		serialVersionUID = -9875955166960066L;
 	private static int
-		timesUserPassUsed = 0,
-		userMax = 5;
+		timesUserPassUsed,
+		userMax;
 	
 	private static String	
-		userPass = "password",
-		adminPass = "WISPadmin",
-		invisibleString = "";
+		userPass,
+		adminPass,
+		invisibleString;
 	
 	
 	private String 
-		titleString = "Seed",
-		contentString = "Seed",
-		visibleString = "";
+		titleString,
+		contentString,
+		visibleString;
 	
 	private int 
 		counter = 0;
 
-	private String[] 
-		tips = {null,null,null,null,null,null};
+	private String[] tips;
+	private ImageIcon[] tipPics;
 	
 	/*
 	 * Constructors
@@ -58,7 +59,14 @@ public class WISPTNodeObject implements Serializable
 		setTitle(title);
 		setContent(content);
 		visibleString = contentString;
-	}
+		tips = new String[6];
+		tipPics = new ImageIcon[6];
+		WISPTNodeObject.setAdminPass("WISPadmin");
+		WISPTNodeObject.setInvisibleString("");
+		WISPTNodeObject.setTimesUserPassUsed(0);
+		WISPTNodeObject.setUserMax(5);
+		WISPTNodeObject.setUserPass("password");
+	}//title content constructor
 	
 	/*
 	 * Methods
@@ -126,10 +134,20 @@ public class WISPTNodeObject implements Serializable
 	{
 		tips[index] = tip;
 	}
+	public void
+	setTipPic(int index, ImageIcon tipPic)
+	{
+		tipPics[index] = tipPic;
+	}
 	public void 
 	setTips(String[]inTips)
 	{
 		tips = inTips;
+	}
+	public void
+	setTipPics(ImageIcon[] inTipPics)
+	{
+		tipPics = inTipPics;
 	}
 	public void 
 	setTitle(String newTitle)
@@ -171,10 +189,20 @@ public class WISPTNodeObject implements Serializable
 	{
 		return tips[index];
 	}
+	public ImageIcon
+	getTipPicAt(int index)
+	{
+		return tipPics[index];
+	}
 	public String[] 
 	getTips()
 	{
 		return tips;
+	}
+	public ImageIcon[]
+	getTipPics()
+	{
+		return tipPics;
 	}
 	public static int 
 	getTimesUserPassUsed()

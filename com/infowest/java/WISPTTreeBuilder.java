@@ -335,7 +335,7 @@ public class WISPTTreeBuilder extends JFrame implements TreeSelectionListener, A
 		{
 			;
 		}
-		WISPTNodeBuilder.main(nodeStrings);
+		//WISPTNodeBuilder.main(nodeStrings);
 		asideNode = null;
 		
 		try 

@@ -41,7 +41,10 @@ public class WISPTNodeBuilder extends JDialog
 	
 	private static boolean savedClose = false;
 	
-	private JTextArea titleTxt, 
+	private WISPTNodeObject wtno;
+	
+	private JTextArea 
+			titleTxt, 
 			contentTxt,
 			tip1,
 			tip2,
@@ -49,20 +52,42 @@ public class WISPTNodeBuilder extends JDialog
 			tip4,
 			tip5,
 			tip6;
-	private JButton acceptChanges,
+	private JLabel	tipLabel1,
+					tipLabel2,
+					tipLabel3,
+					tipLabel4,
+					tipLabel5,
+					tipLabel6;
+	
+	private String	emptyTipLabelString;
+	
+	private JButton 
+			acceptChanges,
 			cancel,
-			packer,
 			addTip,
 			removeTip;
-	private JPanel contentPane,
-			center,
-				//centerTipBtns,
-			south,
-			north;
-	private JScrollPane centerScroll,
+	private JPanel 
+			contentPane,
+				center,
+				east,
+				south;
+	private JScrollPane 
+			eastScroll,
 			southScroll;
-	private JTextArea[] tips = {null,null,null,null,null,null};
-	private int switcher = 0;
+	private JTextArea[] 
+			tips;
+	private JLabel[] 
+			tipLabels;
+	private ImageIcon[]
+			tipPics;
+	private int 
+			switcher = 0,
+			lastPicOpened;
+	private BufferedImage 
+			bufferedImage;
+	private ImageIcon 
+			icon,
+			emptyIcon;
 
 	/*
 	 * TODO Constructor
@@ -72,23 +97,7 @@ public class WISPTNodeBuilder extends JDialog
 	WISPTNodeBuilder()
 	{
 		super();
-		this.addComponentListener
-		(new ComponentListener()
-		{
-				@Override
-				public void componentHidden(ComponentEvent e){/*do nothing*/}
-				@Override
-				public void componentMoved(ComponentEvent e){/*do nothing*/}
-				@Override
-				public void componentResized(ComponentEvent e){/*do nothing*/}
-			@Override
-			public void 
-			componentShown(ComponentEvent arg0) 
-			{
-				savedClose = false;
-			}
-		}
-		);
+		this.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 		try
 		{
 			ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
@@ -110,67 +119,257 @@ public class WISPTNodeBuilder extends JDialog
 		{
 			e.printStackTrace();
 		}
-		this.setPreferredSize(new Dimension(800,400));
+		this.addComponentListener
+			(new ComponentListener()
+			{
+					@Override
+					public void componentHidden(ComponentEvent e){/*do nothing*/}
+					@Override
+					public void componentMoved(ComponentEvent e){/*do nothing*/}
+					@Override
+					public void componentResized(ComponentEvent e){/*do nothing*/}
+				@Override
+				public void 
+				componentShown(ComponentEvent arg0) 
+				{
+					savedClose = false;
+				}
+			}
+			);
+		this.setSize(new Dimension(1280, 600));
 		this.setTitle("Node");
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		
 			contentPane = new JPanel();
 			contentPane.setLayout(new BorderLayout());
-		this.setContentPane(contentPane);
-			
-			//TODO north
-				north = new JPanel(new FlowLayout());
-			contentPane.add(north, BorderLayout.NORTH);
-			
-					packer = new JButton();
-					packer.setPreferredSize(new Dimension(10,10));
-					packer.setMaximumSize(new Dimension(10,10));
-					packer.addActionListener
-					(new ActionListener()
+		this.setContentPane(contentPane);	
+					
+		wtno = getSerializedWTNO();
+		try
+		{
+			System.out.println(wtno.toString());
+		}
+		catch(Exception e)
+		{
+			wtno = new WISPTNodeObject("Title", "Content");
+			wtno.setTips(new String[]{"", "", "", "", "", ""});
+		}
+		
+		//TODO center
+
+				center = new JPanel();
+				center.setLayout(new BoxLayout(center, BoxLayout.PAGE_AXIS));
+			contentPane.add(center, BorderLayout.CENTER);
+				
+					try
 					{
-						@Override
-						public void
-						actionPerformed(ActionEvent e)
-						{
-							packer_actionPerformed(e);
-						}
+						titleTxt = new JTextArea(wtno.toString());
 					}
-					);
-				north.add(packer);
-					
-					
-			//TODO center
-					center = new JPanel();
-				centerScroll = new JScrollPane(center);
-			contentPane.add(centerScroll, BorderLayout.CENTER);
-			
-					center.setLayout(new BoxLayout(center, BoxLayout.PAGE_AXIS));
-					
+					catch(NullPointerException np)
+					{
 						titleTxt = new JTextArea("title");
-					center.add(titleTxt);
-					
-						titleTxt.setBorder(BorderFactory.createTitledBorder("Node Title"));
-						
+					}
+					titleTxt.setLineWrap(true);
+					titleTxt.setBorder(BorderFactory.createTitledBorder("Node Title"));
+				center.add(titleTxt);
+				
+					try
+					{
+						contentTxt = new JTextArea(wtno.getContent());
+					}
+					catch(NullPointerException np)
+					{
 						contentTxt = new JTextArea("content");
-					center.add(contentTxt);
+					}
+					contentTxt.setLineWrap(true);
+					contentTxt.setBorder(BorderFactory.createTitledBorder("Node Content"));
+				center.add(contentTxt);
+					
+					
+					tips = new JTextArea[6];
+					for(int i = 0; i < tips.length; ++i)
+					{
+						tips[i] = new JTextArea("Tip");
+						tips[i].setRows(5);
+						tips[i].setColumns(50);
+						tips[i].setVisible(false);
+						tips[i].setLineWrap(true);
+						tips[i].setAutoscrolls(true);
+						tips[i].setBorder(BorderFactory.createTitledBorder("Tip "+(i+1)));
+					}
+					tip1 = tips[0];
+					tip2 = tips[1];
+					tip3 = tips[2];
+					tip4 = tips[3];
+					tip5 = tips[4];
+					tip6 = tips[5];
+					makeTipsVisible();
+					
+			//east
+				eastScroll = new JScrollPane(new JPanel());
+			contentPane.add(eastScroll, BorderLayout.EAST);
+			
+					east = new JPanel();
+					east.setLayout(new BoxLayout(east, BoxLayout.PAGE_AXIS));
+				eastScroll.setViewportView(east);
 						
-						contentTxt.setBorder(BorderFactory.createTitledBorder("Node Content"));
+						tipLabels = new JLabel[6];
+						tipPics = new ImageIcon[6];
 						
-						
-						for(int i = 0; i < tips.length; ++i)
+						try
 						{
-							tips[i] = new JTextArea("Tip");
-							tips[i].setRows(5);
-							tips[i].setVisible(false);
-							tips[i].setBorder(BorderFactory.createTitledBorder("Tip "+(i+1)));
+							bufferedImage = ImageIO.read(new File("picPlaceholder.png"));
 						}
-						tip1 = tips[0];
-						tip2 = tips[1];
-						tip3 = tips[2];
-						tip4 = tips[3];
-						tip5 = tips[4];
-						tip6 = tips[5];
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
+						}
+						
+						icon = new ImageIcon(bufferedImage);
+						
+						try
+						{
+							bufferedImage = ImageIO.read(new File("picPlaceholderEmpty.png"));
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
+						}
+						
+						emptyIcon = new ImageIcon(bufferedImage);
+						emptyTipLabelString = " (empty)";
+						
+						for(int i = 0; i < tipLabels.length; ++i)
+						{
+							tipLabels[i] = new JLabel("Pic "+(i+1)+emptyTipLabelString);
+							tipLabels[i].setVisible(true);
+							tipLabels[i].setIcon(emptyIcon);
+							tipLabels[i].setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+						}//end for
+						tipLabel1 = tipLabels[0];
+						tipLabel1.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel1, 0);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+						tipLabel2 = tipLabels[1];
+						tipLabel2.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel2, 1);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+						tipLabel3 = tipLabels[2];
+						tipLabel3.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel3, 2);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+						tipLabel4 = tipLabels[3];
+						tipLabel4.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel4, 3);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+						tipLabel5 = tipLabels[4];
+						tipLabel5.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel5, 4);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+						tipLabel6 = tipLabels[5];
+						tipLabel6.addMouseListener
+							(new MouseListener()
+							{
+								@Override
+								public void mouseClicked(MouseEvent me) 
+								{
+									tipLabel_mouseClicked(me, tipLabel6, 5);
+								}//mouseClicked
+	
+									@Override
+									public void mouseEntered(MouseEvent arg0) {}
+									@Override
+									public void mouseExited(MouseEvent arg0) {}
+									@Override
+									public void mousePressed(MouseEvent arg0) {}
+									@Override
+									public void mouseReleased(MouseEvent arg0) {}
+							}
+							);
+					makeTipLabelsVisible();
 						
 			//south
 				southScroll = new JScrollPane(new JPanel());
@@ -233,6 +432,7 @@ public class WISPTNodeBuilder extends JDialog
 							}//end action listener
 							);//action listener added
 					south.add(cancel);
+		revalidate();
 		pack();
 		
 	}
@@ -241,59 +441,145 @@ public class WISPTNodeBuilder extends JDialog
 	main(String[] args) 
 	{
 		WISPTNodeBuilder node = new WISPTNodeBuilder();
-		node.setModalityType(ModalityType.APPLICATION_MODAL);
-		System.out.println(java.util.Arrays.toString(args));
-		try //XXX this needs to happen through the constructor - pass args to it.
+		node.toFront();
+		node.setVisible(true);
+	}
+	
+	public void
+	tipLabel_mouseClicked(MouseEvent me, JLabel clickedTipLabel, int index)
+	{
+		lastPicOpened = index;
+		if(tipPics[index] == null)
 		{
-			node.setNodeTitle(args[0]);
-			node.setNodeContent(args[1]);
-			
-			node.tip1.setText(args[2]);
-			if(!(node.tip1.getText().equals("")))
+			bufferedImage = WISPT.loadImage(true, "Images", this);
+			if(bufferedImage != null)
 			{
-				node.center.add(node.tip1);
-				node.tip1.setVisible(true);
-				node.switcher = 1;
+				tipPics[index] = new ImageIcon(bufferedImage);
+				clickedTipLabel.setIcon(icon);
+			}//if
+			else
+			{
+				clickedTipLabel.setIcon(emptyIcon);
+			}//end null if
+		}
+		else
+		{
+			if(WISPTScreenShotViewer.getNoInstanceOpen())
+			{
+				lastPicOpened = index;
+				WISPTScreenShotViewer ssv = new WISPTScreenShotViewer(tipPics[index], this);
+				ssv.setVisible(true);
+			}//if not already open
+		}//end if/else
+
+		String newText = clickedTipLabel.getText();
+		System.out.println(newText);
+
+		if(tipPics[index] != null)
+		{
+			if(newText.contains(emptyTipLabelString))
+				newText = newText.replace(emptyTipLabelString, "");
+			
+			System.out.println(newText + " isIcon");
+			clickedTipLabel.setText(newText);
+			System.out.println(newText);
+		}
+	}
+	
+	public void
+	setLastPicOpened(ImageIcon newPic)
+	{
+		tipPics[lastPicOpened] = newPic;
+		JLabel clickedTipLabel;
+		if(newPic == null)
+		{
+			switch(lastPicOpened)
+			{
+				case 0:
+					clickedTipLabel = tipLabel1;
+					break;
+				case 1:
+					clickedTipLabel = tipLabel2;
+					break;
+				case 2:
+					clickedTipLabel = tipLabel3;
+					break;
+				case 3:
+					clickedTipLabel = tipLabel4;
+					break;
+				case 4:
+					clickedTipLabel = tipLabel5;
+					break;
+				case 5:
+					clickedTipLabel = tipLabel6;
+					break;
+				default:
+					clickedTipLabel = new JLabel();
+					break;
+			}//switch
+			clickedTipLabel.setIcon(emptyIcon);
+			System.out.println(clickedTipLabel.getText() + " isNullIcon");
+			clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
+			System.out.println(clickedTipLabel.getText());
+		}//if null
+	}//setLastPicOpened
+	
+	
+	
+	public void
+	makeTipsVisible()
+	{
+		try
+		{
+			setNodeTitle(wtno.toString());
+			setNodeContent(wtno.getContent());
+			
+			tip1.setText(wtno.getTipAt(0));
+			if(!(tip1.getText().equals("")))
+			{
+				center.add(tip1);
+				tip1.setVisible(true);
+				switcher = 1;
 			}
 			
-			node.tip2.setText(args[3]);
-			if(!(node.tip2.getText().equals("")))
+			tip2.setText(wtno.getTipAt(1));
+			if(!(tip2.getText().equals("")))
 			{
-				node.center.add(node.tip2);
-				node.tip2.setVisible(true);
-				node.switcher = 2;
+				center.add(tip2);
+				tip2.setVisible(true);
+				switcher = 2;
 			}
 			
-			node.tip3.setText(args[4]);
-			if(!(node.tip3.getText().equals("")))
+			tip3.setText(wtno.getTipAt(2));
+			if(!(tip3.getText().equals("")))
 			{
-				node.center.add(node.tip3);
-				node.tip3.setVisible(true);
-				node.switcher = 3;
+				center.add(tip3);
+				tip3.setVisible(true);
+				switcher = 3;
 			}
 			
-			node.tip4.setText(args[5]);
-			if(!(node.tip4.getText().equals("")))
+			tip4.setText(wtno.getTipAt(3));
+			if(!(tip4.getText().equals("")))
 			{
-				node.center.add(node.tip4);
-				node.tip4.setVisible(true);
-				node.switcher = 4;
+				center.add(tip4);
+				tip4.setVisible(true);
+				switcher = 4;
 			}
 			
-			node.tip5.setText(args[6]);
-			if(!(node.tip5.getText().equals("")))
+			tip5.setText(wtno.getTipAt(4));
+			if(!(tip5.getText().equals("")))
 			{
-				node.center.add(node.tip5);
-				node.tip5.setVisible(true);
-				node.switcher = 5;
+				center.add(tip5);
+				tip5.setVisible(true);
+				switcher = 5;
 			}
 			
-			node.tip6.setText(args[7]);
-			if(!(node.tip6.getText().equals("")))
+			tip6.setText(wtno.getTipAt(5));
+			if(!(tip6.getText().equals("")))
 			{
-				node.center.add(node.tip6);
-				node.tip6.setVisible(true);
-				node.switcher = 6;
+				center.add(tip6);
+				tip6.setVisible(true);
+				switcher = 6;
 			}
 			
 		} 
@@ -303,19 +589,75 @@ public class WISPTNodeBuilder extends JDialog
 			/*node.setNodeTitle("Title");
 			node.setNodeContent("Content");*/
 		}
-		node.setVisible(true);
+		pack();
+	}//end makeTips
+	
+	public void
+	makeTipLabelsVisible()
+	{
+		
+		if(tip1.isVisible())
+		{
+			east.add(tipLabel1);
+		}
+		else
+		{
+			east.remove(tipLabel1);
+		}
+		
+		if(tip2.isVisible())
+		{
+			east.add(tipLabel2);
+		}
+		else
+		{
+			east.remove(tipLabel2);
+		}
+		
+		if(tip3.isVisible())
+		{
+			east.add(tipLabel3);
+		}
+		else
+		{
+			east.remove(tipLabel3);
+		}
+		
+		if(tip4.isVisible())
+		{
+			east.add(tipLabel4);
+		}
+		else
+		{
+			east.remove(tipLabel4);
+		}
+		
+		if(tip5.isVisible())
+		{
+			east.add(tipLabel5);
+		}
+		else
+		{
+			east.remove(tipLabel5);
+		}
+		
+		if(tip6.isVisible())
+		{
+			east.add(tipLabel6);
+		}
+		else
+		{
+			east.remove(tipLabel6);
+		}
+		
+		east.revalidate();
+		east.repaint();
 	}
 	
 	public static boolean
 	isClosedWithSave()
 	{
 		return savedClose;
-	}
-	
-	public void
-	packer_actionPerformed(ActionEvent e)
-	{
-		this.pack();
 	}
 	
 	public void
@@ -351,9 +693,11 @@ public class WISPTNodeBuilder extends JDialog
 			JOptionPane.showMessageDialog(null, "Only six tips per branch/leaf are allowed!");	
 			--switcher;
 		}
+		makeTipLabelsVisible();
 		++switcher;
 		System.out.println(switcher);
 		this.revalidate();
+		pack();
 	}
 	
 	public void
@@ -389,15 +733,47 @@ public class WISPTNodeBuilder extends JDialog
 			JOptionPane.showMessageDialog(null, "There are no more tips to remove!");
 			++switcher;
 		}
+		makeTipLabelsVisible();
 		--switcher;
 		System.out.println(switcher);
 		this.revalidate();
+		pack();
+	}
+	
+	public void
+	assignWTNOProperites(WISPTNodeObject assignee, WISPTNodeObject assigner)
+	{
+		assignee.setTitle(assigner.toString());
+		assignee.setContent(assigner.getContent());
+		assignee.setContentVisible(true);
+		assignee.setCounter(assigner.getCounter());
+		assignee.setTips(assigner.getTips());
+		assignee.setTipPics(assigner.getTipPics());
+	}
+	
+	public WISPTNodeObject
+	getSerializedWTNO()
+	{
+		WISPTNodeObject wtno = new WISPTNodeObject("", "");
+		try 
+		{
+	         DefaultMutableTreeNode readNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(false, "temp", "node", "Serial File", "ser");
+	         assignWTNOProperites(wtno, (WISPTNodeObject)readNode.getUserObject());
+	         System.out.println("Object loaded with (false, \"temp\", \"node\", \"Serial File\", \"ser\")");
+	         return wtno;
+	    }
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	
 	public void
 	acceptChanges_actionPerformed(ActionEvent e)
 	{
 		WISPTNodeObject wtno = new WISPTNodeObject(titleTxt.getText(), contentTxt.getText());
+		wtno.setTipPics(tipPics);
 		String[] stringTips = {"","","","","",""};
 		if(tip1.isVisible())
 			stringTips[0] = tip1.getText();
@@ -425,21 +801,9 @@ public class WISPTNodeBuilder extends JDialog
 			stringTips[5] = "";
 		
 		wtno.setTips(stringTips);
-		DefaultMutableTreeNode savedNode = new DefaultMutableTreeNode(wtno);
+		DefaultMutableTreeNode nodeToSave = new DefaultMutableTreeNode(wtno);
 		
-		try 
-		{
-	         FileOutputStream fileOut = new FileOutputStream("node.ser");
-	         ObjectOutputStream out = new ObjectOutputStream(fileOut);
-	         out.writeObject(savedNode);
-	         out.close();
-	         fileOut.close();
-	         System.out.println("Object saved in node.ser");
-	    }
-		catch(IOException i) 
-		{
-	         i.printStackTrace();
-		}
+		WISPT.saveSerializedObject(false, "temp", "node", "Serial File", "ser", nodeToSave);
 		this.setVisible(false);
 		savedClose = true;
 		this.dispose();
@@ -456,10 +820,12 @@ public class WISPTNodeBuilder extends JDialog
 	setNodeTitle(String t)
 	{
 		titleTxt.setText(t);
+		pack();
 	}
 	public void 
 	setNodeContent(String c)
 	{
 		contentTxt.setText(c);
+		pack();
 	}
 }
