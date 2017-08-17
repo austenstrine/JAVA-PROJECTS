@@ -4,11 +4,13 @@ This is a program that uses a custom-built troubleshooting tree interface
 to teach tech support representatives how to troubleshoot with customers 
 over the phone. It's 100% java, and was built with Eclipse.
 The primary program is WISP-T.java. It uses a serialized TreeModel as the 
-troubleshooting tree. It has a built in TreeBuilder.java application that 
-allows you to create content for the JTree. It will allow users to create 
-profiles, and enable a "teaching mode" that limits the number of times a 
-user can access a given portion of a tree. Navigation will still work, but 
-the content will be 'gone' unless it is unlocked by an administrator.
+troubleshooting tree. It has a built in "Editor Mode" that allows 
+administrators to create content in the same format it is viewed. 
+Administrators can also enable a "teaching mode" that limits the number of 
+times a user can access a given portion of a tree. Navigation will still 
+work, but the content will be 'locked' unless it is unlocked by an 
+administrator. Administrators can also allow the user a certain number of 
+unlocks to use at their discretion.
 
 Why?
 
@@ -36,8 +38,10 @@ company they outource to need only have their employees open the application.
 
 Installation
 
-If you have a java IDE, it's just a matter of making it a runnable .jar file - 
-if not, e-mail me and I'll send you one! Installer coming soon.
+Find the WISPTRunnable.zip in this project, download it, and unzip it. It 
+includes a few images and a runnable .jar file. I'm not sure when I will be 
+making an installer - my goal with this project was to get to beta status
+as quickly as possible so I can move on to the next project.
 
 Participation
 
