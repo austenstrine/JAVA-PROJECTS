@@ -1,0 +1,29 @@
+-------RELEASE NOTES for WISP-T BETA 1.1-------
+
+Basic functionality:
+The program should start up with an automatically generated empty tree & profile, and editor mode on. The editor mode pane on the left includes 5 buttons that alter whatever branch or leaf (hereafter referred to collectively as "Node") is currently selected. 
+The plus adds a node as a child to the currently selected node. 
+The minus deletes the node, and all children/content. 
+The pencil alters the currently selected node. 
+The up arrow moves the currently selected node up one, so that it appears one node higher than its siblings. 
+The down arrow does the same, but makes it appear one node lower than its siblings.
+
+Note that in order to change the title and content of the node, to add screenshots, or to add tips, a separate window is opened, and the text is entered into that window. This will change in Beta 1.2 - it will all be done directly from within WISP-T while editor mode is active, no separate window.
+Note also that in order for the changes you have made to a node to appear, you must completely de-select, then re-select that node. This will also be patched in Beta 1.2 .
+Editor mode may be turned on/off from Settings, under insertUsernameHere Preferences. 
+
+Settings also allows you to define node behavior while in "Training Mode". It lists the User password, the Admin Password, the Locked Message, and the number of times a user can "Unlock" a node with their user password.
+When enabled, Training Mode will replace the main text of a node with the Locked Message after that node has been accessed more than the administrator wants. Right now there's not much distinction between a regular user and an administrator, and the administrator has no control over how many times a node may be accessed before it gets locked. This will be patched in future releases.
+
+User profile functionality is incomplete. Right now WISP-T tries to load a "default" profile, and if one does not exist in the user profiles folder, it will create one. In the future, the default profile will be a static object that either: 
+A. exists, or 
+B. is created if it does not exist. 
+There will be no external files for default profiles.
+When user profile functionality is complete, WISP-T will save user profiles(and related content such as screenshots and tree files) on a server, so that they are accessible from any computer. Admin profiles will have power over certain properties of non-admin profiles. The state of WISP-T will be saved to the currently loaded profile when WISP-T: 
+A. exits, and 
+B. changes profiles, including which tree was opened, which node was selected, whether the tree and/or tips panes are expanded/collapsed, and anything else I find to be relevant.
+
+Note that the cancel button in settings does nothing right now. You have to click the X in the corner to close without saving changes.
+Still investigating miscellaneus bugs and necessary interface optimizations.
+
+That's all! E-mail me at austenstrine@gmail.com if you have any questions.
