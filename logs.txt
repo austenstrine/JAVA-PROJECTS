@@ -1,0 +1,129 @@
+WISPT: User Profiles\defaultAdminUserProfile.user
+WISPT: Object read from User Profiles\defaultAdminUserProfile.user
+WISPT: 1280 width
+WISPT: 600 height
+WISPT: Choose the nature of the customer's problem.
+WISPT: Object saved in temp
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+NodeBuilder: Object loaded with (false, "temp", "node", "Serial File", "ser")
+NodeBuilder: UBNT
+NodeBuilder: wtno pics resulted in error
+NodeBuilder: Pic 1 isNullIcon
+NodeBuilder: Pic 1 (empty)
+NodeBuilder: Pic 2 isNullIcon
+NodeBuilder: Pic 2 (empty)
+NodeBuilder: Pic 3 isNullIcon
+NodeBuilder: Pic 3 (empty)
+NodeBuilder: Pic 4 isNullIcon
+NodeBuilder: Pic 4 (empty)
+NodeBuilder: Pic 5 isNullIcon
+NodeBuilder: Pic 5 (empty)
+NodeBuilder: Pic 6 isNullIcon
+NodeBuilder: Pic 6 (empty)
+WISPT: Images\tipPicScreenshotOfTip.png successfully written. png
+NodeBuilder: Pic 1 (empty)
+NodeBuilder: Pic 1 isIcon
+NodeBuilder: Pic 1
+NodeBuilder: Pic 2 (empty) isNullIcon
+NodeBuilder: Pic 3 (empty) isNullIcon
+NodeBuilder: Pic 4 (empty) isNullIcon
+NodeBuilder: Pic 5 (empty) isNullIcon
+NodeBuilder: Pic 6 (empty) isNullIcon
+Source is WISPT. Delete button disabled!
+NodeBuilder: Pic 1 isNullIcon
+NodeBuilder: Pic 1 (empty)
+NodeBuilder: Pic 2 (empty) isNullIcon
+NodeBuilder: Pic 3 (empty) isNullIcon
+NodeBuilder: Pic 4 (empty) isNullIcon
+NodeBuilder: Pic 5 (empty) isNullIcon
+NodeBuilder: Pic 6 (empty) isNullIcon
+NodeBuilder: Pic 1 (empty) isNullIcon
+NodeBuilder: Pic 2 (empty) isNullIcon
+NodeBuilder: Pic 3 (empty) isNullIcon
+NodeBuilder: Pic 4 (empty) isNullIcon
+NodeBuilder: Pic 5 (empty) isNullIcon
+NodeBuilder: Pic 6 (empty) isNullIcon
+NodeBuilder: Pic 1 (empty) isNullIcon
+NodeBuilder: Pic 2 (empty) isNullIcon
+NodeBuilder: Pic 3 (empty) isNullIcon
+NodeBuilder: Pic 4 (empty) isNullIcon
+NodeBuilder: Pic 5 (empty) isNullIcon
+NodeBuilder: Pic 6 (empty) isNullIcon
+WISPT: WISPTNodeBuilder passed.
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+WISPT: asideNode set
+WISPT: UBNT
+WISPT: Object saved in temp
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+NodeBuilder: Object loaded with (false, "temp", "node", "Serial File", "ser")
+NodeBuilder: UBNT
+NodeBuilder: wtno pics resulted in error
+NodeBuilder: Pic 1 isNullIcon
+NodeBuilder: Pic 1 (empty)
+NodeBuilder: Pic 2 isNullIcon
+NodeBuilder: Pic 2 (empty)
+NodeBuilder: Pic 3 isNullIcon
+NodeBuilder: Pic 3 (empty)
+NodeBuilder: Pic 4 isNullIcon
+NodeBuilder: Pic 4 (empty)
+NodeBuilder: Pic 5 isNullIcon
+NodeBuilder: Pic 5 (empty)
+NodeBuilder: Pic 6 isNullIcon
+NodeBuilder: Pic 6 (empty)
+WISPT: Images\tipPicScreenshotOfTip.png successfully written. png
+NodeBuilder: Pic 1 (empty)
+NodeBuilder: Pic 1 isIcon
+NodeBuilder: Pic 1
+NodeBuilder: Pic 2 (empty) isNullIcon
+NodeBuilder: Pic 3 (empty) isNullIcon
+NodeBuilder: Pic 4 (empty) isNullIcon
+NodeBuilder: Pic 5 (empty) isNullIcon
+NodeBuilder: Pic 6 (empty) isNullIcon
+WISPT: Object saved in temp
+WISPT: WISPTNodeBuilder passed.
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+WISPT: asideNode set
+WISPT: UBNT
+WISPT: Ah! The all-encompassing Connectivity problem. Let's check out the PPPoE IP and the SU!
+WISPT: Choose the nature of the customer's problem.
+WISPT: Pic 1 (empty)
+WISPT: Pic 1 isIcon
+WISPT: Pic 1
+WISPT: Pic 1
+WISPT: Pic 1 isIcon
+WISPT: Pic 1
+WISPT: Pic 1
+WISPT: Pic 1 isIcon
+WISPT: Pic 1
+WISPT: Ah! The all-encompassing Connectivity problem. Let's check out the PPPoE IP and the SU!
+WISPT: Choose the nature of the customer's problem.
+WISPT: Pic 1
+WISPT: Pic 1 isIcon
+WISPT: Pic 1
+WISPT: Object saved in temp
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+NodeBuilder: Object loaded with (false, "temp", "node", "Serial File", "ser")
+NodeBuilder: UBNT
+NodeBuilder: Pic 1
+NodeBuilder: Pic 1 isIcon
+NodeBuilder: Pic 1
+NodeBuilder: Pic 2 isNullIcon
+NodeBuilder: Pic 2 (empty)
+NodeBuilder: Pic 3 isNullIcon
+NodeBuilder: Pic 3 (empty)
+NodeBuilder: Pic 4 isNullIcon
+NodeBuilder: Pic 4 (empty)
+NodeBuilder: Pic 5 isNullIcon
+NodeBuilder: Pic 5 (empty)
+NodeBuilder: Pic 6 isNullIcon
+NodeBuilder: Pic 6 (empty)
+WISPT: WISPTNodeBuilder passed.
+WISPT: temp\node.ser
+WISPT: Object read from temp\node.ser
+WISPT: asideNode set
+WISPT: UBNT

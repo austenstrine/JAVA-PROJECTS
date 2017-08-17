@@ -1,18 +1,9 @@
 package com.infowest.java;
 
-import java.awt.Dialog.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.awt.*;
+
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 
-import javax.imageio.*;
-
-import javax.swing.*;
 import javax.swing.tree.*;
 
 
@@ -35,6 +26,7 @@ public class WISPTUserProfile implements Serializable
 						tipsVisible,
 						treeVisible;
 	
+	@SuppressWarnings("unused")
 	private String userName,
 						userPassword,
 						lockedMessage,
@@ -47,6 +39,12 @@ public class WISPTUserProfile implements Serializable
 	private TreePath lastUserSelectedNodePath;
 	/*
 	 *  TODO constructors
+	 */
+	/**
+	 * 
+	 * @param isDefaultRootAdmin
+	 * @param userProfileFolderPath
+	 * @param userProfileName
 	 */
 	public WISPTUserProfile(boolean isDefaultRootAdmin, String userProfileFolderPath, String userProfileName)
 	{
@@ -73,9 +71,9 @@ public class WISPTUserProfile implements Serializable
 		 this.userUnlocks = 3;
 		 //this.lastUserSelectedNodePath = new TreePath(null);
 
-			File currentDirectoryFile = new File("Tree Saves"+File.separator);//creates a empty file in the tree saves folder of that directory
+			File currentDirectoryFile = new File("Tree Saves");//creates a empty file in the tree saves folder of that directory
 			
-		 this.lastTreeUsedPath = currentDirectoryFile.toString()+"dt.tree";
+		 this.lastTreeUsedPath = currentDirectoryFile.toString()+File.separator+"dt.tree";
 		 this.userProfileFolderPath = userProfileFolderPath;
 		 this.userProfileName = userProfileName;
 	}

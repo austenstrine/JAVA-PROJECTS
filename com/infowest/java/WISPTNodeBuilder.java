@@ -16,7 +16,7 @@
 
 package com.infowest.java;
 
-import java.awt.Dialog.*;
+
 import java.awt.event.*;
 import java.awt.image.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ public class WISPTNodeBuilder extends JDialog
 {
 	/**
 	 * This class is designed for serializing a DefaultMutableTreeNode filled with user data.
-	 * It uses another class, WISPTNodeObject, which is serialized with it.
+	 * It uses another class, WISPTNodeObject, which is serialized within the DefaultMutableTreeNode.
 	 */
 	private static final long serialVersionUID = -4089171883331980678L;
 	
@@ -117,7 +117,8 @@ public class WISPTNodeBuilder extends JDialog
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			WISPT.ps.println("NodeBuilder: ");
+			e.printStackTrace(WISPT.ps);
 		}
 		this.addComponentListener
 			(new ComponentListener()
@@ -148,7 +149,7 @@ public class WISPTNodeBuilder extends JDialog
 		wtno = getSerializedWTNO();
 		try
 		{
-			System.out.println(wtno.toString());
+			WISPT.ps.println("NodeBuilder: "+wtno.toString());
 		}
 		catch(Exception e)
 		{
@@ -215,7 +216,19 @@ public class WISPTNodeBuilder extends JDialog
 				eastScroll.setViewportView(east);
 						
 						tipLabels = new JLabel[6];
-						tipPics = new ImageIcon[6];
+						try
+						{
+							tipPics = wtno.getTipPics();
+							if(tipPics == null)
+							{
+								throw new NullPointerException();
+							}
+						}
+						catch(Exception ex)
+						{
+							WISPT.ps.println("NodeBuilder: "+"wtno pics resulted in error");
+							tipPics = new ImageIcon[6];
+						}
 						
 						try
 						{
@@ -223,7 +236,8 @@ public class WISPTNodeBuilder extends JDialog
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							WISPT.ps.println("NodeBuilder: ");
+							e.printStackTrace(WISPT.ps);
 							bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
 						}
 						
@@ -235,7 +249,8 @@ public class WISPTNodeBuilder extends JDialog
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							WISPT.ps.println("NodeBuilder: ");
+							e.printStackTrace(WISPT.ps);
 							bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
 						}
 						
@@ -244,7 +259,7 @@ public class WISPTNodeBuilder extends JDialog
 						
 						for(int i = 0; i < tipLabels.length; ++i)
 						{
-							tipLabels[i] = new JLabel("Pic "+(i+1)+emptyTipLabelString);
+							tipLabels[i] = new JLabel("Pic "+(i+1));
 							tipLabels[i].setVisible(true);
 							tipLabels[i].setIcon(emptyIcon);
 							tipLabels[i].setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
@@ -370,6 +385,7 @@ public class WISPTNodeBuilder extends JDialog
 							}
 							);
 					makeTipLabelsVisible();
+					validatePicToLabelRelationship();
 						
 			//south
 				southScroll = new JScrollPane(new JPanel());
@@ -455,12 +471,7 @@ public class WISPTNodeBuilder extends JDialog
 			if(bufferedImage != null)
 			{
 				tipPics[index] = new ImageIcon(bufferedImage);
-				clickedTipLabel.setIcon(icon);
-			}//if
-			else
-			{
-				clickedTipLabel.setIcon(emptyIcon);
-			}//end null if
+			}
 		}
 		else
 		{
@@ -472,25 +483,15 @@ public class WISPTNodeBuilder extends JDialog
 			}//if not already open
 		}//end if/else
 
-		String newText = clickedTipLabel.getText();
-		System.out.println(newText);
 
-		if(tipPics[index] != null)
-		{
-			if(newText.contains(emptyTipLabelString))
-				newText = newText.replace(emptyTipLabelString, "");
-			
-			System.out.println(newText + " isIcon");
-			clickedTipLabel.setText(newText);
-			System.out.println(newText);
-		}
+		validatePicToLabelRelationship();
 	}
 	
 	public void
 	setLastPicOpened(ImageIcon newPic)
 	{
 		tipPics[lastPicOpened] = newPic;
-		JLabel clickedTipLabel;
+		/* all of this is potentially unnecessary
 		if(newPic == null)
 		{
 			switch(lastPicOpened)
@@ -518,10 +519,12 @@ public class WISPTNodeBuilder extends JDialog
 					break;
 			}//switch
 			clickedTipLabel.setIcon(emptyIcon);
-			System.out.println(clickedTipLabel.getText() + " isNullIcon");
+			WISPT.ps.println("NodeBuilder: "+clickedTipLabel.getText() + " isNullIcon");
 			clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
-			System.out.println(clickedTipLabel.getText());
-		}//if null
+			WISPT.ps.println("NodeBuilder: "+clickedTipLabel.getText());
+			
+		}//if null*/
+		validatePicToLabelRelationship();
 	}//setLastPicOpened
 	
 	
@@ -585,12 +588,112 @@ public class WISPTNodeBuilder extends JDialog
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			WISPT.ps.println("NodeBuilder: ");
+			e.printStackTrace(WISPT.ps);
 			/*node.setNodeTitle("Title");
 			node.setNodeContent("Content");*/
 		}
 		pack();
 	}//end makeTips
+	
+	public void
+	validatePicToLabelRelationship()
+	{
+		JLabel clickedTipLabel;
+		for(int index = 0; index < tipPics.length; ++index)
+		{
+			
+			try 
+			{
+				if(tipPics[index] != null)
+				{
+					switch(index)
+					{
+						case 0:
+							clickedTipLabel = tipLabel1;
+							break;
+						case 1:
+							clickedTipLabel = tipLabel2;
+							break;
+						case 2:
+							clickedTipLabel = tipLabel3;
+							break;
+						case 3:
+							clickedTipLabel = tipLabel4;
+							break;
+						case 4:
+							clickedTipLabel = tipLabel5;
+							break;
+						case 5:
+							clickedTipLabel = tipLabel6;
+							break;
+						default:
+							clickedTipLabel = new JLabel();
+							break;
+					}//switch
+					
+					clickedTipLabel.setIcon(icon);
+					
+					String newText = clickedTipLabel.getText();
+						WISPT.ps.println("NodeBuilder: "+newText);
+
+					if(newText.contains(emptyTipLabelString))
+					{
+						newText = newText.replace(emptyTipLabelString, "");
+					}
+						WISPT.ps.println("NodeBuilder: "+newText + " isIcon");
+					clickedTipLabel.setText(newText);
+						WISPT.ps.println("NodeBuilder: "+newText);
+				}//if pic isn't null
+				else
+				{
+					switch(index)
+					{
+						case 0:
+							clickedTipLabel = tipLabel1;
+							break;
+						case 1:
+							clickedTipLabel = tipLabel2;
+							break;
+						case 2:
+							clickedTipLabel = tipLabel3;
+							break;
+						case 3:
+							clickedTipLabel = tipLabel4;
+							break;
+						case 4:
+							clickedTipLabel = tipLabel5;
+							break;
+						case 5:
+							clickedTipLabel = tipLabel6;
+							break;
+						default:
+							clickedTipLabel = new JLabel();
+							break;
+					}//switch
+					
+					clickedTipLabel.setIcon(emptyIcon);
+						WISPT.ps.println("NodeBuilder: "+clickedTipLabel.getText() + " isNullIcon");
+					if(!clickedTipLabel.getText().contains(emptyTipLabelString))
+					{
+						clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
+							WISPT.ps.println("NodeBuilder: "+clickedTipLabel.getText());
+					}
+				}//else if pic is null
+			} 
+			catch (Exception ex) 
+			{
+				WISPT.ps.println("NodeBuilder: ");
+				ex.printStackTrace(WISPT.ps);
+			}
+		}//validatePicToLabelRelationship
+		
+		
+
+
+		
+		
+	}
 	
 	public void
 	makeTipLabelsVisible()
@@ -695,7 +798,7 @@ public class WISPTNodeBuilder extends JDialog
 		}
 		makeTipLabelsVisible();
 		++switcher;
-		System.out.println(switcher);
+		WISPT.ps.println("NodeBuilder: "+switcher);
 		this.revalidate();
 		pack();
 	}
@@ -735,20 +838,9 @@ public class WISPTNodeBuilder extends JDialog
 		}
 		makeTipLabelsVisible();
 		--switcher;
-		System.out.println(switcher);
+		WISPT.ps.println("NodeBuilder: "+switcher);
 		this.revalidate();
 		pack();
-	}
-	
-	public void
-	assignWTNOProperites(WISPTNodeObject assignee, WISPTNodeObject assigner)
-	{
-		assignee.setTitle(assigner.toString());
-		assignee.setContent(assigner.getContent());
-		assignee.setContentVisible(true);
-		assignee.setCounter(assigner.getCounter());
-		assignee.setTips(assigner.getTips());
-		assignee.setTipPics(assigner.getTipPics());
 	}
 	
 	public WISPTNodeObject
@@ -758,13 +850,14 @@ public class WISPTNodeBuilder extends JDialog
 		try 
 		{
 	         DefaultMutableTreeNode readNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(false, "temp", "node", "Serial File", "ser");
-	         assignWTNOProperites(wtno, (WISPTNodeObject)readNode.getUserObject());
-	         System.out.println("Object loaded with (false, \"temp\", \"node\", \"Serial File\", \"ser\")");
+	         wtno = (WISPTNodeObject)readNode.getUserObject();
+	         WISPT.ps.println("NodeBuilder: "+"Object loaded with (false, \"temp\", \"node\", \"Serial File\", \"ser\")");
 	         return wtno;
 	    }
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
+			WISPT.ps.println("NodeBuilder: ");
+			ex.printStackTrace(WISPT.ps);
 			return null;
 		}
 	}

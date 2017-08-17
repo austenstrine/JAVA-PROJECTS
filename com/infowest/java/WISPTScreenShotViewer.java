@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
@@ -15,16 +14,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class WISPTScreenShotViewer extends JDialog
 {
@@ -38,8 +34,6 @@ public class WISPTScreenShotViewer extends JDialog
 		contentPane,
 		centerPane,
 		southPane;
-	private JScrollPane
-		picHolderScroll;
 	private JLabel 
 		picHolder;
 	private JButton
@@ -51,7 +45,6 @@ public class WISPTScreenShotViewer extends JDialog
 	private ImageIcon
 		pic;
 	private static boolean
-		editorModeIsEnabled = true,
 		noInstanceOpen = true;
 	
 	
@@ -73,7 +66,10 @@ public class WISPTScreenShotViewer extends JDialog
 				}
 
 				@Override
-				public void windowClosing(WindowEvent e) {}
+				public void windowClosing(WindowEvent e) 
+				{
+					noInstanceOpen = true;
+				}
 				@Override
 				public void windowDeactivated(WindowEvent e) {}
 				@Override
@@ -164,7 +160,14 @@ public class WISPTScreenShotViewer extends JDialog
 							}//actionPerformed
 						}//new ActionListener
 						);//addActionListener
-					deletePicture.setEnabled(editorModeIsEnabled);
+					deletePicture.setEnabled(true);
+					try
+					{
+						Component tryOrFail = (WISPT)parentComponent;
+						if(tryOrFail != null)
+							deletePicture.setEnabled(false);
+					}
+					catch(Exception ex){WISPT.ps.println("Source is WISPT. Delete button disabled!");}
 				southPane.add(deletePicture);
 			
 					done = new JButton("Done");
@@ -188,12 +191,6 @@ public class WISPTScreenShotViewer extends JDialog
 	getNoInstanceOpen()
 	{
 		return noInstanceOpen;
-	}
-	
-	public static void
-	setEditorModeEnabled(boolean isEnabled)
-	{
-		editorModeIsEnabled = isEnabled;
 	}
 	
 	public void

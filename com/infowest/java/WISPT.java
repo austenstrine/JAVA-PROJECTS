@@ -20,10 +20,7 @@ import java.util.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.awt.*;
-import java.awt.Dialog.ModalityType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -46,6 +43,10 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 	private static final long serialVersionUID = -1079398159072533776L;
 	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
 	
+	public static PrintStream ps;
+	
+	public static ImageIcon passedImage;
+	
 	private Color white =  new Color(1f, 1f, 1f),
 			nineGray =  new Color(0.9f, 0.9f, 0.9f),
 			eightGray =  new Color(0.8f, 0.8f, 0.8f),
@@ -59,6 +60,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			black =  new Color(0f, 0f, 0f)*/
 			;
 	
+	@SuppressWarnings("unused")
 	private Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
 			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3),
@@ -90,6 +92,7 @@ private static boolean successfulWrite;
 /*
  * end user info FIXME all need instantiation through a user login JOptionPane
  */
+	@SuppressWarnings("unused")
 	private DefaultTreeModel loadedUserModel;
 	
 	private String	lastTxt = "",
@@ -114,6 +117,7 @@ private static boolean successfulWrite;
 							enableEditorMode,
 		  					processingOnCheck;
 	
+		@SuppressWarnings("unused")
 		private JPanel settingsContentPane,
 						adminTab,
 						userTab,
@@ -190,6 +194,7 @@ private static boolean successfulWrite;
 						tipLabel6;
 	
 
+	@SuppressWarnings("unused")
 	private ImageIcon	labelIcon,
 						labelEmptyIcon; 
 	
@@ -242,1028 +247,1056 @@ private static boolean successfulWrite;
 
 
 	
+	@SuppressWarnings("unused")
 	private String rootPath;
 /*
  *	TODO Constructors
  */
 	
-	public WISPT()
+	public WISPT(PrintStream ps)
 	{
 		super();
-		rootPath = this.getClass().getClassLoader().getResource("").getPath();
-		userProfilePath = "User Profiles";
-		userProfile = (WISPTUserProfile)loadSerializedObject(false, userProfilePath, "defaultAdminUserProfile", "User Profile", "user");
 		try
 		{
-			userProfile.setUserProfilePath(userProfilePath);
-			setUser(userProfile);
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-		this.addWindowListener
-			(new WindowAdapter()
-				{
-					@Override
-					public void
-					windowClosing(WindowEvent we)
+			WISPT.ps = ps;
+			rootPath = this.getClass().getClassLoader().getResource("").getPath();
+			userProfilePath = "User Profiles";
+			try
+			{
+				userProfile = (WISPTUserProfile)loadSerializedObject(false, userProfilePath, "defaultAdminUserProfile", "User Profile", "user");
+				if(userProfile == null)
+					throw new NullPointerException();
+			}
+			catch(Exception ex)
+			{
+				
+				ex.printStackTrace(ps);
+				userProfile = new WISPTUserProfile(true, "", "");
+			}
+			try
+			{
+				setUser(userProfile);
+			}
+			catch(Exception ex)
+			{
+				
+				ex.printStackTrace(ps);
+				setUser(new WISPTUserProfile(true, "", ""));
+			}
+			this.addWindowListener
+				(new WindowAdapter()
 					{
-						//saveSerializedObject(false, userProfilePath, "defaultUserProfile", "User Profile", "user", userProfile);
-						System.exit(0);
+						@Override
+						public void
+						windowClosing(WindowEvent we)
+						{
+							//saveSerializedObject(false, userProfilePath, "defaultUserProfile", "User Profile", "user", userProfile);
+							System.exit(0);
+						}
 					}
-				}
-			);
-		try 
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} 
-		catch (ClassNotFoundException | 
-				InstantiationException | 
-				IllegalAccessException | 
-				UnsupportedLookAndFeelException e1) 
-		{
-			e1.printStackTrace();
-		}
-		try
-		{
-			File img = new File("wisp-t 20.png");
-			BufferedImage bufferedImage = ImageIO.read(img);
-			icons.add(bufferedImage);
-			img = new File("wisp-t 250.png");
-			bufferedImage = ImageIO.read(img);
-			icons.add(bufferedImage);
-			img = new File("wisp-t 500.png");
-			bufferedImage = ImageIO.read(img);
-			icons.add(bufferedImage);
-			img = new File("wisp-t 750.png");
-			bufferedImage = ImageIO.read(img);
-			icons.add(bufferedImage);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		this.setIconImages(icons);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("WISP-T \u00A9 2017");
-		this.setBackground(white);
-		
-		JFrame.setDefaultLookAndFeelDecorated(false);
-		ToolTipManager.sharedInstance().setDismissDelay(60000);
-		setDefaultLookAndFeelDecorated(true);
-		
-		 contentPane = new JPanel(new BorderLayout());
-		 contentPane.setBorder(matte);
-		 contentPane.setBackground(white);
-		this.setContentPane(contentPane);
-		
-		/*
-		 * TODO MENU/NORTH
-		 */
-			northPane = new JPanel(new GridLayout(1,1));
-			northPane.setBackground(white);	
-			northPane.setBorder(null);
-		contentPane.add(northPane, BorderLayout.NORTH);			
-
-				menu = new JMenuBar();
-				menu.setBorder(null);
-			northPane.add(menu);
-
+				);
+			try 
+			{
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} 
+			catch (ClassNotFoundException | 
+					InstantiationException | 
+					IllegalAccessException | 
+					UnsupportedLookAndFeelException e1) 
+			{
+				e1.printStackTrace(ps);
+			}
+			try
+			{
+				File img = new File("wisp-t 20.png");
+				BufferedImage bufferedImage = ImageIO.read(img);
+				icons.add(bufferedImage);
+				img = new File("wisp-t 250.png");
+				bufferedImage = ImageIO.read(img);
+				icons.add(bufferedImage);
+				img = new File("wisp-t 500.png");
+				bufferedImage = ImageIO.read(img);
+				icons.add(bufferedImage);
+				img = new File("wisp-t 750.png");
+				bufferedImage = ImageIO.read(img);
+				icons.add(bufferedImage);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace(ps);
+			}
 			
-					file = new JMenu("File");
-				menu.add(file);
+			this.setIconImages(icons);
+			this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+			this.setTitle("WISP-T \u00A9 2017");
+			this.setBackground(white);
+			
+			JFrame.setDefaultLookAndFeelDecorated(false);
+			ToolTipManager.sharedInstance().setDismissDelay(60000);
+			setDefaultLookAndFeelDecorated(true);
+			
+			 contentPane = new JPanel(new BorderLayout());
+			 contentPane.setBorder(matte);
+			 contentPane.setBackground(white);
+			this.setContentPane(contentPane);
+			
+			/*
+			 * TODO MENU/NORTH
+			 */
+				northPane = new JPanel(new GridLayout(1,1));
+				northPane.setBackground(white);	
+				northPane.setBorder(null);
+			contentPane.add(northPane, BorderLayout.NORTH);			
+	
+					menu = new JMenuBar();
+					menu.setBorder(null);
+				northPane.add(menu);
+	
 				
-						newTree = new JMenuItem("Create New Tree");
-						newTree.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void actionPerformed(ActionEvent e)
-								{
-									newTree_actionPerformed(e);
-								}//end actionPerformed
-							}//end listener	
-							);//listener added
-					file.add(newTree);
-				
-						loadTree = new JMenuItem("Load Saved Tree");
-						loadTree.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void actionPerformed(ActionEvent e)
-								{
-									loadTree_actionPerformed(e);
-								}//end actionPerformed
-							}//end listener	
-							);//listener added
-					file.add(loadTree);
+						file = new JMenu("File");
+					menu.add(file);
 					
-						saveTree = new JMenuItem("Save Current Tree");
-						saveTree.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void actionPerformed(ActionEvent e)
-								{
-									saveTree_actionPerformed(e);
-								}//end actionPerformed
-							}//end listener	
-							);//listener added
-					file.add(saveTree);
-						
-						
-						
-						logIn = new JMenuItem("Log In");
-						logIn.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									logIn_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						logIn.setEnabled(true);
-					file.add(logIn);
-						
-						
-						logOut = new JMenuItem("Log Out");
-						logOut.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									logOut_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						logOut.setEnabled(true);
-					file.add(logOut);
-						
-						
-						newUser = new JMenuItem("New User");
-						newUser.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									newUser_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						newUser.setEnabled(true);
-					file.add(newUser);
-						
-						
-						exit = new JMenuItem("Exit");
-						exit.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									 exit_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-					file.add(exit);
-					
-					
-					edit = new JMenu("Edit");
-				menu.add(edit);
-				
-						toggle = new JMenu("Toggle");
-					edit.add(toggle);
-					
-							tipsVisible = true;
-							
-							toggleTips = new JMenuItem("\u2611 Tips");
-							toggleTips.addActionListener
+							newTree = new JMenuItem("Create New Tree");
+							newTree.addActionListener
 								(new ActionListener()
-								{	
+								{
+									@Override
+									public void actionPerformed(ActionEvent e)
+									{
+										newTree_actionPerformed(e);
+									}//end actionPerformed
+								}//end listener	
+								);//listener added
+						file.add(newTree);
+					
+							loadTree = new JMenuItem("Load Saved Tree");
+							loadTree.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void actionPerformed(ActionEvent e)
+									{
+										loadTree_actionPerformed(e);
+									}//end actionPerformed
+								}//end listener	
+								);//listener added
+						file.add(loadTree);
+						
+							saveTree = new JMenuItem("Save Current Tree");
+							saveTree.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void actionPerformed(ActionEvent e)
+									{
+										saveTree_actionPerformed(e);
+									}//end actionPerformed
+								}//end listener	
+								);//listener added
+						file.add(saveTree);
+							
+							
+							
+							logIn = new JMenuItem("Log In");
+							logIn.addActionListener
+								(new ActionListener()
+								{
 									@Override
 									public void
 									actionPerformed(ActionEvent e)
 									{
-										toggleTips_actionPerformed(e);
+										logIn_actionPerformed(e);
 									}//end actionPerformed
 								}//end ActionListener
 								);//ActionListener added
-						toggle.add(toggleTips);
+							logIn.setEnabled(true);
+						file.add(logIn);
 							
-								treeVisible = true;
 							
-							toggleNavTree = new JMenuItem("\u2611 Navigation Tree");
-							toggleNavTree.addActionListener
+							logOut = new JMenuItem("Log Out");
+							logOut.addActionListener
 								(new ActionListener()
-								{	
+								{
 									@Override
 									public void
 									actionPerformed(ActionEvent e)
 									{
-										toggleNavTree_actionPerformed(e);
+										logOut_actionPerformed(e);
 									}//end actionPerformed
 								}//end ActionListener
-								);//actionListener added
-						toggle.add(toggleNavTree);
+								);//ActionListener added
+							logOut.setEnabled(true);
+						file.add(logOut);
 							
-					edit.addSeparator();
-
-						openTreeBuilder = new JMenuItem("Open TreeBuilder");
-						openTreeBuilder.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
+							
+							newUser = new JMenuItem("New User");
+							newUser.addActionListener
+								(new ActionListener()
 								{
-									openTreeBuilder_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						openTreeBuilder.setEnabled(false);
-					edit.add(openTreeBuilder);
-					
-						unlockTreeNode = new JMenuItem("Unlock Selected Branch/Leaf");
-						unlockTreeNode.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void 
-								actionPerformed(ActionEvent e)
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										newUser_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							newUser.setEnabled(true);
+						file.add(newUser);
+							
+							
+							exit = new JMenuItem("Exit");
+							exit.addActionListener
+								(new ActionListener()
 								{
-									unlockTreeNode_actionPerformed(e);
-								}
-							}
-							);
-					edit.add(unlockTreeNode);
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										 exit_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+						file.add(exit);
 						
-					navigate = new JMenu("Navigate");
-				menu.add(navigate);
+						
+						edit = new JMenu("Edit");
+					menu.add(edit);
+					
+							toggle = new JMenu("Toggle");
+						edit.add(toggle);
+						
+								tipsVisible = true;
+								
+								toggleTips = new JMenuItem("\u2611 Tips");
+								toggleTips.addActionListener
+									(new ActionListener()
+									{	
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											toggleTips_actionPerformed(e);
+										}//end actionPerformed
+									}//end ActionListener
+									);//ActionListener added
+							toggle.add(toggleTips);
+								
+									treeVisible = true;
+								
+								toggleNavTree = new JMenuItem("\u2611 Navigation Tree");
+								toggleNavTree.addActionListener
+									(new ActionListener()
+									{	
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											toggleNavTree_actionPerformed(e);
+										}//end actionPerformed
+									}//end ActionListener
+									);//actionListener added
+							toggle.add(toggleNavTree);
+								
+						edit.addSeparator();
 	
-						previous = new JMenuItem("Previous Step");
-						previous.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
+							openTreeBuilder = new JMenuItem("Open TreeBuilder");
+							openTreeBuilder.addActionListener
+								(new ActionListener()
 								{
-									//FIXME previous_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						previous.setEnabled(false);
-					navigate.add(previous);
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										openTreeBuilder_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							openTreeBuilder.setEnabled(false);
+						edit.add(openTreeBuilder);
 						
-						next = new JMenuItem("Next Step");//is only valid if previous step was just called.
-						next.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
+							unlockTreeNode = new JMenuItem("Unlock Selected Branch/Leaf");
+							unlockTreeNode.addActionListener
+								(new ActionListener()
 								{
-									//FIXME next_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						next.setEnabled(false);
-					navigate.add(next);
-						
-						history = new JMenuItem("History");
-						history.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									//FIXME history_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						history.setEnabled(false);
-					navigate.add(history);
-						
-					userPrefs = new JMenu(userName + " Preferences");
-				menu.add(userPrefs);
-				
-						startupSettings = new JMenuItem("Settings");
-						startupSettings.addActionListener
-							(new ActionListener()
-							{
-								@Override
-								public void
-								actionPerformed(ActionEvent e)
-								{
-									startupSettings_actionPerformed(e);
-								}//end actionPerformed
-							}//end ActionListener
-							);//ActionListener added
-						startupSettings.setEnabled(true);
-					userPrefs.add(startupSettings);
-					
-					//TODO startupSettingsDialog
-					
-							startupSettingsDialog = new JDialog(this, "Settings");
-							startupSettingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-							startupSettingsDialog.setVisible(false);
-							startupSettingsDialog.setSize(800, 400);
+									@Override
+									public void 
+									actionPerformed(ActionEvent e)
+									{
+										unlockTreeNode_actionPerformed(e);
+									}
+								}
+								);
+						edit.add(unlockTreeNode);
 							
-								settingsContentPane = new JPanel(new BorderLayout());
-								settingsContentPane.setBorder(pad);
-								settingsContentPane.setBackground(white);
-							startupSettingsDialog.setContentPane(settingsContentPane);
+						navigate = new JMenu("Navigate");
+					menu.add(navigate);
+		
+							previous = new JMenuItem("Previous Step");
+							previous.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										//FIXME previous_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							previous.setEnabled(false);
+						navigate.add(previous);
 							
-									settingsCenterTabbedPane = new JTabbedPane();
-								settingsContentPane.add(settingsCenterTabbedPane, BorderLayout.CENTER);
+							next = new JMenuItem("Next Step");//is only valid if previous step was just called.
+							next.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										//FIXME next_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							next.setEnabled(false);
+						navigate.add(next);
+							
+							history = new JMenuItem("History");
+							history.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										//FIXME history_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							history.setEnabled(false);
+						navigate.add(history);
+							
+						userPrefs = new JMenu(userName + " Preferences");
+					menu.add(userPrefs);
+					
+							startupSettings = new JMenuItem("Settings");
+							startupSettings.addActionListener
+								(new ActionListener()
+								{
+									@Override
+									public void
+									actionPerformed(ActionEvent e)
+									{
+										startupSettings_actionPerformed(e);
+									}//end actionPerformed
+								}//end ActionListener
+								);//ActionListener added
+							startupSettings.setEnabled(true);
+						userPrefs.add(startupSettings);
+						
+						//TODO startupSettingsDialog
+						
+								startupSettingsDialog = new JDialog(this, "Settings");
+								startupSettingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+								startupSettingsDialog.setVisible(false);
+								startupSettingsDialog.setSize(800, 400);
 								
-										adminTab = new JPanel(new GridLayout(1,1));
-									settingsCenterTabbedPane.add("Administration", adminTab);
+									settingsContentPane = new JPanel(new BorderLayout());
+									settingsContentPane.setBorder(pad);
+									settingsContentPane.setBackground(white);
+								startupSettingsDialog.setContentPane(settingsContentPane);
+								
+										settingsCenterTabbedPane = new JTabbedPane();
+									settingsContentPane.add(settingsCenterTabbedPane, BorderLayout.CENTER);
 									
-											adminSettings = new JPanel(new BorderLayout());
-											/*
-											 * Save button need be the only element with a listener.
-											 * On action, it will set all settings according to what
-											 * is currently in the settings pane elements. If a c_heck
-											 * box is c_hecked, that setting becomes enabled. Whatever
-											 * resides in a text field becomes that setting's new text.
-											 * 
-											 */
-										adminTab.add(adminSettings);
-										// TODO Finish settings
-												adminSettingsCenter = new JPanel();
-												adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
-											adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
-											
-													processingOnCheck = new JCheckBox("Enable Detailed Process Tooltips");
-													processingOnCheck.setSelected(processTooltipsEnabled);
-												adminSettingsCenter.add(processingOnCheck);
+											adminTab = new JPanel(new GridLayout(1,1));
+										settingsCenterTabbedPane.add("Administration", adminTab);
+										
+												adminSettings = new JPanel(new BorderLayout());
+												/*
+												 * Save button need be the only element with a listener.
+												 * On action, it will set all settings according to what
+												 * is currently in the settings pane elements. If a c_heck
+												 * box is c_hecked, that setting becomes enabled. Whatever
+												 * resides in a text field becomes that setting's new text.
+												 * 
+												 */
+											adminTab.add(adminSettings);
+											// TODO Finish settings
+													adminSettingsCenter = new JPanel();
+													adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
+												adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
+												
+														processingOnCheck = new JCheckBox("Enable Detailed Process Tooltips");
+														processingOnCheck.setSelected(processTooltipsEnabled);
+													adminSettingsCenter.add(processingOnCheck);
+														
+														trainingModeCheckBox = new JCheckBox("Enable Training Mode");
+														trainingModeCheckBox.setSelected(trainingModeEnabled);
+													adminSettingsCenter.add(trainingModeCheckBox);
 													
-													trainingModeCheckBox = new JCheckBox("Enable Training Mode");
-													trainingModeCheckBox.setSelected(trainingModeEnabled);
-												adminSettingsCenter.add(trainingModeCheckBox);
-												
-													enableEditorMode = new JCheckBox("Enable Editor Mode");
-													enableEditorMode.setSelected(editorModeEnabled);
-												adminSettingsCenter.add(enableEditorMode);
+														enableEditorMode = new JCheckBox("Enable Editor Mode");
+														enableEditorMode.setSelected(editorModeEnabled);
+													adminSettingsCenter.add(enableEditorMode);
+														
+														changeUserPassword = new JTextField(userPassword);
+													adminSettingsCenter.add(changeUserPassword);
 													
-													changeUserPassword = new JTextField(userPassword);
-												adminSettingsCenter.add(changeUserPassword);
-												
-													changeAdminPassword = new JTextField("WISPadmin");
-												adminSettingsCenter.add(changeAdminPassword);
-												
-													changeLockedMessage = new JTextField(lockedMessage);
-												adminSettingsCenter.add(changeLockedMessage);
-												
-													userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
-													userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
-												adminSettingsCenter.add(userUnlocksSpinner);
-												
-												adminSettingsSouth = new JPanel(new GridLayout(2,1));
-											adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
-												
-													save = new JButton("Save");
-													save.addActionListener
-													(new ActionListener()
-													{
-														@Override
-														public void
-														actionPerformed(ActionEvent e)
+														changeAdminPassword = new JTextField("WISPadmin");
+													adminSettingsCenter.add(changeAdminPassword);
+													
+														changeLockedMessage = new JTextField(lockedMessage);
+													adminSettingsCenter.add(changeLockedMessage);
+													
+														userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
+														userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
+													adminSettingsCenter.add(userUnlocksSpinner);
+													
+													adminSettingsSouth = new JPanel(new GridLayout(2,1));
+												adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
+													
+														save = new JButton("Save");
+														save.addActionListener
+														(new ActionListener()
 														{
-															saveSettings_actionPerformed(e);
-														}//end actionPerformed
-													}//end ActionListener
-													);//actionListener added'
-												adminSettingsSouth.add(save);
-													cancel = new JButton("Cancel");
-													//action listener that will hide and revert to onset state
-												adminSettingsSouth.add(cancel);
-											
-										userTab = new JPanel(new GridLayout(1,1));
-									settingsCenterTabbedPane.add("User Preferences", userTab);
-											
-											userSettings = new JPanel(new FlowLayout());
-										userTab.add(userSettings);
-											
-											userSettings.add(new JCheckBox("cb"));
-											userSettings.add(new JCheckBox("cb"));
-											userSettings.add(new JCheckBox("cb"));
-									
-							
-						editName = new JMenuItem("Change Username");
-						editName.addActionListener
-						(new ActionListener()
-						{
-							@Override
-							public void
-							actionPerformed(ActionEvent e)
+															@Override
+															public void
+															actionPerformed(ActionEvent e)
+															{
+																saveSettings_actionPerformed(e);
+															}//end actionPerformed
+														}//end ActionListener
+														);//actionListener added'
+													adminSettingsSouth.add(save);
+														cancel = new JButton("Cancel");
+														//action listener that will hide and revert to onset state
+													adminSettingsSouth.add(cancel);
+												
+											userTab = new JPanel(new GridLayout(1,1));
+										settingsCenterTabbedPane.add("User Preferences", userTab);
+												
+												userSettings = new JPanel(new FlowLayout());
+											userTab.add(userSettings);
+												
+												userSettings.add(new JCheckBox("cb"));
+												userSettings.add(new JCheckBox("cb"));
+												userSettings.add(new JCheckBox("cb"));
+										
+								
+							editName = new JMenuItem("Change Username");
+							editName.addActionListener
+							(new ActionListener()
 							{
-								//FIXME editName_actionPerformed(e);
-							}//end actionPerformed
-						}//end ActionListener
-						);//ActionListener added
-						editName.setEnabled(false);		
-					userPrefs.add(editName);
-				
-
-		/*
-		 * TODO TREE/WEST+CENTER_EAST	
-		 */   	
-		   	westCenterEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
-			westCenterEastSplit.setResizeWeight(0.2);
-			westCenterEastSplit.setBorder(pad);
-			westCenterEastSplit.setBackground(white);
-			westCenterEastSplit.setDividerSize(2);
-		contentPane.add(westCenterEastSplit, BorderLayout.CENTER);
-		
-				
-				westPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JPanel(),new JLabel());
-				westPane.setBorder(pad);
-				westPane.setBackground(white);
-				westPane.setDividerSize(2);
-			westCenterEastSplit.setLeftComponent(westPane);
-		
-					westNorthPad = new JPanel(new GridLayout(1,1));
-					westNorthPad.setBorder(bevelDwn);
-					westNorthPad.setBackground(white);
-				westPane.setTopComponent(westNorthPad);;
-				
-						treeScroll = new JScrollPane();
-						treeScroll.setBorder(null);
-						treeScroll.setBackground(white);
-					westNorthPad.add(treeScroll);
-				
-							tree = new JTree();
-							tree.setModel(model);
-							tree.addTreeSelectionListener(this);
-							tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-							tree.setBorder(null);
-							tree.setBackground(white);
-							tree.setExpandsSelectedPaths(true);
-							tree.setEnabled(true);
-						treeScroll.setViewportView(tree);
+								@Override
+								public void
+								actionPerformed(ActionEvent e)
+								{
+									//FIXME editName_actionPerformed(e);
+								}//end actionPerformed
+							}//end ActionListener
+							);//ActionListener added
+							editName.setEnabled(false);		
+						userPrefs.add(editName);
 					
-					westSouthPad = new JPanel(new GridLayout(1,1));
-					westSouthPad.setBorder(null);
-					westSouthPad.setBackground(white);/*
-				westPane.setBottomComponent(westSouthPad);*/
-					
-						westSouthEditorBtns = new JPanel(new GridLayout(2,3));
-						westSouthEditorBtns.setBorder(null);
-						westSouthEditorBtns.setBackground(white);
-					westSouthPad.add(westSouthEditorBtns);
-						
-							addNodeBtn = new JButton("+");
-							addNodeBtn.addActionListener
-								(new ActionListener()
-								{
-									@Override
-									public void
-									actionPerformed(ActionEvent e)
-									{
-										addNodeBtn_actionPerformed(e);
-									}
-								}
-								);
-						westSouthEditorBtns.add(addNodeBtn);
-							
-							removeNodeBtn = new JButton("-");
-							removeNodeBtn.addActionListener
-								(new ActionListener()
-								{
-									@Override
-									public void
-									actionPerformed(ActionEvent e)
-									{
-										removeNodeBtn_actionPerformed(e);
-									}
-								}
-								);
-						westSouthEditorBtns.add(removeNodeBtn);
-						
-							editNodeBtn = new JButton("\uD83D\uDD89");
-							editNodeBtn.addActionListener
-								(new ActionListener()
-								{
-									@Override
-									public void
-									actionPerformed(ActionEvent e)
-									{
-										editNodeBtn_actionPerformed(e);
-									}
-								}
-								);
-						westSouthEditorBtns.add(editNodeBtn);
-							
-							upNodeBtn = new JButton("\u2191");
-							upNodeBtn.addActionListener
-								(new ActionListener()
-								{
-									@Override 
-									public void 
-									actionPerformed(ActionEvent e) 
-									{
-										moveBtn_actionPerformed(e, true);
-									}
-								}
-								);
-						westSouthEditorBtns.add(upNodeBtn);
-						
-							downNodeBtn = new JButton("\u2193");
-							downNodeBtn.addActionListener
-								(new ActionListener()
-								{
-									@Override 
-									public void 
-									actionPerformed(ActionEvent e) 
-									{
-										moveBtn_actionPerformed(e, false);
-									}
-								}
-								);
-						westSouthEditorBtns.add(downNodeBtn);
-							
-						
-		/*
-		 * TODO TXT/CENTER_EAST(east side of west split pane)
-		 */
-				//centerEastSplit.addMouseListener(this);
-				centerEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, centerPad, eastPad);
-				centerEastSplit.setResizeWeight(0.75);
-				centerEastSplit.setBorder(null);
-				centerEastSplit.setBackground(white);
-				centerEastSplit.setDividerSize(2);
-			westCenterEastSplit.setRightComponent(centerEastSplit);
+	
+			/*
+			 * TODO TREE/WEST+CENTER_EAST	
+			 */   	
+			   	westCenterEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
+				westCenterEastSplit.setResizeWeight(0.2);
+				westCenterEastSplit.setBorder(pad);
+				westCenterEastSplit.setBackground(white);
+				westCenterEastSplit.setDividerSize(2);
+			contentPane.add(westCenterEastSplit, BorderLayout.CENTER);
 			
-
-	  				centerPad = new JPanel(new GridLayout(1,1));
-					centerPad.setBorder(pad);
-					centerPad.setBackground(white);
-				centerEastSplit.setLeftComponent(centerPad);
-				
-		
-						centerBevel = new JPanel(new GridLayout(1,1));
-						centerBevel.setBorder(bevelDwn);
-						centerBevel.setBackground(white);
-					centerPad.add(centerBevel);
 					
+					westPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JPanel(),new JLabel());
+					westPane.setBorder(pad);
+					westPane.setBackground(white);
+					westPane.setDividerSize(2);
+				westCenterEastSplit.setLeftComponent(westPane);
 			
-							centerPane  = new JPanel(new BorderLayout());
-							centerPane.setBorder(pad);
-							centerPane.setBackground(white);
-						centerBevel.add(centerPane);
-						
-								centerSouthPane = new JPanel(new FlowLayout());
-								centerSouthPane.setBorder(pad);
-								centerSouthPane.setBackground(white);
-							centerPane.add(centerSouthPane, BorderLayout.SOUTH);
-							
-									navRadioButtons = new ButtonGroup();/*
-								centerSouthPane*/
-							
-										navRadio1 = new JRadioButton("first");
-										navRadio1.setBackground(white);
-										navRadio1.addActionListener
-											(new ActionListener()
-											{
-												@Override
-												public void
-												actionPerformed(ActionEvent e)
-												{
-													navRadio_actionPerformed(e, 0);
-												}//end actionPerformed
-											}//end ActionListener
-											);//ActionListener added
-									navRadioButtons.add(navRadio1);
-								centerSouthPane.add(navRadio1);
-										
-
-										navRadio2 = new JRadioButton("second");
-										navRadio2.setBackground(white);
-										navRadio2.addActionListener
-											(new ActionListener()
-											{
-												@Override
-												public void
-												actionPerformed(ActionEvent e)
-												{
-													navRadio_actionPerformed(e, 1);
-												}//end actionPerformed
-											}//end ActionListener
-											);//ActionListener added
-										navRadio2.setVisible(false);
-									navRadioButtons.add(navRadio2);
-								centerSouthPane.add(navRadio2);
-										
-										navRadio3 = new JRadioButton("third");
-										navRadio3.setBackground(white);
-										navRadio3.addActionListener
-											(new ActionListener()
-											{
-												@Override
-												public void
-												actionPerformed(ActionEvent e)
-												{
-													navRadio_actionPerformed(e, 2);
-												}//end actionPerformed
-											}//end ActionListener
-											);//ActionListener added
-										navRadio3.setVisible(false);
-									navRadioButtons.add(navRadio3);
-								centerSouthPane.add(navRadio3);
-										
-										navRadio4 = new JRadioButton("fourth");
-										navRadio4.setBackground(white);
-										navRadio4.addActionListener
-											(new ActionListener()
-											{
-												@Override
-												public void
-												actionPerformed(ActionEvent e)
-												{
-													navRadio_actionPerformed(e, 3);
-												}//end actionPerformed
-											}//end ActionListener
-											);//ActionListener added
-										navRadio4.setVisible(false);
-									navRadioButtons.add(navRadio4);
-								centerSouthPane.add(navRadio4);
-
-								
-								centerCenterPane = new JPanel();
-								centerCenterPane.setLayout(new BoxLayout(centerCenterPane, BoxLayout.PAGE_AXIS));
-								centerCenterPane.setBorder(pad);
-								centerCenterPane.setBackground(white);
-							centerPane.add(centerCenterPane, BorderLayout.CENTER);
-								
-									mainTxtArea = new JTextArea("Welcome to WISP-T!\nPlease create or load a tree.");
-									mainTxtArea.setLineWrap(true);
-									mainTxtArea.setEditable(false);
-									mainTxtArea.setBorder(null);
-									mainTxtArea.setColumns(50);
-								centerCenterPane.add(mainTxtArea);
-								
-								 	tipArea = new JTextArea("");
-									tipArea.setLineWrap(true);
-									tipArea.setEditable(false);
-									tipArea.setBorder(null);/*
-								centerCenterPane.add(tipArea);
-								centerCenterPane.remove(tipArea);*/	
-								
-								
-							
-		/*
-		 * TODO TIPS/EAST
-		 */
-					eastPad = new JPanel(new GridLayout(1,1));
-					eastPad.setBorder(pad);
-					eastPad.setBackground(white);
-				centerEastSplit.setRightComponent(eastPad);
-						
-						eastScroll = new JScrollPane();
-						eastScroll.setBorder(bevelDwn);
-						eastScroll.setBackground(white);
-					eastPad.add(eastScroll);
-
-							eastPane = new JPanel(new GridLayout(6,2));
-							eastPane.setBorder(null);
-							eastPane.setBackground(white);
-						eastScroll.setViewportView(eastPane);
-						
-								
-								BufferedImage bufferedImage;
-								try
-								{
-									bufferedImage = ImageIO.read(new File("picPlaceholder.png"));
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
-								}
-								
-								labelIcon = new ImageIcon(bufferedImage);
-								
-								try
-								{
-									bufferedImage = ImageIO.read(new File("picPlaceholderEmpty.png"));
-								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
-								}
-								
-								labelEmptyIcon = new ImageIcon(bufferedImage);
-								
-								JLabel[] tipLabels = new JLabel[6];
-								emptyTipLabelString = " (empty)";
-								tipPics = new ImageIcon[6];
-								
-								for(int i = 0; i < tipLabels.length; ++i)
-								{
-									tipLabels[i] = new JLabel("Pic " + (i+1) + emptyTipLabelString);
-									tipLabels[i].setVisible(false);
-									tipLabels[i].setIcon(labelEmptyIcon);
-									tipLabels[i].setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
-								}//end for
+						westNorthPad = new JPanel(new GridLayout(1,1));
+						westNorthPad.setBorder(bevelDwn);
+						westNorthPad.setBackground(white);
+					westPane.setTopComponent(westNorthPad);;
 					
-						 		tipCheck1 = new JCheckBox("first");
-								tipCheck1.addActionListener
+							treeScroll = new JScrollPane();
+							treeScroll.setBorder(null);
+							treeScroll.setBackground(white);
+						westNorthPad.add(treeScroll);
+					
+								tree = new JTree();
+								tree.setModel(model);
+								tree.addTreeSelectionListener(this);
+								tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+								tree.setBorder(null);
+								tree.setBackground(white);
+								tree.setExpandsSelectedPaths(true);
+								tree.setEnabled(true);
+							treeScroll.setViewportView(tree);
+						
+						westSouthPad = new JPanel(new GridLayout(1,1));
+						westSouthPad.setBorder(null);
+						westSouthPad.setBackground(white);/*
+					westPane.setBottomComponent(westSouthPad);*/
+						
+							westSouthEditorBtns = new JPanel(new GridLayout(2,3));
+							westSouthEditorBtns.setBorder(null);
+							westSouthEditorBtns.setBackground(white);
+						westSouthPad.add(westSouthEditorBtns);
+							
+								addNodeBtn = new JButton("+");
+								addNodeBtn.addActionListener
 									(new ActionListener()
 									{
 										@Override
 										public void
 										actionPerformed(ActionEvent e)
 										{
-											tipCheck_actionPerformed(e, tipCheck1.isSelected(), 0);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck1.setBackground(white);
-							eastPane.add(tipCheck1);
-							
-							
-							tipLabel1 = tipLabels[0];
-							tipLabel1.addMouseListener
-								(new MouseListener()
-								{
-									@Override
-									public void mouseClicked(MouseEvent me) 
+											addNodeBtn_actionPerformed(e);
+										}
+									}
+									);
+							westSouthEditorBtns.add(addNodeBtn);
+								
+								removeNodeBtn = new JButton("-");
+								removeNodeBtn.addActionListener
+									(new ActionListener()
 									{
-										tipLabel_mouseClicked(me, tipLabel1, 0);
-									}//mouseClicked
-		
 										@Override
-										public void mouseEntered(MouseEvent arg0) {}
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											removeNodeBtn_actionPerformed(e);
+										}
+									}
+									);
+							westSouthEditorBtns.add(removeNodeBtn);
+							
+								editNodeBtn = new JButton("\uD83D\uDD89");
+								editNodeBtn.addActionListener
+									(new ActionListener()
+									{
 										@Override
-										public void mouseExited(MouseEvent arg0) {}
-										@Override
-										public void mousePressed(MouseEvent arg0) {}
-										@Override
-										public void mouseReleased(MouseEvent arg0) {}
-								}
-								);
-						eastPane.add(tipLabel1);
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											editNodeBtn_actionPerformed(e);
+										}
+									}
+									);
+							westSouthEditorBtns.add(editNodeBtn);
+								
+								upNodeBtn = new JButton("\u2191");
+								upNodeBtn.addActionListener
+									(new ActionListener()
+									{
+										@Override 
+										public void 
+										actionPerformed(ActionEvent e) 
+										{
+											moveBtn_actionPerformed(e, true);
+										}
+									}
+									);
+							westSouthEditorBtns.add(upNodeBtn);
+							
+								downNodeBtn = new JButton("\u2193");
+								downNodeBtn.addActionListener
+									(new ActionListener()
+									{
+										@Override 
+										public void 
+										actionPerformed(ActionEvent e) 
+										{
+											moveBtn_actionPerformed(e, false);
+										}
+									}
+									);
+							westSouthEditorBtns.add(downNodeBtn);
+								
+							
+			/*
+			 * TODO TXT/CENTER_EAST(east side of west split pane)
+			 */
+					//centerEastSplit.addMouseListener(this);
+					centerEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, centerPad, eastPad);
+					centerEastSplit.setResizeWeight(0.75);
+					centerEastSplit.setBorder(null);
+					centerEastSplit.setBackground(white);
+					centerEastSplit.setDividerSize(2);
+				westCenterEastSplit.setRightComponent(centerEastSplit);
+				
+	
+		  				centerPad = new JPanel(new GridLayout(1,1));
+						centerPad.setBorder(pad);
+						centerPad.setBackground(white);
+					centerEastSplit.setLeftComponent(centerPad);
+					
+			
+							centerBevel = new JPanel(new GridLayout(1,1));
+							centerBevel.setBorder(bevelDwn);
+							centerBevel.setBackground(white);
+						centerPad.add(centerBevel);
+						
+				
+								centerPane  = new JPanel(new BorderLayout());
+								centerPane.setBorder(pad);
+								centerPane.setBackground(white);
+							centerBevel.add(centerPane);
+							
+									centerSouthPane = new JPanel(new FlowLayout());
+									centerSouthPane.setBorder(pad);
+									centerSouthPane.setBackground(white);
+								centerPane.add(centerSouthPane, BorderLayout.SOUTH);
+								
+										navRadioButtons = new ButtonGroup();/*
+									centerSouthPane*/
+								
+											navRadio1 = new JRadioButton("first");
+											navRadio1.setBackground(white);
+											navRadio1.addActionListener
+												(new ActionListener()
+												{
+													@Override
+													public void
+													actionPerformed(ActionEvent e)
+													{
+														navRadio_actionPerformed(e, 0);
+													}//end actionPerformed
+												}//end ActionListener
+												);//ActionListener added
+										navRadioButtons.add(navRadio1);
+									centerSouthPane.add(navRadio1);
+											
+	
+											navRadio2 = new JRadioButton("second");
+											navRadio2.setBackground(white);
+											navRadio2.addActionListener
+												(new ActionListener()
+												{
+													@Override
+													public void
+													actionPerformed(ActionEvent e)
+													{
+														navRadio_actionPerformed(e, 1);
+													}//end actionPerformed
+												}//end ActionListener
+												);//ActionListener added
+											navRadio2.setVisible(false);
+										navRadioButtons.add(navRadio2);
+									centerSouthPane.add(navRadio2);
+											
+											navRadio3 = new JRadioButton("third");
+											navRadio3.setBackground(white);
+											navRadio3.addActionListener
+												(new ActionListener()
+												{
+													@Override
+													public void
+													actionPerformed(ActionEvent e)
+													{
+														navRadio_actionPerformed(e, 2);
+													}//end actionPerformed
+												}//end ActionListener
+												);//ActionListener added
+											navRadio3.setVisible(false);
+										navRadioButtons.add(navRadio3);
+									centerSouthPane.add(navRadio3);
+											
+											navRadio4 = new JRadioButton("fourth");
+											navRadio4.setBackground(white);
+											navRadio4.addActionListener
+												(new ActionListener()
+												{
+													@Override
+													public void
+													actionPerformed(ActionEvent e)
+													{
+														navRadio_actionPerformed(e, 3);
+													}//end actionPerformed
+												}//end ActionListener
+												);//ActionListener added
+											navRadio4.setVisible(false);
+										navRadioButtons.add(navRadio4);
+									centerSouthPane.add(navRadio4);
+	
 									
-								tipCheck2 = new JCheckBox("second");
-								tipCheck2.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											tipCheck_actionPerformed(e, tipCheck2.isSelected(), 1);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck2.setBackground(white);
-								tipCheck2.setVisible(false);
-							eastPane.add(tipCheck2);
-							
-								tipLabel2 = tipLabels[1];
-								tipLabel2.addMouseListener
-									(new MouseListener()
-									{
-										@Override
-										public void mouseClicked(MouseEvent me) 
-										{
-											tipLabel_mouseClicked(me, tipLabel2, 1);
-										}//mouseClicked
-			
-											@Override
-											public void mouseEntered(MouseEvent arg0) {}
-											@Override
-											public void mouseExited(MouseEvent arg0) {}
-											@Override
-											public void mousePressed(MouseEvent arg0) {}
-											@Override
-											public void mouseReleased(MouseEvent arg0) {}
-									}
-									);
-							eastPane.add(tipLabel2);
-			
+									centerCenterPane = new JPanel();
+									centerCenterPane.setLayout(new BoxLayout(centerCenterPane, BoxLayout.PAGE_AXIS));
+									centerCenterPane.setBorder(pad);
+									centerCenterPane.setBackground(white);
+								centerPane.add(centerCenterPane, BorderLayout.CENTER);
 									
-								tipCheck3 = new JCheckBox("third");
-								tipCheck3.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											tipCheck_actionPerformed(e, tipCheck3.isSelected(), 2);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck3.setBackground(white);
-								tipCheck3.setVisible(false);
-							eastPane.add(tipCheck3);
-							
-								tipLabel3 = tipLabels[2];
-								tipLabel3.addMouseListener
-									(new MouseListener()
-									{
-										@Override
-										public void mouseClicked(MouseEvent me) 
-										{
-											tipLabel_mouseClicked(me, tipLabel3, 2);
-										}//mouseClicked
-			
-											@Override
-											public void mouseEntered(MouseEvent arg0) {}
-											@Override
-											public void mouseExited(MouseEvent arg0) {}
-											@Override
-											public void mousePressed(MouseEvent arg0) {}
-											@Override
-											public void mouseReleased(MouseEvent arg0) {}
-									}
-									);
-							eastPane.add(tipLabel3);
-							
-								tipCheck4 = new JCheckBox("fourth");
-								tipCheck4.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											tipCheck_actionPerformed(e, tipCheck4.isSelected(), 3);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck4.setBackground(white);
-								tipCheck4.setVisible(false);
-							eastPane.add(tipCheck4);
-							
-
-								tipLabel4 = tipLabels[3];
-								tipLabel4.addMouseListener
-									(new MouseListener()
-									{
-										@Override
-										public void mouseClicked(MouseEvent me) 
-										{
-											tipLabel_mouseClicked(me, tipLabel4, 3);
-										}//mouseClicked
-			
-											@Override
-											public void mouseEntered(MouseEvent arg0) {}
-											@Override
-											public void mouseExited(MouseEvent arg0) {}
-											@Override
-											public void mousePressed(MouseEvent arg0) {}
-											@Override
-											public void mouseReleased(MouseEvent arg0) {}
-									}
-									);
-							eastPane.add(tipLabel4);
+										mainTxtArea = new JTextArea("Welcome to WISP-T!\nPlease create or load a tree.");
+										mainTxtArea.setLineWrap(true);
+										mainTxtArea.setEditable(false);
+										mainTxtArea.setBorder(null);
+										mainTxtArea.setColumns(50);
+									centerCenterPane.add(mainTxtArea);
+									
+									 	tipArea = new JTextArea("");
+										tipArea.setLineWrap(true);
+										tipArea.setEditable(false);
+										tipArea.setBorder(null);/*
+									centerCenterPane.add(tipArea);
+									centerCenterPane.remove(tipArea);*/	
+									
+									
 								
-								tipCheck5 = new JCheckBox("fifth");
-								tipCheck5.addActionListener
-									(new ActionListener()
-									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											tipCheck_actionPerformed(e, tipCheck5.isSelected(), 4);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck5.setBackground(white);
-								tipCheck5.setVisible(false);
-							eastPane.add(tipCheck5);
+			/*
+			 * TODO TIPS/EAST
+			 */
+						eastPad = new JPanel(new GridLayout(1,1));
+						eastPad.setBorder(pad);
+						eastPad.setBackground(white);
+					centerEastSplit.setRightComponent(eastPad);
 							
-								tipLabel5 = tipLabels[4];
-								tipLabel5.addMouseListener
-									(new MouseListener()
+							eastScroll = new JScrollPane();
+							eastScroll.setBorder(bevelDwn);
+							eastScroll.setBackground(white);
+						eastPad.add(eastScroll);
+	
+								eastPane = new JPanel(new GridLayout(6,2));
+								eastPane.setBorder(null);
+								eastPane.setBackground(white);
+							eastScroll.setViewportView(eastPane);
+							
+									
+									BufferedImage bufferedImage;
+									try
 									{
-										@Override
-										public void mouseClicked(MouseEvent me) 
-										{
-											tipLabel_mouseClicked(me, tipLabel5, 4);
-										}//mouseClicked
-			
-											@Override
-											public void mouseEntered(MouseEvent arg0) {}
-											@Override
-											public void mouseExited(MouseEvent arg0) {}
-											@Override
-											public void mousePressed(MouseEvent arg0) {}
-											@Override
-											public void mouseReleased(MouseEvent arg0) {}
+										bufferedImage = ImageIO.read(new File("picPlaceholder.png"));
 									}
-									);
-							eastPane.add(tipLabel5);
-								
-								tipCheck6 = new JCheckBox("last");
-								tipCheck6.addActionListener
-									(new ActionListener()
+									catch(Exception e)
 									{
-										@Override
-										public void
-										actionPerformed(ActionEvent e)
-										{
-											tipCheck_actionPerformed(e, tipCheck6.isSelected(), 5);
-										}//end actionPerformed
-									}//end ActionListener
-									);//ActionListener added
-								tipCheck6.setBackground(white);
-								tipCheck6.setVisible(false);
-							eastPane.add(tipCheck6);
-								
-
-								tipLabel6 = tipLabels[5];
-								tipLabel6.addMouseListener
-									(new MouseListener()
-									{
-										@Override
-										public void mouseClicked(MouseEvent me) 
-										{
-											tipLabel_mouseClicked(me, tipLabel6, 5);
-										}//mouseClicked
-			
-											@Override
-											public void mouseEntered(MouseEvent arg0) {}
-											@Override
-											public void mouseExited(MouseEvent arg0) {}
-											@Override
-											public void mousePressed(MouseEvent arg0) {}
-											@Override
-											public void mouseReleased(MouseEvent arg0) {}
+										e.printStackTrace(ps);
+										bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
 									}
-									);
-							eastPane.add(tipLabel6);
-			
-		/*
-		 * TODO CONSOLE/SOUTH
-		 */
-			southPadPane = new JPanel(new GridLayout(1,1));
-			southPadPane.setBorder(null);
-			southPadPane.setBackground(white);
-		contentPane.add(southPadPane, BorderLayout.SOUTH);
-		
-				southPane = new JPanel(new GridLayout(1,2));
-				southPane.setBorder(null);
-				southPane.setBackground(white);
-			southPadPane.add(southPane);
-			
-					consoleMsgs = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
-					consoleMsgs.setBorder(null);
-					consoleMsgs.setBackground(white);
-					consoleMsgs.setDividerSize(2);
-				southPane.add(consoleMsgs);		
+									
+									labelIcon = new ImageIcon(bufferedImage);
+									
+									try
+									{
+										bufferedImage = ImageIO.read(new File("picPlaceholderEmpty.png"));
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace(ps);
+										bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
+									}
+									
+									labelEmptyIcon = new ImageIcon(bufferedImage);
+									
+									JLabel[] tipLabels = new JLabel[6];
+									emptyTipLabelString = " (empty)";
+									tipPics = new ImageIcon[6];
+									
+									for(int i = 0; i < tipLabels.length; ++i)
+									{
+										tipLabels[i] = new JLabel("Pic " + (i+1) + emptyTipLabelString);
+										tipLabels[i].setVisible(false);
+										tipLabels[i].setIcon(labelEmptyIcon);
+										tipLabels[i].setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+									}//end for
 						
-						southPSplit = new JPanel();
-						southPSplit.setBackground(white);
-					consoleMsgs.setLeftComponent(southPSplit);
-		
-							processingLabel = new JLabel("Load Complete");
-						southPSplit.add(processingLabel);
+							 		tipCheck1 = new JCheckBox("first");
+									tipCheck1.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck1.isSelected(), 0);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck1.setBackground(white);
+								eastPane.add(tipCheck1);
+								
+								
+								tipLabel1 = tipLabels[0];
+								tipLabel1.addMouseListener
+									(new MouseListener()
+									{
+										@Override
+										public void mouseClicked(MouseEvent me) 
+										{
+											tipLabel_mouseClicked(me, tipLabel1, 0);
+										}//mouseClicked
 			
-						southUSplit = new JPanel();
-						southUSplit.setBackground(white);
-					consoleMsgs.setRightComponent(southUSplit);
-						
-							userLabel = new JLabel(userName); 
-						southUSplit.add(userLabel);
-
-						pack();
-					consoleMsgs.setDividerLocation(0.40d);
-						southPSplit.setMinimumSize(new Dimension(southPSplit.getWidth()*3, southPSplit.getHeight()));
-		
-		
-		pack();
-		centerSouthPane.setSize(centerSouthPane.getWidth(), (int)(centerSouthPane.getHeight()*1.5));
-		centerSouthPane.setPreferredSize(centerSouthPane.getSize());
-		centerPad.setMinimumSize(centerPad.getSize());
-		treeScroll.setMinimumSize(treeScroll.getSize());
-		eastScroll.setMinimumSize(eastScroll.getSize());
-		this.setMinimumSize(this.getSize());
-		this.setSize(1280, 600);
-		westPane.setDividerLocation(westPane.getHeight()*2);
-		tipCheck1.setVisible(false);
-		navRadio1.setVisible(false);
-		p(this.getWidth()+" width");
-		p(this.getHeight()+" height");
-		saveSettings_actionPerformed(new ActionEvent(bufferedImage, lastPicOpened, emptyTipLabelString));
+											@Override
+											public void mouseEntered(MouseEvent arg0) {}
+											@Override
+											public void mouseExited(MouseEvent arg0) {}
+											@Override
+											public void mousePressed(MouseEvent arg0) {}
+											@Override
+											public void mouseReleased(MouseEvent arg0) {}
+									}
+									);
+							eastPane.add(tipLabel1);
+										
+									tipCheck2 = new JCheckBox("second");
+									tipCheck2.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck2.isSelected(), 1);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck2.setBackground(white);
+									tipCheck2.setVisible(false);
+								eastPane.add(tipCheck2);
+								
+									tipLabel2 = tipLabels[1];
+									tipLabel2.addMouseListener
+										(new MouseListener()
+										{
+											@Override
+											public void mouseClicked(MouseEvent me) 
+											{
+												tipLabel_mouseClicked(me, tipLabel2, 1);
+											}//mouseClicked
+				
+												@Override
+												public void mouseEntered(MouseEvent arg0) {}
+												@Override
+												public void mouseExited(MouseEvent arg0) {}
+												@Override
+												public void mousePressed(MouseEvent arg0) {}
+												@Override
+												public void mouseReleased(MouseEvent arg0) {}
+										}
+										);
+								eastPane.add(tipLabel2);
+				
+										
+									tipCheck3 = new JCheckBox("third");
+									tipCheck3.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck3.isSelected(), 2);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck3.setBackground(white);
+									tipCheck3.setVisible(false);
+								eastPane.add(tipCheck3);
+								
+									tipLabel3 = tipLabels[2];
+									tipLabel3.addMouseListener
+										(new MouseListener()
+										{
+											@Override
+											public void mouseClicked(MouseEvent me) 
+											{
+												tipLabel_mouseClicked(me, tipLabel3, 2);
+											}//mouseClicked
+				
+												@Override
+												public void mouseEntered(MouseEvent arg0) {}
+												@Override
+												public void mouseExited(MouseEvent arg0) {}
+												@Override
+												public void mousePressed(MouseEvent arg0) {}
+												@Override
+												public void mouseReleased(MouseEvent arg0) {}
+										}
+										);
+								eastPane.add(tipLabel3);
+								
+									tipCheck4 = new JCheckBox("fourth");
+									tipCheck4.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck4.isSelected(), 3);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck4.setBackground(white);
+									tipCheck4.setVisible(false);
+								eastPane.add(tipCheck4);
+								
+	
+									tipLabel4 = tipLabels[3];
+									tipLabel4.addMouseListener
+										(new MouseListener()
+										{
+											@Override
+											public void mouseClicked(MouseEvent me) 
+											{
+												tipLabel_mouseClicked(me, tipLabel4, 3);
+											}//mouseClicked
+				
+												@Override
+												public void mouseEntered(MouseEvent arg0) {}
+												@Override
+												public void mouseExited(MouseEvent arg0) {}
+												@Override
+												public void mousePressed(MouseEvent arg0) {}
+												@Override
+												public void mouseReleased(MouseEvent arg0) {}
+										}
+										);
+								eastPane.add(tipLabel4);
+									
+									tipCheck5 = new JCheckBox("fifth");
+									tipCheck5.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck5.isSelected(), 4);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck5.setBackground(white);
+									tipCheck5.setVisible(false);
+								eastPane.add(tipCheck5);
+								
+									tipLabel5 = tipLabels[4];
+									tipLabel5.addMouseListener
+										(new MouseListener()
+										{
+											@Override
+											public void mouseClicked(MouseEvent me) 
+											{
+												tipLabel_mouseClicked(me, tipLabel5, 4);
+											}//mouseClicked
+				
+												@Override
+												public void mouseEntered(MouseEvent arg0) {}
+												@Override
+												public void mouseExited(MouseEvent arg0) {}
+												@Override
+												public void mousePressed(MouseEvent arg0) {}
+												@Override
+												public void mouseReleased(MouseEvent arg0) {}
+										}
+										);
+								eastPane.add(tipLabel5);
+									
+									tipCheck6 = new JCheckBox("last");
+									tipCheck6.addActionListener
+										(new ActionListener()
+										{
+											@Override
+											public void
+											actionPerformed(ActionEvent e)
+											{
+												tipCheck_actionPerformed(e, tipCheck6.isSelected(), 5);
+											}//end actionPerformed
+										}//end ActionListener
+										);//ActionListener added
+									tipCheck6.setBackground(white);
+									tipCheck6.setVisible(false);
+								eastPane.add(tipCheck6);
+									
+	
+									tipLabel6 = tipLabels[5];
+									tipLabel6.addMouseListener
+										(new MouseListener()
+										{
+											@Override
+											public void mouseClicked(MouseEvent me) 
+											{
+												tipLabel_mouseClicked(me, tipLabel6, 5);
+											}//mouseClicked
+				
+												@Override
+												public void mouseEntered(MouseEvent arg0) {}
+												@Override
+												public void mouseExited(MouseEvent arg0) {}
+												@Override
+												public void mousePressed(MouseEvent arg0) {}
+												@Override
+												public void mouseReleased(MouseEvent arg0) {}
+										}
+										);
+								eastPane.add(tipLabel6);
+				
+			/*
+			 * TODO CONSOLE/SOUTH
+			 */
+				southPadPane = new JPanel(new GridLayout(1,1));
+				southPadPane.setBorder(null);
+				southPadPane.setBackground(white);
+			contentPane.add(southPadPane, BorderLayout.SOUTH);
+			
+					southPane = new JPanel(new GridLayout(1,2));
+					southPane.setBorder(null);
+					southPane.setBackground(white);
+				southPadPane.add(southPane);
+				
+						consoleMsgs = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
+						consoleMsgs.setBorder(null);
+						consoleMsgs.setBackground(white);
+						consoleMsgs.setDividerSize(2);
+					southPane.add(consoleMsgs);		
+							
+							southPSplit = new JPanel();
+							southPSplit.setBackground(white);
+						consoleMsgs.setLeftComponent(southPSplit);
+			
+								processingLabel = new JLabel("Load Complete");
+							southPSplit.add(processingLabel);
+				
+							southUSplit = new JPanel();
+							southUSplit.setBackground(white);
+						consoleMsgs.setRightComponent(southUSplit);
+							
+								userLabel = new JLabel(userName); 
+							southUSplit.add(userLabel);
+	
+							pack();
+						consoleMsgs.setDividerLocation(0.40d);
+							southPSplit.setMinimumSize(new Dimension(southPSplit.getWidth()*3, southPSplit.getHeight()));
+			
+			
+			pack();
+			centerSouthPane.setSize(centerSouthPane.getWidth(), (int)(centerSouthPane.getHeight()*1.5));
+			centerSouthPane.setPreferredSize(centerSouthPane.getSize());
+			centerPad.setMinimumSize(centerPad.getSize());
+			treeScroll.setMinimumSize(treeScroll.getSize());
+			eastScroll.setMinimumSize(eastScroll.getSize());
+			this.setMinimumSize(this.getSize());
+			this.setSize(1280, 600);
+			westPane.setDividerLocation(westPane.getHeight()*2);
+			tipCheck1.setVisible(false);
+			navRadio1.setVisible(false);
+			p(this.getWidth()+" width");
+			p(this.getHeight()+" height");
+			try
+			{
+				saveSettings_actionPerformed(new ActionEvent(bufferedImage, lastPicOpened, emptyTipLabelString));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace(WISPT.ps);
+			}
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace(WISPT.ps);
+	}
 		//setUser(userProfile);
 		
 		/*UserProfileBuilder builderWindow = new UserProfileBuilder(this);
@@ -1281,8 +1314,17 @@ private static boolean successfulWrite;
 	public static void 
 	main(String[] args) 
 	{
-		WISPT window = new WISPT();
-		window.setVisible(true);
+		try
+		{
+			File file = new File("logs.txt");
+			PrintStream ps = new PrintStream(file);
+			WISPT window = new WISPT(ps);
+			window.setVisible(true);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace(WISPT.ps);
+		}
 	}
 
 /*
@@ -1311,7 +1353,7 @@ private static boolean successfulWrite;
 				}
 				catch(Exception ex)
 				{
-					ex.printStackTrace();
+					ex.printStackTrace(ps);
 					return null;
 				}//read image try/catch
 				String fileName = "";
@@ -1322,12 +1364,12 @@ private static boolean successfulWrite;
 					int index = fileName.lastIndexOf(".");
 					extension = fileName.substring(index+1);
 					ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
-					System.out.println(pathForFile+File.separator+fileName+" successfully written. "+extension);
+					WISPT.ps.println("WISPT: "+pathForFile+File.separator+fileName+" successfully written. "+extension);
 				}
 				catch(Exception ex)
 				{
-					ex.printStackTrace();
-					System.out.println(pathForFile+File.separator+fileName+" write failed. "+extension);
+					ex.printStackTrace(ps);
+					WISPT.ps.println("WISPT: "+pathForFile+File.separator+fileName+" write failed. "+extension);
 				}//write local image try/catch
 				return image;
 			}//choice/approve if
@@ -1340,7 +1382,7 @@ private static boolean successfulWrite;
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace();
+				ex.printStackTrace(ps);
 				return null;
 			}//imageread try/catch
 			String fileName = "";
@@ -1352,12 +1394,12 @@ private static boolean successfulWrite;
 				int index = fileName.lastIndexOf(".");
 				extension = fileName.substring(index+1);
 				ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
-				System.out.println(pathForFile+File.separator+fileName+" successfully written. "+extension);
+				WISPT.ps.println("WISPT: "+pathForFile+File.separator+fileName+" successfully written. "+extension);
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace();
-				System.out.println(pathForFile+File.separator+fileName+" write failed. "+extension);
+				ex.printStackTrace(ps);
+				WISPT.ps.println("WISPT: "+pathForFile+File.separator+fileName+" write failed. "+extension);
 			}//write local image try/catch
 			return image;
 		}//showDialog else
@@ -1374,8 +1416,21 @@ private static boolean successfulWrite;
 	tipLabel_mouseClicked(MouseEvent me, JLabel clickedTipLabel, int index)
 	{
 		lastPicOpened = index;
-		BufferedImage bufferedImage;
-		if(tipPics[index] != null)
+		//BufferedImage bufferedImage;
+		if(tipPics[index] == null)
+		{
+			/*bufferedImage = WISPT.loadImage(true, "Images", this);
+			if(bufferedImage != null)
+			{
+				tipPics[index] = new ImageIcon(bufferedImage);
+				clickedTipLabel.setIcon(labelIcon);
+			}//if
+			else
+			{*/
+				clickedTipLabel.setIcon(labelEmptyIcon);
+			//}//end null if
+		}
+		else
 		{
 			if(WISPTScreenShotViewer.getNoInstanceOpen())
 			{
@@ -1386,16 +1441,16 @@ private static boolean successfulWrite;
 		}//end if/else
 
 		String newText = clickedTipLabel.getText();
-		System.out.println(newText);
+		WISPT.ps.println("WISPT: "+newText);
 
 		if(tipPics[index] != null)
 		{
 			if(newText.contains(emptyTipLabelString))
 				newText = newText.replace(emptyTipLabelString, "");
 			
-			System.out.println(newText + " isIcon");
+			WISPT.ps.println("WISPT: "+newText + " isIcon");
 			clickedTipLabel.setText(newText);
-			System.out.println(newText);
+			WISPT.ps.println("WISPT: "+newText);
 		}
 	}
 	
@@ -1483,7 +1538,7 @@ private static boolean successfulWrite;
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace();
+				ex.printStackTrace(ps);
 			}
 		}
 	}
@@ -1565,7 +1620,7 @@ private static boolean successfulWrite;
 	    }
 		catch(IOException i) 
 		{
-	         i.printStackTrace();
+	         i.printStackTrace(ps);
 		}//end read try/catch
 	}
 	
@@ -1700,6 +1755,7 @@ private static boolean successfulWrite;
 		{
 			westPane.setBottomComponent(westSouthPad);
 			westSouthPad.setVisible(true);
+			westPane.setDividerLocation(0.75);
 			southUSplit.setBackground(new Color(255,180,180));
 			southPSplit.setBackground(new Color(255,180,180));
 			if(!userName.contains(" (EDITOR MODE ACTIVE)"))
@@ -1737,10 +1793,26 @@ private static boolean successfulWrite;
 	public void 
 	addNodeBtn_actionPerformed(ActionEvent e)
 	{
-		setAsideNodeWithWISPTNodeBuilder();
+		setAsideNodeWithWISPTNodeBuilder(false);
 		p(asideNode.toString());
 		
-		model.insertNodeInto(asideNode, selectedNode, 0);
+		if(WISPTNodeBuilder.isClosedWithSave())
+		{
+			model.insertNodeInto(asideNode, selectedNode, 0);
+		}
+		else
+		{
+			asideNode = new DefaultMutableTreeNode(new WISPTNodeObject("Title","Content"));
+			try
+			{
+				WISPT.saveSerializedObject(false, "temp", "node", "Serial File", "ser", asideNode);
+			}
+			catch(Exception ex)
+			{
+				WISPT.ps.print("WISPT: ");
+				ex.printStackTrace(WISPT.ps);
+			}
+		}
 		
 		tree.revalidate();
 	}
@@ -1768,7 +1840,7 @@ private static boolean successfulWrite;
 	public void
 	editNodeBtn_actionPerformed(ActionEvent e)
 	{
-		setAsideNodeWithWISPTNodeBuilder();
+		setAsideNodeWithWISPTNodeBuilder(true);
 		p(asideNode.toString());
 		
 		WISPTNodeObject wtno = (WISPTNodeObject)asideNode.getUserObject();
@@ -1829,7 +1901,7 @@ private static boolean successfulWrite;
 		}
 		catch(NullPointerException npe)
 		{
-			npe.printStackTrace();
+			npe.printStackTrace(ps);
 		}
 	}
 	
@@ -1874,9 +1946,9 @@ private static boolean successfulWrite;
 					break;
 			}//switch
 			clickedTipLabel.setIcon(labelEmptyIcon);
-			System.out.println(clickedTipLabel.getText() + " isNullIcon");
+			WISPT.ps.println("WISPT: "+clickedTipLabel.getText() + " isNullIcon");
 			clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
-			System.out.println(clickedTipLabel.getText());
+			WISPT.ps.println("WISPT: "+clickedTipLabel.getText());
 		}//if null
 	}//setLastPicOpened
 	
@@ -1915,7 +1987,8 @@ private static boolean successfulWrite;
 		} 
 		catch (ClassNotFoundException | IOException e) 
 		{
-			e.printStackTrace();
+			e.printStackTrace(ps);
+			model = new DefaultTreeModel(new DefaultMutableTreeNode(new WISPTNodeObject("Title", "Content")));
 		}
 
 		isAdmin = profile.getAdminPrivelage();
@@ -1968,6 +2041,7 @@ private static boolean successfulWrite;
 		try 
 		{
 			File currentDirectoryFile = new File(folderPath);//creates a empty file in that directory
+			currentDirectoryFile.mkdir();
 			objectPath = folderPath+File.separator+fileNameOnly+"."+fileNameExtensionFilterExtension;
 			if(showUserDialog)
 			{
@@ -1983,25 +2057,25 @@ private static boolean successfulWrite;
 			        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
 			        in.close();
 			        fileIn.close();
-			        System.out.println("Object read from "+selectedFile.getName());
+			        WISPT.ps.println("WISPT: "+"Object read from "+selectedFile.getName());
 				}//end if
 				objectPath = fc.getSelectedFile().toString();//FIXME might have broken something here
 			}
 			else
 			{
-				System.out.println(objectPath);
+				WISPT.ps.println("WISPT: "+objectPath);
 				FileInputStream fileIn = new FileInputStream(objectPath);
 		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
 		        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
 		        in.close();
 		        fileIn.close();
-		        System.out.println("Object read from "+objectPath);
+		        WISPT.ps.println("WISPT: "+"Object read from "+objectPath);
 			}
 			return objectToReturn;
 	    }//try
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(ps);
 			return null;
 		}//end try/catch
 	}//end loadSerializedObject()
@@ -2038,7 +2112,7 @@ private static boolean successfulWrite;
 						FileInputStream fileIn = new FileInputStream(selectedCurrentDirectoryFile);//if successful, tries to open the location
 				        ObjectInputStream in = new ObjectInputStream(fileIn); //if opened, tries to processes it as a serialized object
 				        Object testObject = in.readObject();//if processed, tries to assign it to a variable
-				        System.out.println(testObject.toString());
+				        WISPT.ps.println("WISPT: "+testObject.toString());
 				        in.close();
 				        fileIn.close();
 				        	//if the file does not exist, or is not a valid serialized java file, this point will not be reached
@@ -2069,13 +2143,13 @@ private static boolean successfulWrite;
 					        out.close();
 					        fileOut.flush();
 					        fileOut.close();
-					        System.out.println("Object saved in "+fileName+"."+fileTypeExtension);
+					        WISPT.ps.println("WISPT: "+"Object saved in "+fileName+"."+fileTypeExtension);
 					    }//end inner if
 					}//try
 					catch(Exception ex)
 					{
 						JOptionPane.showMessageDialog(null, "Save Failed! Contact the administrator.");
-						System.out.println(ex.getStackTrace().toString());
+						WISPT.ps.println("WISPT: "+ex.getStackTrace().toString());
 						successfulWrite = false;
 					}//end inner try/catch
 				}//end if approve option
@@ -2089,31 +2163,38 @@ private static boolean successfulWrite;
 		        out.close();
 		        fileOut.flush();
 		        fileOut.close();
-		        System.out.println("Object saved in "+currentDirectoryFile.toString());
+		        WISPT.ps.println("WISPT: "+"Object saved in "+currentDirectoryFile.toString());
 			}
 			
 		}//try
 		catch(Exception ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(ps);
 		}//end outer try/catch
 	}//end saveSerializedObject()
 	
 	public void 
-	setAsideNodeWithWISPTNodeBuilder()
+	setAsideNodeWithWISPTNodeBuilder(boolean isEditedNode)
 	{
 		successfulWrite = false;
-		
-		saveSerializedObject(false, "temp", "node", "Serial File", "ser", selectedNode);
+		//FIXME should have an if/else tied to whether it should be edit or new execution. Right now edit and new look identical, confusing
+		if(isEditedNode)
+		{
+			saveSerializedObject(false, "temp", "node", "Serial File", "ser", selectedNode);
+		}
+		else
+		{
+			saveSerializedObject(false, "temp", "node", "Serial File", "ser", new DefaultMutableTreeNode(new WISPTNodeObject("Title", "Content")));
+		}
 		
 		if(successfulWrite)
 		{
 			WISPTNodeBuilder.main(null);
-			System.out.println("WISPTNodeBuilder passed.");
+			WISPT.ps.println("WISPT: "+"WISPTNodeBuilder passed.");
 		}//if successful write
 		
 		asideNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(false, "temp", "node", "Serial File", "ser");
-		System.out.println("asideNode set");
+		WISPT.ps.println("WISPT: "+"asideNode set");
 	}
 	
 	public void 
@@ -2160,6 +2241,29 @@ private static boolean successfulWrite;
 			}//end counter or hide if
 		}//end training mode if
 	}
+	
+	public void
+	processTipLabel(JLabel labelToBeProcessed, int indexOfPic)
+	{
+		try
+		{
+			if(tipPics[indexOfPic] != null)
+			{
+				labelToBeProcessed.setVisible(true);
+				labelToBeProcessed.setIcon(labelIcon);
+				
+				String newText = labelToBeProcessed.getText();
+				WISPT.ps.println("WISPT: "+newText);
+				if(newText.contains(emptyTipLabelString))
+					newText = newText.replace(emptyTipLabelString, "");
+				
+				WISPT.ps.println("WISPT: "+newText + " isIcon");
+				labelToBeProcessed.setText(newText);
+				WISPT.ps.println("WISPT: "+newText);
+			}
+		}
+		catch(Exception ex){}
+	}
 
 // TODO treeValueChaned override
 	@Override
@@ -2176,10 +2280,17 @@ private static boolean successfulWrite;
 			previousSelectedNode = selectedNode;
 			selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 			selectedWTNO = (WISPTNodeObject)selectedNode.getUserObject();
-			userProfile.setLastSelectedNodePath(new TreePath(selectedNode.getPath()));
+			try
+			{
+				userProfile.setLastSelectedNodePath(new TreePath(selectedNode.getPath()));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace(WISPT.ps);
+			}
 			//p(userProfile.getLastSelectedNodePath().toString());
 			//training mode if/else below
-			if(!selectedNode.isLeaf())
+			if(!selectedNode.isLeaf() && trainingModeEnabled)
 			{
 				boolean allChildrenInvisible = true;
 				for(int i = 0; i < selectedNode.getChildCount(); ++i)
@@ -2197,15 +2308,14 @@ private static boolean successfulWrite;
 					incrementCounter();
 				}
 			}
-			else
+			else if(trainingModeEnabled)
 			{
 				incrementCounter();
 			}
 			
 			mainTxtArea.setText(selectedWTNO.getContent());
 			String[] tips = selectedWTNO.getTips();
-			@SuppressWarnings("unused")
-			ImageIcon[] tipPics = selectedWTNO.getTipPics();
+			tipPics = selectedWTNO.getTipPics();
 			DefaultMutableTreeNode child;
 			WISPTNodeObject childObject;
 			
@@ -2216,7 +2326,7 @@ private static boolean successfulWrite;
 				centerCenterPane.remove(tipArea);
 				centerCenterPane.revalidate();
 				centerCenterPane.repaint();
-				System.out.println(selectedWTNO.getContent());
+				WISPT.ps.println("WISPT: "+selectedWTNO.getContent());
 			}
 			
 			try
@@ -2250,89 +2360,69 @@ private static boolean successfulWrite;
 				;
 			}
 			
-			
-			
-			
-			if(!tips[0].equals(""))
-			{
-				tipCheck1.setVisible(true);
-				tipCheck1.setText(tips[0].split(":")[0]);
-				try
+			try {
+				if(!tips[0].equals(""))
 				{
-					if(tipPics[0] != null)
-						tipLabel1.setVisible(true);
+					tipCheck1.setVisible(true);
+					tipCheck1.setText(tips[0].split(":")[0]);
 				}
-				catch(Exception ex){}
-			}
-
-			if(!tips[1].equals(""))
-			{
-				tipCheck2.setVisible(true);
-				tipCheck2.setText(tips[1].split(":")[0]);
-				try
-				{
-					if(tipPics[1] != null)
-						tipLabel2.setVisible(true);
-				}
-				catch(Exception ex){}
-			}
-			
-
-			if(!tips[2].equals(""))
-			{
-				tipCheck3.setVisible(true);
-				tipCheck3.setText(tips[2].split(":")[0]);
-				try
-				{
-					if(tipPics[2] != null)
-						tipLabel3.setVisible(true);
-				}
-				catch(Exception ex){}
-			}
-			
-			if(!tips[3].equals(""))
-			{
-				tipCheck4.setVisible(true);
-				tipCheck4.setText(tips[3].split(":")[0]);
-				try
-				{
-					if(tipPics[3] != null)
-						tipLabel4.setVisible(true);
-				}
-				catch(Exception ex){}
-			}
-			
-			if(!tips[4].equals(""))
-			{
-				tipCheck5.setVisible(true);
-				tipCheck5.setText(tips[4].split(":")[0]);
-				try
-				{
-					if(tipPics[4] != null)
-						tipLabel5.setVisible(true);
-				}
-				catch(Exception ex){}
-			}
-			
-
-			if(!tips[5].equals(""))
-			{
-				tipCheck6.setVisible(true);
-				tipCheck6.setText(tips[5].split(":")[0]);
-				try
-				{
-					if(tipPics[5] != null)
-						tipLabel6.setVisible(true);
-				}
-				catch(Exception ex){}
-			}
 				
+				processTipLabel(tipLabel1, 0);
+				
+
+				if(!tips[1].equals(""))
+				{
+					tipCheck2.setVisible(true);
+					tipCheck2.setText(tips[1].split(":")[0]);
+				}
+
+				processTipLabel(tipLabel2, 1);
+
+				if(!tips[2].equals(""))
+				{
+					tipCheck3.setVisible(true);
+					tipCheck3.setText(tips[2].split(":")[0]);
+				}
+
+
+				processTipLabel(tipLabel3, 2);
+				
+				if(!tips[3].equals(""))
+				{
+					tipCheck4.setVisible(true);
+					tipCheck4.setText(tips[3].split(":")[0]);
+				}
+
+				processTipLabel(tipLabel4, 3);
+				
+				if(!tips[4].equals(""))
+				{
+					tipCheck5.setVisible(true);
+					tipCheck5.setText(tips[4].split(":")[0]);
+				}
+
+
+				processTipLabel(tipLabel5, 4);
+
+				if(!tips[5].equals(""))
+				{
+					tipCheck6.setVisible(true);
+					tipCheck6.setText(tips[5].split(":")[0]);
+				}
+
+				processTipLabel(tipLabel6, 5);
+			} 
+			catch (Exception ex) 
+			{
+				ex.printStackTrace(WISPT.ps);
+			}
+			
 		}
 	}
 	public void
 	p(String s)
 	{
-		System.out.println(s);
+		WISPT.ps.println("WISPT: "+s);
 	}
 	public void
 	p(Exception ex)
@@ -2352,9 +2442,9 @@ private static boolean successfulWrite;
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			e.printStackTrace(ps);
 		}
-		ex.printStackTrace();
+		ex.printStackTrace(ps);
 	}
 }
 
@@ -2473,7 +2563,7 @@ class LoginDialog extends JDialog
 		catch(Exception ex)
 		{
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
-			ex.printStackTrace();
+			ex.printStackTrace(WISPT.ps);
 		}
 		
 	}//end LID_okayBtn_AP
