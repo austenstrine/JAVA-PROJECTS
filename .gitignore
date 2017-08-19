@@ -22,3 +22,8 @@ Aliens2/.metadata/.plugins/org.eclipse.jdt.core/assumedExternalFilesCache
 *.MF
 *.gitignore
 *.class
+*.class
+*.class
+com/infowest/java/WISPT$1.class
+com/infowest/java/WISPT$1.class
+*.class

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.infowest.java;
+package com.myriapps.java;
 
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
