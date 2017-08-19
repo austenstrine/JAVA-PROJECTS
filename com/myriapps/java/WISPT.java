@@ -38,7 +38,7 @@ import javax.swing.tree.*;
 public class WISPT extends JFrame implements TreeSelectionListener//, ActionListener, ComponentListener, MouseListener 
 {
 /*
- *	TODO Variables 
+ *	Variables 
  */
 	private static final long serialVersionUID = -1079398159072533776L;
 	private ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>(4);
@@ -67,7 +67,7 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			matte = BorderFactory.createMatteBorder(5,5,5,5, eightGray);
 	
 /*
- * TODO current user info
+ * current user info
  */
 	
 	private boolean isAdmin,
@@ -213,7 +213,7 @@ private static boolean successfulWrite;
 					removePicLabelBtn;
 	
 	/*
-	 * TODO MENU DECLARATIONS
+	 * MENU DECLARATIONS
 	 */
 	private JMenuBar menu;
 	
@@ -247,7 +247,7 @@ private static boolean successfulWrite;
 	@SuppressWarnings("unused")
 	private String rootPath;
 /*
- *	TODO Constructors
+ *	Constructors
  */
 	
 	public WISPT(PrintStream ps)
@@ -338,7 +338,7 @@ private static boolean successfulWrite;
 			this.setContentPane(contentPane);
 			
 			/*
-			 * TODO MENU/NORTH
+			 * MENU/NORTH
 			 */
 				northPane = new JPanel(new GridLayout(1,1));
 				northPane.setBackground(white);	
@@ -592,7 +592,7 @@ private static boolean successfulWrite;
 							startupSettings.setEnabled(true);
 						userPrefs.add(startupSettings);
 						
-						//TODO startupSettingsDialog
+						//startupSettingsDialog
 						
 								startupSettingsDialog = new JDialog(this, "Settings");
 								startupSettingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
@@ -620,7 +620,7 @@ private static boolean successfulWrite;
 												 * 
 												 */
 											adminTab.add(adminSettings);
-											// TODO Finish settings
+											// Finish settings
 													adminSettingsCenter = new JPanel();
 													adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
 												adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
@@ -698,7 +698,7 @@ private static boolean successfulWrite;
 					
 	
 			/*
-			 * TODO TREE/WEST+CENTER_EAST	
+			 * TREE/WEST+CENTER_EAST	
 			 */   	
 			   	westCenterEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
 				westCenterEastSplit.setResizeWeight(0.2);
@@ -740,7 +740,7 @@ private static boolean successfulWrite;
 						//FIXME cleanup/remove splitpane
 							
 			/*
-			 * TODO TXT/CENTER_EAST(east side of west split pane)
+			 * TXT/CENTER_EAST(east side of west split pane)
 			 */
 					//centerEastSplit.addMouseListener(this);
 					centerEastSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, centerPad, eastPad);
@@ -885,7 +885,7 @@ private static boolean successfulWrite;
 										navRadioButtons.add(navRadio4);
 									centerSouthPane.add(navRadio4);
 			/*
-			 * TODO TIPS/EAST
+			 * TIPS/EAST
 			 */
 						eastPad = new JPanel(new GridLayout(1,1));
 						eastPad.setBorder(pad);
@@ -989,7 +989,7 @@ private static boolean successfulWrite;
 									visibleTipCheckIndex = -1;
 				
 			/*
-			 * TODO CONSOLE/SOUTH
+			 * CONSOLE/SOUTH
 			 */
 				southPadPane = new JPanel();
 				southPadPane.setLayout(new BoxLayout(southPadPane, BoxLayout.PAGE_AXIS));
@@ -1201,7 +1201,7 @@ private static boolean successfulWrite;
 
 
 /*
- *	TODO Main Method 
+ *	Main Method 
  */
 	
 	public static void 
@@ -1221,9 +1221,17 @@ private static boolean successfulWrite;
 	}
 
 /*
- *	TODO Methods
+ *	Methods
  */
 	
+	/**
+	 * 
+	 * @param callingClass
+	 * @param showDialog
+	 * @param pathForFile
+	 * @param parent
+	 * @return
+	 */
 	public static BufferedImage
 	loadImage(Object callingClass, boolean showDialog, String pathForFile, Component parent)
 	{
@@ -1305,8 +1313,13 @@ private static boolean successfulWrite;
 		return objectPath;
 	}
 	
+	/**
+	 * 
+	 * @param mouseEvent
+	 * @param index
+	 */
 	public void
-	picLabel_mouseClicked(MouseEvent me, int index)
+	picLabel_mouseClicked(MouseEvent mouseEvent, int index)
 	{
 		lastPicOpened = index;
 		//BufferedImage bufferedImage;
@@ -1545,12 +1558,12 @@ private static boolean successfulWrite;
 	
 	/**
 	 * 
-	 * @param e
+	 * @param event
 	 * @param selected
 	 * @param index
 	 */
 	public void
-	tipCheck_actionPerformed(ActionEvent e, boolean selected, int index)
+	tipCheck_actionPerformed(ActionEvent event, boolean selected, int index)
 	{
 		try
 		{
@@ -1591,8 +1604,13 @@ private static boolean successfulWrite;
 		}//end try/catch
 	}//end startupSettings_AP
 	
+	/**
+	 * 
+	 * @param event
+	 * @param index
+	 */
 	public void
-	navRadio_actionPerformed(ActionEvent e, int index)
+	navRadio_actionPerformed(ActionEvent event, int index)
 	{
 		try
 		{
@@ -1740,6 +1758,11 @@ private static boolean successfulWrite;
 		}
 	}
 	
+	/**
+	 * 
+	 * @param event
+	 * @param directionUp
+	 */
 	public void
 	moveNodeBtn_actionPerformed(ActionEvent event, boolean directionUp)
 	{
@@ -1851,14 +1874,18 @@ private static boolean successfulWrite;
 		}//switch
 	}
 	
-	public void //TODO chassis for listener methods
+	public void //chassis for listener methods
 	y_actionPerformed(ActionEvent e)
 	{
 		//stuff happens
 	}//end AP
 	
-	// TODO end of actionPerformed methods
+	//end of actionPerformed methods
 	
+	/**
+	 * 
+	 * @param newPic
+	 */
 	public void
 	setLastPicOpened(ImageIcon newPic)
 	{
@@ -1897,6 +1924,10 @@ private static boolean successfulWrite;
 		}//if null
 	}//setLastPicOpened
 	
+	/**
+	 * 
+	 * @param profile
+	 */
 	public void 
 	setUser(WISPTUserProfile profile) 
 	{
@@ -1912,15 +1943,6 @@ private static boolean successfulWrite;
 		lastTreeUsedPath = profile.getLastTreeUsedPath();
 
 		userUnlocks = profile.getUserUnlocks();
-		/*try
-		{
-			tree.setSelectionPath(new TreePath(profile.getLastSelectedNodePath()));
-			tree.validate();
-		}
-		catch(Exception e)
-		{
-			p(e);
-		}*/
 
 		try 
 		{
@@ -1946,38 +1968,46 @@ private static boolean successfulWrite;
 		}
 	}
 	
-	
-	/*This function is for loading any serialized java object that has been saved. 
-	 * It can use a JFileChooser dialog to do so.
+	/**This function is for loading any already serialized java object. 
+	 * It can use a JFileChooser dialog to do so. 
 	 * 
-	 * @param showUserDialog
-	 * If true, allows the user to choose the file through a dialog, and assumes the 
-	 * path parameter is the folder to start in. If false, it does not give the user 
-	 * a dialog, and assumes that the path parameter is the full file path to be 
-	 * loaded.
-	 * @param path
-	 * If showUserDialog is true, this should be the path in the program's root 
-	 * folder that the dialog will start in, i.e. "/Documents".
-	 * If showUserDialog is false, this should be the full path to the file,
-	 * i.e. "/Documents/document.doc"
-	 * @param fileType
-	 * The type of file that the dialog should be searching for, 
-	 * i.e. "Microsoft Word Document"
-	 * @param fileTypeExtension
-	 * The extension of the aforementioned file type, 
-	 * i.e. "doc" for .doc
-	 * @return
-	 * Will return a de-serialized Object, as selected in the dialog. If it was 
-	 * unable to do so, it returns null.
-	 */
-	/**
+	 * 	@param callingClass
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		Always put the keyword "this" here, unless in a static context. Then put a anonymous object.
+	 * 		<br>This is only here for the purpose of logs.
+	 * 	</p>
+	 * 	@param showUserDialog
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		If true, allows the user to choose the file through a dialog. If false, it does not give the
+	 * 		<br>user a dialog.
+	 * 	</p>
+	 * 	@param folderPath
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		The folder that either A. the user will begin looking for files in through the dialog, or B. 
+	 * 		<br>the file exists in. 
+	 * 		<br>ex. "Saved Objects"
+	 * 	</p>
+	 * 	@param fileNameOnly
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		The name of the file without the extension. This value will be ignored if showUserDialog is 
+	 * 		<br>false.
+	 * 		<br>ex. "savedObjectFile"
+	 * 	</p>
+	 * 	@param fileNameExtensionFilterType
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		The type of file that the dialog should be searching for, 
+	 * 		<br>ex. "Microsoft Word Document"
+	 * 	</p>
+	 * 	@param fileNameExtensionFilterExtension
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		The extension of the aforementioned file type, 
+	 * 		<br>ex. "doc" for .doc
+	 * 	</p>
+	 * 	@return
+	 * 	<p style="padding-left: 15px; display=inline-block">
+	 * 		Will return the object found at the path specified, or Null if it fails.
+	 * 	</p>
 	 * 
-	 * @param showUserDialog
-	 * @param folderPath
-	 * @param fileName
-	 * @param fileNameExtensionFilterType
-	 * @param fileNameExtensionFilterExtension
-	 * @return
 	 */
 	public static Object
 	loadSerializedObject(Object callingClass, boolean showUserDialog, String folderPath, String fileNameOnly, String fileNameExtensionFilterType, String fileNameExtensionFilterExtension)
@@ -2027,6 +2057,7 @@ private static boolean successfulWrite;
 	
 	/**
 	 * 
+	 * @param callingClass
 	 * @param showUserDialog
 	 * @param folderPath
 	 * @param fileName
@@ -2185,6 +2216,10 @@ private static boolean successfulWrite;
 		}//end training mode if
 	}
 	
+	/**
+	 * 
+	 * @param indexOfLabelAndPic
+	 */
 	public void
 	processTipLabel(int indexOfLabelAndPic)
 	{
@@ -2248,7 +2283,7 @@ private static boolean successfulWrite;
 		}
 	}
 
-// TODO treeValueChaned override
+// treeValueChaned override
 	@Override
 	public void 
 	valueChanged(TreeSelectionEvent arg0) 
@@ -2385,18 +2420,27 @@ private static boolean successfulWrite;
 			
 		}
 	}
+	/**
+	 * 
+	 * @param callingClass
+	 * @param stringToPrint
+	 */
 	public static void
-	p(Object callingClass, String s)
+	p(Object callingClass, String stringToPrint)
 	{
 		
-		WISPT.ps.println(callingClass.getClass().getName()+": "+s);
-		System.out.println(callingClass.getClass().getName()+": "+s);
+		WISPT.ps.println(callingClass.getClass().getName()+": "+stringToPrint);
+		System.out.println(callingClass.getClass().getName()+": "+stringToPrint);
 	}
+	/**
+	 * 
+	 * @param exception
+	 */
 	public static void
-	p(Exception ex)
+	p(Exception exception)
 	{
-		ex.printStackTrace();
-		ex.printStackTrace(ps);
+		exception.printStackTrace();
+		exception.printStackTrace(ps);
 	}
 }
 
@@ -2424,6 +2468,10 @@ class LoginDialog extends JDialog
 				LID_username,
 				LID_password;
 
+	/**
+	 * 
+	 * @param mainWindow
+	 */
 	public LoginDialog(WISPT mainWindow)
 	{
 		super();
@@ -2488,8 +2536,13 @@ class LoginDialog extends JDialog
 			this.setVisible(true);
 	}
 	
+	/**
+	 * 
+	 * @param event
+	 * @param mainWindow
+	 */
 	public void
-	LID_okayBtn_actionPerformed(ActionEvent e, WISPT mainWindow)
+	LID_okayBtn_actionPerformed(ActionEvent event, WISPT mainWindow)
 	{
 		String pathOfFolder = "User Profiles";
 		String fileName = LID_username.getText()+".user";
@@ -2536,7 +2589,7 @@ class UserProfileBuilder extends JDialog
 	private static final long serialVersionUID = -3380905246782845147L;
 
 /*
- * TODO variables
+ * variables
  */
 	private JCheckBox UPB_isAdmin,
 						UPB_editorModeEnabled,
@@ -2558,8 +2611,12 @@ class UserProfileBuilder extends JDialog
 					UPB_cancelBtn;
 
 /*
- *  TODO constructors
+ *  constructors
  */
+	/**
+	 * 
+	 * @param mainWindow
+	 */
 	public UserProfileBuilder(WISPT mainWindow)
 	{
 		super();
@@ -2634,11 +2691,15 @@ class UserProfileBuilder extends JDialog
 	}
 
 	/*
-	 * TODO UPB_Methods
+	 * UPB_Methods
 	 */
-	
+	/**
+	 * 
+	 * @param event
+	 * @param mainWindow
+	 */
 	public void
-	UPB_okayBtn_actionPerformed(ActionEvent e, WISPT mainWindow)
+	UPB_okayBtn_actionPerformed(ActionEvent event, WISPT mainWindow)
 	{
 		WISPTUserProfile profile = new WISPTUserProfile(UPB_isAdmin.isSelected(), "User Profiles", UPB_username.getText()+".user");
 		profile.setEditorModeEnabled(UPB_editorModeEnabled.isSelected());

@@ -90,7 +90,7 @@ public class WISPTNodeBuilder extends JDialog
 			emptyIcon;
 
 	/*
-	 * TODO Constructor
+	 * Constructor
 	 */
 	
 	public 
@@ -157,7 +157,7 @@ public class WISPTNodeBuilder extends JDialog
 			wtno.setTips(new String[]{"", "", "", "", "", ""});
 		}
 		
-		//TODO center
+		//center
 
 				center = new JPanel();
 				center.setLayout(new BoxLayout(center, BoxLayout.PAGE_AXIS));
