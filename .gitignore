@@ -2,8 +2,6 @@
 *.classpath
 *.project
 *.lock
-*.log
-*.zip
 *.version
 *.index
 *.tree
@@ -20,10 +18,4 @@ Aliens2/.metadata/.plugins/org.eclipse.jdt.core/externalFilesCache
 Aliens2/.metadata/.plugins/org.eclipse.jdt.core/assumedExternalFilesCache
 *.ini
 *.MF
-*.gitignore
-*.class
-*.class
-*.class
-com/infowest/java/WISPT$1.class
-com/infowest/java/WISPT$1.class
 *.class
