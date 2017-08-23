@@ -31,10 +31,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.*;
 
-
-//Ignore user profiles for now! Priority needs to be screenshot integration for tips. 
-//Without screenshot integration, this software will be irrelevant!
-
 public class WISPT extends JFrame implements TreeSelectionListener//, ActionListener, ComponentListener, MouseListener 
 {
 /*
@@ -61,10 +57,12 @@ public class WISPT extends JFrame implements TreeSelectionListener//, ActionList
 			;
 	
 	@SuppressWarnings("unused")
-	private Border bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
-			bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
+	private Border //bevelDwn = BorderFactory.createBevelBorder(BevelBorder.LOWERED, nineGray, eightGray, sevenGray, sixGray),
+			//bevel = BorderFactory.createBevelBorder(BevelBorder.RAISED, nineGray, eightGray, sevenGray, sixGray),
 			pad = BorderFactory.createEmptyBorder(3,3,3,3),
-			matte = BorderFactory.createMatteBorder(5,5,5,5, eightGray);
+			matte = BorderFactory.createMatteBorder(3,3,3,3, eightGray),
+			bevelDwn = matte,
+			bevel = matte;
 	
 /*
  * current user info
@@ -95,7 +93,7 @@ private static boolean successfulWrite;
 	@SuppressWarnings("unused")
 	private DefaultTreeModel loadedUserModel;
 	
-	private String	lastTxt = "",
+	private String	//lastTxt = "",
 					emptyTipLabelString;
 	
 	private WISPTNodeObject selectedWTNO = null;
@@ -181,6 +179,8 @@ private static boolean successfulWrite;
 						contentArea;
 	
 	private JTextArea[] tipAreas;
+	
+	private String[] tipAreaStrings;
 			
 	private JCheckBox[] tipChecks;
 	
@@ -192,7 +192,8 @@ private static boolean successfulWrite;
 	private ImageIcon[]	pics;
 	
 	private int		lastPicOpened,
-					visibleTipCheckIndex;
+					visibleTipCheckIndex,
+					visiblePicLabelIndex;
 	
 	private JRadioButton	navRadio1,
 							navRadio2,
@@ -230,8 +231,7 @@ private static boolean successfulWrite;
 			private JMenu toggle;
 				private JMenuItem	toggleTips,
 									toggleNavTree;
-			private JMenuItem	openTreeBuilder,
-								unlockTreeNode;
+			private JMenuItem	unlockTreeNode;
 				
 		private JMenu navigate;
 			private JMenuItem	previous,
@@ -260,14 +260,14 @@ private static boolean successfulWrite;
 			userProfilePath = "User Profiles";
 			try
 			{
-				userProfile = (WISPTUserProfile)loadSerializedObject(this, false, userProfilePath, "defaultAdminUserProfile", "User Profile", "user");
+				userProfile = (WISPTUserProfile)loadSerializedObject(this.getClass(), false, userProfilePath, "defaultAdminUserProfile", "User Profile", "user");
 				if(userProfile == null)
 					throw new NullPointerException();
 			}
 			catch(Exception ex)
 			{
-				
-				ex.printStackTrace(ps);
+
+				p(new Exception().getStackTrace()[0], ex);
 				userProfile = new WISPTUserProfile(true, "", "");
 			}
 			try
@@ -276,8 +276,8 @@ private static boolean successfulWrite;
 			}
 			catch(Exception ex)
 			{
-				
-				ex.printStackTrace(ps);
+
+				p(new Exception().getStackTrace()[0], ex);
 				setUser(new WISPTUserProfile(true, "", ""));
 			}
 			this.addWindowListener
@@ -301,7 +301,7 @@ private static boolean successfulWrite;
 					IllegalAccessException | 
 					UnsupportedLookAndFeelException e1) 
 			{
-				e1.printStackTrace(ps);
+				p(new Exception().getStackTrace()[0], e1);
 			}
 			try
 			{
@@ -320,7 +320,7 @@ private static boolean successfulWrite;
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(ps);
+				p(new Exception().getStackTrace()[0], e);
 			}
 			
 			this.setIconImages(icons);
@@ -333,7 +333,7 @@ private static boolean successfulWrite;
 			setDefaultLookAndFeelDecorated(true);
 			
 			 contentPane = new JPanel(new BorderLayout());
-			 contentPane.setBorder(matte);
+			 contentPane.setBorder(null);
 			 contentPane.setBackground(white);
 			this.setContentPane(contentPane);
 			
@@ -496,21 +496,7 @@ private static boolean successfulWrite;
 							toggle.add(toggleNavTree);
 								
 						edit.addSeparator();
-	
-							openTreeBuilder = new JMenuItem("Open TreeBuilder");
-							openTreeBuilder.addActionListener
-								(new ActionListener()
-								{
-									@Override
-									public void
-									actionPerformed(ActionEvent e)
-									{
-										openTreeBuilder_actionPerformed(e);
-									}//end actionPerformed
-								}//end ActionListener
-								);//ActionListener added
-							openTreeBuilder.setEnabled(false);
-						edit.add(openTreeBuilder);
+
 						
 							unlockTreeNode = new JMenuItem("Unlock Selected Branch/Leaf");
 							unlockTreeNode.addActionListener
@@ -585,7 +571,7 @@ private static boolean successfulWrite;
 									public void
 									actionPerformed(ActionEvent e)
 									{
-										startupSettings_actionPerformed(e);
+										startupSettings_actionPerformed(e, true);
 									}//end actionPerformed
 								}//end ActionListener
 								);//ActionListener added
@@ -594,91 +580,7 @@ private static boolean successfulWrite;
 						
 						//startupSettingsDialog
 						
-								startupSettingsDialog = new JDialog(this, "Settings");
-								startupSettingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-								startupSettingsDialog.setVisible(false);
-								startupSettingsDialog.setSize(800, 400);
 								
-									settingsContentPane = new JPanel(new BorderLayout());
-									settingsContentPane.setBorder(pad);
-									settingsContentPane.setBackground(white);
-								startupSettingsDialog.setContentPane(settingsContentPane);
-								
-										settingsCenterTabbedPane = new JTabbedPane();
-									settingsContentPane.add(settingsCenterTabbedPane, BorderLayout.CENTER);
-									
-											adminTab = new JPanel(new GridLayout(1,1));
-										settingsCenterTabbedPane.add("Administration", adminTab);
-										
-												adminSettings = new JPanel(new BorderLayout());
-												/*
-												 * Save button need be the only element with a listener.
-												 * On action, it will set all settings according to what
-												 * is currently in the settings pane elements. If a c_heck
-												 * box is c_hecked, that setting becomes enabled. Whatever
-												 * resides in a text field becomes that setting's new text.
-												 * 
-												 */
-											adminTab.add(adminSettings);
-											// Finish settings
-													adminSettingsCenter = new JPanel();
-													adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
-												adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
-												
-														processingOnCheck = new JCheckBox("Enable Detailed Process Tooltips");
-														processingOnCheck.setSelected(processTooltipsEnabled);
-													adminSettingsCenter.add(processingOnCheck);
-														
-														trainingModeCheckBox = new JCheckBox("Enable Training Mode");
-														trainingModeCheckBox.setSelected(trainingModeEnabled);
-													adminSettingsCenter.add(trainingModeCheckBox);
-													
-														enableEditorMode = new JCheckBox("Enable Editor Mode");
-														enableEditorMode.setSelected(editorModeEnabled);
-													adminSettingsCenter.add(enableEditorMode);
-														
-														changeUserPassword = new JTextField(userPassword);
-													adminSettingsCenter.add(changeUserPassword);
-													
-														changeAdminPassword = new JTextField("WISPadmin");
-													adminSettingsCenter.add(changeAdminPassword);
-													
-														changeLockedMessage = new JTextField(lockedMessage);
-													adminSettingsCenter.add(changeLockedMessage);
-													
-														userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
-														userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
-													adminSettingsCenter.add(userUnlocksSpinner);
-													
-													adminSettingsSouth = new JPanel(new GridLayout(2,1));
-												adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
-													
-														save = new JButton("Save");
-														save.addActionListener
-														(new ActionListener()
-														{
-															@Override
-															public void
-															actionPerformed(ActionEvent e)
-															{
-																saveSettings_actionPerformed(e);
-															}//end actionPerformed
-														}//end ActionListener
-														);//actionListener added'
-													adminSettingsSouth.add(save);
-														cancel = new JButton("Cancel");
-														//action listener that will hide and revert to onset state
-													adminSettingsSouth.add(cancel);
-												
-											userTab = new JPanel(new GridLayout(1,1));
-										settingsCenterTabbedPane.add("User Preferences", userTab);
-												
-												userSettings = new JPanel(new FlowLayout());
-											userTab.add(userSettings);
-												
-												userSettings.add(new JCheckBox("cb"));
-												userSettings.add(new JCheckBox("cb"));
-												userSettings.add(new JCheckBox("cb"));
 										
 								
 							editName = new JMenuItem("Change Username");
@@ -807,7 +709,12 @@ private static boolean successfulWrite;
 												tipAreas[i].setBorder(null);
 										 	}/*
 										centerCenterPane.add(tipAreas);*/	
-									
+										 	
+										 	tipAreaStrings = new String[12];
+										 	for(int i = 0; i < tipAreaStrings.length; ++i)
+										 	{
+										 		tipAreaStrings[i] = tipAreas[i].getText();
+										 	}
 							
 									centerSouthPane = new JPanel(new FlowLayout());
 									centerSouthPane.setBorder(pad);
@@ -910,7 +817,7 @@ private static boolean successfulWrite;
 									}
 									catch(Exception e)
 									{
-										e.printStackTrace(ps);
+										p(new Exception().getStackTrace()[0], e);
 										bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
 									}
 									
@@ -922,7 +829,7 @@ private static boolean successfulWrite;
 									}
 									catch(Exception e)
 									{
-										e.printStackTrace(ps);
+										p(new Exception().getStackTrace()[0], e);
 										bufferedImage = new BufferedImage(1,1,BufferedImage.TYPE_BYTE_GRAY);
 									}
 									
@@ -932,6 +839,29 @@ private static boolean successfulWrite;
 									emptyTipLabelString = " (empty)";
 									pics = new ImageIcon[12];
 									tipChecks = new JCheckBox[12];
+									
+									for(int i = 0; i < tipChecks.length; ++i)
+									{
+										tipChecks[i] = new JCheckBox(""+(i+1));
+										tipChecks[i].setBackground(white);
+										final int INDEX = i;
+										tipChecks[i].addActionListener
+											(new ActionListener()
+											{
+												@Override
+												public void
+												actionPerformed(ActionEvent e)
+												{
+													tipCheck_actionPerformed(e, tipChecks[INDEX].isSelected(), INDEX);
+												}//end actionPerformed
+											}//end ActionListener
+											);//ActionListener added
+										if(i != 0)
+										{
+											tipChecks[i].setVisible(false);
+										}
+									}
+									visibleTipCheckIndex = -1;
 									
 									for(int i = 0; i < picLabels.length; ++i)
 									{
@@ -960,33 +890,10 @@ private static boolean successfulWrite;
 													public void mouseReleased(MouseEvent arg0) {}
 											}
 											);
-										
-									}//end for
-									
-									for(int i = 0; i < tipChecks.length; ++i)
-									{
-										tipChecks[i] = new JCheckBox(""+(i+1));
-										tipChecks[i].setBackground(white);
-										final int INDEX = i;
-										tipChecks[i].addActionListener
-											(new ActionListener()
-											{
-												@Override
-												public void
-												actionPerformed(ActionEvent e)
-												{
-													tipCheck_actionPerformed(e, tipChecks[INDEX].isSelected(), INDEX);
-												}//end actionPerformed
-											}//end ActionListener
-											);//ActionListener added
-										if(i != 0)
-										{
-											tipChecks[i].setVisible(false);
-										}
 										eastPane.add(tipChecks[i]);
 										eastPane.add(picLabels[i]);
-									}
-									visibleTipCheckIndex = -1;
+									}//end for
+									visiblePicLabelIndex = -1;
 				
 			/*
 			 * CONSOLE/SOUTH
@@ -1128,9 +1035,31 @@ private static boolean successfulWrite;
 						removeTipBtn.setBackground(new Color(255,180,180));
 					southNorthEditorBtns.add(removeTipBtn);
 						addPicLabelBtn = new JButton("+ Pic");
+						addPicLabelBtn.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent e)
+							{
+								addPicLabelBtn_actionPerformed(e);
+							}
+						}
+						);
 						addPicLabelBtn.setBackground(new Color(255,180,180));
 					southNorthEditorBtns.add(addPicLabelBtn);
 						removePicLabelBtn = new JButton("- Pic");
+						removePicLabelBtn.addActionListener
+							(new ActionListener()
+							{
+								@Override
+								public void
+								actionPerformed(ActionEvent ae)
+								{
+									removePicLabelBtn_actionPerformed(ae);
+								}
+							}
+							);
 						removePicLabelBtn.setBackground(new Color(255,180,180));
 					southNorthEditorBtns.add(removePicLabelBtn);
 						
@@ -1175,20 +1104,21 @@ private static boolean successfulWrite;
 			this.setSize(1280, 600);
 			tipChecks[0].setVisible(false);
 			navRadio1.setVisible(false);
-			p(this, this.getWidth()+" width");
-			p(this, this.getHeight()+" height");
+			p(new Exception().getStackTrace()[0], this.getWidth()+" width");
+			p(new Exception().getStackTrace()[0], this.getHeight()+" height");
 			try
 			{
-				saveSettings_actionPerformed(new ActionEvent(bufferedImage, lastPicOpened, emptyTipLabelString));
+				startupSettings_actionPerformed(new ActionEvent(this, 0, "No commands"), false);
+				saveSettings_actionPerformed(new ActionEvent(this, 0, "No commands"));
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(WISPT.ps);
+				p(new Exception().getStackTrace()[0], e);
 			}
 	}
 	catch(Exception e)
 	{
-		e.printStackTrace(WISPT.ps);
+		p(new Exception().getStackTrace()[0], e);
 	}
 		//setUser(userProfile);
 		
@@ -1207,6 +1137,7 @@ private static boolean successfulWrite;
 	public static void 
 	main(String[] args) 
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			File file = new File("logs.txt");
@@ -1216,7 +1147,7 @@ private static boolean successfulWrite;
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace(WISPT.ps);
+			p(new Exception().getStackTrace()[0], e);
 		}
 	}
 
@@ -1233,8 +1164,9 @@ private static boolean successfulWrite;
 	 * @return
 	 */
 	public static BufferedImage
-	loadImage(Object callingClass, boolean showDialog, String pathForFile, Component parent)
+	loadImage(Class<?> callingClass, boolean showDialog, String pathForFile)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		BufferedImage image;
 		if(showDialog)
 		{
@@ -1243,7 +1175,7 @@ private static boolean successfulWrite;
 			JFileChooser jfc = new JFileChooser(pathForFile);
 			jfc.setAcceptAllFileFilterUsed(false);
 			jfc.addChoosableFileFilter(new WISPTImageFilter());
-			int choice = jfc.showOpenDialog(parent);
+			int choice = jfc.showOpenDialog(null);
 			if(choice == JFileChooser.APPROVE_OPTION)
 			{
 				File selectedFile;
@@ -1254,7 +1186,7 @@ private static boolean successfulWrite;
 				}
 				catch(Exception ex)
 				{
-					ex.printStackTrace(ps);
+					p(new Exception().getStackTrace()[0], ex);
 					return null;
 				}//read image try/catch
 				String fileName = "";
@@ -1265,12 +1197,12 @@ private static boolean successfulWrite;
 					int index = fileName.lastIndexOf(".");
 					extension = fileName.substring(index+1);
 					ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
-					p(callingClass, pathForFile+File.separator+fileName+" successfully written. "+extension);
+					p(new Exception().getStackTrace()[0], pathForFile+File.separator+fileName+" successfully written. "+extension);
 				}
 				catch(Exception ex)
 				{
-					ex.printStackTrace(ps);
-					p(callingClass, pathForFile+File.separator+fileName+" write failed. "+extension);
+					p(new Exception().getStackTrace()[0], ex);
+					p(new Exception().getStackTrace()[0], pathForFile+File.separator+fileName+" write failed. "+extension);
 				}//write local image try/catch
 				return image;
 			}//choice/approve if
@@ -1283,7 +1215,7 @@ private static boolean successfulWrite;
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace(ps);
+				p(new Exception().getStackTrace()[0], ex);
 				return null;
 			}//imageread try/catch
 			String fileName = "";
@@ -1295,12 +1227,12 @@ private static boolean successfulWrite;
 				int index = fileName.lastIndexOf(".");
 				extension = fileName.substring(index+1);
 				ImageIO.write(image, extension, new File(pathForFile+File.separator+fileName));
-				p(callingClass, pathForFile+File.separator+fileName+" successfully written. "+extension);
+				p(new Exception().getStackTrace()[0], pathForFile+File.separator+fileName+" successfully written. "+extension);
 			}
 			catch(Exception ex)
 			{
-				ex.printStackTrace(ps);
-				p(callingClass, pathForFile+File.separator+fileName+" write failed. "+extension);
+				p(new Exception().getStackTrace()[0], ex);
+				p(new Exception().getStackTrace()[0], pathForFile+File.separator+fileName+" write failed. "+extension);
 			}//write local image try/catch
 			return image;
 		}//showDialog else
@@ -1310,6 +1242,7 @@ private static boolean successfulWrite;
 	public static String
 	getObjectPath()
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		return objectPath;
 	}
 	
@@ -1321,53 +1254,69 @@ private static boolean successfulWrite;
 	public void
 	picLabel_mouseClicked(MouseEvent mouseEvent, int index)
 	{
+		p(new Exception().getStackTrace()[0], " entered, \n\t\t\tnext is if(pics[index] == null)else");
 		lastPicOpened = index;
-		//BufferedImage bufferedImage;
+		BufferedImage bufferedImage;
 		if(pics[index] == null)
 		{
-			/*bufferedImage = WISPT.loadImage(true, "Images", this);
+			p(new Exception().getStackTrace()[0], "if(pics[index] == null) entered, \n\t\t\tnext is bufferedImage");
+			bufferedImage = WISPT.loadImage(this.getClass(), true, "Images");
+			p(new Exception().getStackTrace()[0], "bufferedImage instantiated with WISPT.loadImage(), \n\t\t\tnext is if(bufferedImage != null)else");
 			if(bufferedImage != null)
 			{
+				p(new Exception().getStackTrace()[0], "if(bufferedImage != null) entered, \n\t\t\tnext is pics[index] assignment");
 				pics[index] = new ImageIcon(bufferedImage);
-				clickedTipLabel.setIcon(labelIcon);
+				p(new Exception().getStackTrace()[0], "pics[index] assigned with new ImageIcon(bufferedImage), \n\t\t\tnext is picLabels[index].setIcon(labelIcon)");
+				picLabels[index].setIcon(labelIcon);
+				p(new Exception().getStackTrace()[0], "picLabels[index].setIcon(labelIcon) successfully passed, exiting if(bufferedImage != null)");
 			}//if
 			else
-			{*/
+			{
+				p(new Exception().getStackTrace()[0], "if(bufferedImage != null)ELSE entered, \n\t\t\tnext is picLabels[index].setIcon(labelEmptyIcon)");
 				picLabels[index].setIcon(labelEmptyIcon);
-			//}//end null if
+				p(new Exception().getStackTrace()[0], "picLabels[index].setIcon(labelEmptyIcon) successfully passed, exiting if(bufferedImage != null)ELSE");
+			}//end null if
 		}
 		else
 		{
-			if(WISPTScreenShotViewer.getNoInstanceOpen())
-			{
-				lastPicOpened = index;
-				WISPTScreenShotViewer ssv = new WISPTScreenShotViewer(pics[index], this);
-				ssv.setVisible(true);
-			}//if not already open
+			p(new Exception().getStackTrace()[0], "if(pics[index] == null)ELSE entered, \n\t\t\tnext is lastPicOpened assignment");
+			lastPicOpened = index;
+			p(new Exception().getStackTrace()[0], "lastPicOpened assignment successfully passed, \n\t\t\tnext is passedLabel instantiation");
+			JLabel passedLabel = new JLabel(picLabels[index].getText());
+			passedLabel.setIcon(pics[index]);
+			p(new Exception().getStackTrace()[0], "passedLabel instantiated successfully, \n\t\t\tnext is passedLabel assignment with ScreenShotViewer.SSV_displayScreenShot(passedLabel, this, editorModeEnabled)");
+			passedLabel = ScreenShotViewer.SSV_displayScreenShot(passedLabel, this, editorModeEnabled);
+			p(new Exception().getStackTrace()[0], "passedLabel assigned successfully, exiting if(pics[index] == null)ELSE");
+			picLabels[index].setText(passedLabel.getText());
+			
+			eastPane.revalidate();
 		}//end if/else
+		p(new Exception().getStackTrace()[0], "passed if(pics[index] == null)else structure, \n\t\t\tnext is String newText = picLabels[index].getText()");
 
 		String newText = picLabels[index].getText();
-		p(this, newText);
+		p(new Exception().getStackTrace()[0], newText);
 
 		if(pics[index] != null)
 		{
 			if(newText.contains(emptyTipLabelString))
 				newText = newText.replace(emptyTipLabelString, "");
 			
-			p(this, newText + " isIcon");
+			p(new Exception().getStackTrace()[0], newText + " isIcon");
 			picLabels[index].setText(newText);
-			p(this, newText);
+			p(new Exception().getStackTrace()[0], newText);
 		}
 	}
 	
 	public void
 	logOut_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		//should be the same as logging into the default profile. Should only confirm.
 	}
 	public void
 	newUser_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		UserProfileBuilder builder = new UserProfileBuilder(this);
 		builder.setVisible(true);
 	}
@@ -1375,6 +1324,7 @@ private static boolean successfulWrite;
 	public void
 	logIn_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		LoginDialog lid = new LoginDialog(this);
 		lid.setVisible(true);
 	}
@@ -1382,6 +1332,7 @@ private static boolean successfulWrite;
 	public void
 	unlockTreeNode_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			selectedWTNO.unlockNode();//dialog asking for PW
@@ -1393,13 +1344,14 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end unlockTreeNodeAP
 	
 	public void
 	toggleNavTree_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			if(treeVisible)
@@ -1420,13 +1372,14 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
-	}//end tNavTreeAP
+	}//end toggleNavTreeAP
 	
 	public void
 	newTree_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		int continueChoice = JOptionPane.showConfirmDialog(this, "This will erase any unsaved changes to the current tree. Continue?");
 		if(continueChoice == 0)
 		{
@@ -1441,24 +1394,25 @@ private static boolean successfulWrite;
 				treeScroll.revalidate();
 				treeScroll.repaint();
 				wipeButtons();
-			}
+			}//try
 			catch(Exception ex)
 			{
 				ex.printStackTrace(ps);
-			}
-		}
-	}
+			}//catch
+		}//if continueChoice
+	}//newTree AP
 	
 	public void
 	loadTree_actionPerformed(ActionEvent e)
 	{
-		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(this, true, "Tree Saves", null, "Serialized Tree File", "tree");
+		p(new Exception().getStackTrace()[0], "entered");
+		DefaultTreeModel inTree = (DefaultTreeModel)loadSerializedObject(this.getClass(), true, "Tree Saves", null, "Serialized Tree File", "tree");
 		lastTreeUsedPath = objectPath;
 		try
 		{
 			if(inTree == null)
 			{
-				throw new NullPointerException("M");
+				throw new NullPointerException("DefaultTreeModel inTree == null");
 			}
 			model = inTree;
 			tree.setModel(model);
@@ -1470,13 +1424,14 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end loadTree AP
 
 	public void
 	saveTree_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try 
 		{
 			File currentDirectoryFile = new File("Tree Saves"+File.separator);//creates a empty file in that directory
@@ -1520,7 +1475,7 @@ private static boolean successfulWrite;
 			        out.writeObject(tree.getModel());
 			        out.close();
 			        fileOut.close();
-			        p(this, "Object saved in "+fileName+".tree");
+			        p(new Exception().getStackTrace()[0], "Object saved in "+fileName+".tree");
 			    }
 			}
 	    }
@@ -1533,6 +1488,7 @@ private static boolean successfulWrite;
 	public void
 	toggleTips_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			if(tipsVisible)
@@ -1552,7 +1508,7 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end tTips_AP
 	
@@ -1565,6 +1521,7 @@ private static boolean successfulWrite;
 	public void
 	tipCheck_actionPerformed(ActionEvent event, boolean selected, int index)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			if(selected)
@@ -1578,7 +1535,7 @@ private static boolean successfulWrite;
 			}//if selected
 			else
 			{
-				tipAreas[index].setText("");
+				selectedWTNO.setTip(index, tipAreas[index].getText());
 				centerCenterPane.remove(tipAreas[index]);
 			}//else if not selected
 			
@@ -1587,20 +1544,112 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			ex.printStackTrace(WISPT.ps);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end tipCheck_AP
 
 	public void
-	startupSettings_actionPerformed(ActionEvent e)
+	startupSettings_actionPerformed(ActionEvent e, boolean showDialog)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
-			startupSettingsDialog.setVisible(true);
+			startupSettingsDialog = new JDialog(this, "Settings");
+			startupSettingsDialog.setVisible(false);
+			startupSettingsDialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+			startupSettingsDialog.setSize(800, 400);
+			
+				settingsContentPane = new JPanel(new BorderLayout());
+				settingsContentPane.setBorder(pad);
+				settingsContentPane.setBackground(white);
+			startupSettingsDialog.setContentPane(settingsContentPane);
+			
+					settingsCenterTabbedPane = new JTabbedPane();
+				settingsContentPane.add(settingsCenterTabbedPane, BorderLayout.CENTER);
+				
+						adminTab = new JPanel(new GridLayout(1,1));
+					settingsCenterTabbedPane.add("Administration", adminTab);
+					
+							adminSettings = new JPanel(new BorderLayout());
+						adminTab.add(adminSettings);
+						// Finish settings
+								adminSettingsCenter = new JPanel();
+								adminSettingsCenter.setLayout(new BoxLayout(adminSettingsCenter, BoxLayout.PAGE_AXIS));
+							adminSettings.add(adminSettingsCenter, BorderLayout.CENTER);
+							
+									processingOnCheck = new JCheckBox("Enable Detailed Process Tooltips");
+									processingOnCheck.setSelected(processTooltipsEnabled);
+								adminSettingsCenter.add(processingOnCheck);
+									
+									trainingModeCheckBox = new JCheckBox("Enable Training Mode");
+									trainingModeCheckBox.setSelected(trainingModeEnabled);
+								adminSettingsCenter.add(trainingModeCheckBox);
+								
+									enableEditorMode = new JCheckBox("Enable Editor Mode");
+									enableEditorMode.setSelected(editorModeEnabled);
+								adminSettingsCenter.add(enableEditorMode);
+									
+									changeUserPassword = new JTextField(userPassword);
+								adminSettingsCenter.add(changeUserPassword);
+								
+									changeAdminPassword = new JTextField("WISPadmin");
+								adminSettingsCenter.add(changeAdminPassword);
+								
+									changeLockedMessage = new JTextField(lockedMessage);
+								adminSettingsCenter.add(changeLockedMessage);
+								
+									userUnlocksSpinner = new JSpinner(new SpinnerNumberModel(5,1,25,1));
+									userUnlocksSpinner.setMaximumSize(new Dimension(60, 30));
+								adminSettingsCenter.add(userUnlocksSpinner);
+								
+								adminSettingsSouth = new JPanel(new GridLayout(2,1));
+							adminSettings.add(adminSettingsSouth, BorderLayout.SOUTH);
+								
+									save = new JButton("Save");
+									save.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent e)
+										{
+											saveSettings_actionPerformed(e);
+										}//end actionPerformed
+									}//end ActionListener
+									);//actionListener added'
+								adminSettingsSouth.add(save);
+									cancel = new JButton("Cancel");
+									cancel.addActionListener
+									(new ActionListener()
+									{
+										@Override
+										public void
+										actionPerformed(ActionEvent ae)
+										{
+											cancel_actionPerformed(ae);
+										}
+									}
+									);
+									//action listener that will hide and revert to onset state
+								adminSettingsSouth.add(cancel);
+							
+						userTab = new JPanel(new GridLayout(1,1));
+					settingsCenterTabbedPane.add("User Preferences", userTab);
+							
+							userSettings = new JPanel(new FlowLayout());
+						userTab.add(userSettings);
+							
+							userSettings.add(new JCheckBox("cb"));
+							userSettings.add(new JCheckBox("cb"));
+							userSettings.add(new JCheckBox("cb"));
+			if(showDialog)
+			{
+				startupSettingsDialog.setVisible(true);
+			}
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end startupSettings_AP
 	
@@ -1612,6 +1661,7 @@ private static boolean successfulWrite;
 	public void
 	navRadio_actionPerformed(ActionEvent event, int index)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)selectedNode.getChildAt(index);
@@ -1622,13 +1672,14 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end navRadio_AP
 	
 	public void
 	exit_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		try
 		{
 		//XXX there is a better way to do this, lookup
@@ -1636,26 +1687,15 @@ private static boolean successfulWrite;
 		}
 		catch(Exception ex)
 		{
-			p(ex);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end try/catch
 	}//end exit_AP
 	
-	public void
-	openTreeBuilder_actionPerformed(ActionEvent e)
-	{
-		try
-		{
-			WISPTTreeBuilder.main(new String[1]);
-		}
-		catch(Exception ex)
-		{
-			p(ex);
-		}//end try/catch
-	}//end openTreeBuilder_AP
 	
 	public void
 	saveSettings_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		processTooltipsEnabled = processingOnCheck.isSelected();
 		trainingModeEnabled = trainingModeCheckBox.isSelected();
 		editorModeEnabled = enableEditorMode.isSelected();
@@ -1708,13 +1748,27 @@ private static boolean successfulWrite;
 		WISPTNodeObject.setInvisibleString(lockedMessage);
 		userUnlocks = (int)userUnlocksSpinner.getValue();
 		WISPTNodeObject.setUserMax(userUnlocks);
-		startupSettingsDialog.setVisible(false);
+		startupSettingsDialog.dispose();
 	}//end save_AP
+	
+	public void
+	cancel_actionPerformed(ActionEvent ae)
+	{
+		processingOnCheck.setSelected(processTooltipsEnabled);
+		trainingModeCheckBox.setSelected(trainingModeEnabled);
+		enableEditorMode.setSelected(editorModeEnabled);
+		changeUserPassword.setText(userPassword);
+		changeAdminPassword.setText(WISPTNodeObject.getAdminPass());
+		changeLockedMessage.setText(lockedMessage);
+		userUnlocksSpinner.setValue(WISPTNodeObject.getUserMax());
+		startupSettingsDialog.dispose();
+	}
 	
 	
 	public void 
 	addNodeBtn_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		model.insertNodeInto(new DefaultMutableTreeNode(new WISPTNodeObject("Title","Content")), selectedNode, 0);
 		tree.revalidate();
 	}
@@ -1722,6 +1776,7 @@ private static boolean successfulWrite;
 	public void
 	removeNodeBtn_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		if ((DefaultMutableTreeNode)model.getRoot()==selectedNode) 
 		{
 			JOptionPane.showMessageDialog(null, "Root cannot be deleted!");
@@ -1742,6 +1797,7 @@ private static boolean successfulWrite;
 	public void
 	cutNodeBtn_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		clipboardNode = selectedNode;
 		model.removeNodeFromParent(selectedNode);
 		tree.revalidate();
@@ -1750,6 +1806,7 @@ private static boolean successfulWrite;
 	public void
 	pasteNodeBtn_actionPerformed(ActionEvent e)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		if(clipboardNode != null)
 		{
 			model.insertNodeInto(clipboardNode, selectedNode, 0);
@@ -1766,112 +1823,195 @@ private static boolean successfulWrite;
 	public void
 	moveNodeBtn_actionPerformed(ActionEvent event, boolean directionUp)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		DefaultMutableTreeNode asideNode;
 		try
 		{
-			p(this, "actionPerformed entered");
+			p(new Exception().getStackTrace()[0], "actionPerformed entered");
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode)selectedNode.getParent();
-			p(this, "parent instantiated");
-			p(this, "selectedNode is child of parent, "+parent.isNodeChild(selectedNode));
+			p(new Exception().getStackTrace()[0], "parent instantiated");
+			p(new Exception().getStackTrace()[0], "selectedNode is child of parent, "+parent.isNodeChild(selectedNode));
 			int selectedIndex = parent.getIndex((TreeNode)selectedNode);
-			p(this, "selectedIndex instantiated");
+			p(new Exception().getStackTrace()[0], "selectedIndex instantiated");
 			if(directionUp && selectedIndex != 0)
 			{
-				p(this, "upIf entered");
+				p(new Exception().getStackTrace()[0], "upIf entered");
 				model = (DefaultTreeModel)tree.getModel();
-				p(this, "model instantiated");
+				p(new Exception().getStackTrace()[0], "model instantiated");
 				asideNode = selectedNode;
 				model.removeNodeFromParent(selectedNode);
-				p(this, "selected node removed");
+				p(new Exception().getStackTrace()[0], "selected node removed");
 				model.insertNodeInto(asideNode, parent, selectedIndex - 1);
 				selectedNode = asideNode;
-				p(this, "selected node inserted");
+				p(new Exception().getStackTrace()[0], "selected node inserted");
 				tree.setModel(model);
-				p(this, "model updated");
+				p(new Exception().getStackTrace()[0], "model updated");
 				tree.revalidate();
-				p(this, "tree revalidated");
+				p(new Exception().getStackTrace()[0], "tree revalidated");
 				tree.setSelectionPath(new TreePath(selectedNode.getPath()));
-				p(this, "selection set");
+				p(new Exception().getStackTrace()[0], "selection set");
 			}
 			else if(!directionUp && selectedIndex != parent.getChildCount()-1)
 			{
-				p(this, "downIf entered");
+				p(new Exception().getStackTrace()[0], "downIf entered");
 				model = (DefaultTreeModel)tree.getModel();
-				p(this, "model instantiated");
+				p(new Exception().getStackTrace()[0], "model instantiated");
 				asideNode = selectedNode;
 				model.removeNodeFromParent(selectedNode);
-				p(this, "selected node removed");
+				p(new Exception().getStackTrace()[0], "selected node removed");
 				model.insertNodeInto(asideNode, parent, selectedIndex + 1);
 				selectedNode = asideNode;
-				p(this, "selected node inserted");
+				p(new Exception().getStackTrace()[0], "selected node inserted");
 				tree.setModel(model);
-				p(this, "model updated");
+				p(new Exception().getStackTrace()[0], "model updated");
 				tree.revalidate();
-				p(this, "tree revalidated");
+				p(new Exception().getStackTrace()[0], "tree revalidated");
 				tree.setSelectionPath(new TreePath(selectedNode.getPath()));
-				p(this, "selection set");
+				p(new Exception().getStackTrace()[0], "selection set");
 			}
 		}
 		catch(NullPointerException npe)
 		{
-			npe.printStackTrace(ps);
+			p(new Exception().getStackTrace()[0], npe);
 		}
 	}
 	
 	public void
 	addTipBtn_actionPerformed(ActionEvent e)
 	{
-		switch(visibleTipCheckIndex)
+		if(selectedNode.isNodeAncestor( (DefaultMutableTreeNode)model.getRoot() ))
 		{
-		case -1:
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-			tipChecks[visibleTipCheckIndex+1].setVisible(true);
-			tipChecks[visibleTipCheckIndex+1].setSelected(true);
-			tipCheck_actionPerformed(new ActionEvent(this, lastPicOpened, emptyTipLabelString), tipChecks[visibleTipCheckIndex+1].isSelected(), visibleTipCheckIndex+1);
-			tipAreas[visibleTipCheckIndex+1].setText("Tip "+(visibleTipCheckIndex+1));
-			visibleTipCheckIndex += 1;
-			break;
-		case 11:
-			JOptionPane.showMessageDialog(this, "Each node may only have 12 Tips!");
-			break;
-		}//switch
+			p(new Exception().getStackTrace()[0], "entered");
+			switch(visibleTipCheckIndex)
+			{
+			case -1:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				tipChecks[visibleTipCheckIndex+1].setVisible(true);
+				tipChecks[visibleTipCheckIndex+1].setSelected(true);
+				tipCheck_actionPerformed(new ActionEvent(this, lastPicOpened, emptyTipLabelString), tipChecks[visibleTipCheckIndex+1].isSelected(), visibleTipCheckIndex+1);
+				tipAreas[visibleTipCheckIndex+1].setText("Tip "+(visibleTipCheckIndex+2));
+				visibleTipCheckIndex += 1;
+				break;
+			case 11:
+				JOptionPane.showMessageDialog(this, "Each node may only have 12 Tips!");
+				break;
+			}//switch
+		}//if root is ancestor of selected
 	}
 	
 	public void
 	removeTipBtn_actionPerformed(ActionEvent e)
 	{
-		switch(visibleTipCheckIndex)
+		if(selectedNode.isNodeAncestor( (DefaultMutableTreeNode)model.getRoot() ))
 		{
-		case -1:
-			JOptionPane.showMessageDialog(this, "No Tips to remove!");
-			break;
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-			tipChecks[visibleTipCheckIndex].setVisible(false);
-			tipAreas[visibleTipCheckIndex].setText("");
-			visibleTipCheckIndex -= 1;
-			break;
-		}//switch
+			p(new Exception().getStackTrace()[0], "entered");
+			switch(visibleTipCheckIndex)
+			{
+			case -1:
+				JOptionPane.showMessageDialog(this, "No Tips to remove!");
+				break;
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				tipChecks[visibleTipCheckIndex].setVisible(false);
+				tipAreas[visibleTipCheckIndex].setText("");
+				visibleTipCheckIndex -= 1;
+				break;
+			}//switch
+		}//if root is ancestor of selected
+	}
+	
+	public void
+	addPicLabelBtn_actionPerformed(ActionEvent e)
+	{
+		if(selectedNode.isNodeAncestor( (DefaultMutableTreeNode)model.getRoot() ))
+		{
+			p(new Exception().getStackTrace()[0], "entered");
+			switch(visiblePicLabelIndex)
+			{
+			case -1:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				picLabels[visiblePicLabelIndex+1].setVisible(true);
+				picLabels[visiblePicLabelIndex+1].setText("Tip "+(visiblePicLabelIndex+2));
+				picLabel_mouseClicked(new MouseEvent(this, 0, 0, 0, 0, 0, 0, false), visiblePicLabelIndex+1);
+				visiblePicLabelIndex += 1;
+				break;
+			case 11:
+				JOptionPane.showMessageDialog(this, "Each node may only have 12 Pics!");
+				break;
+			}//switch
+		}//if root is ancestor of selected
+	}
+	
+	public void
+	removePicLabelBtn_actionPerformed(ActionEvent e)
+	{
+		int decision = -1;
+		if(selectedNode.isNodeAncestor( (DefaultMutableTreeNode)model.getRoot() ))
+		{
+			decision = JOptionPane.showConfirmDialog(this,
+													"Are you sure you want to remove \"" 
+													+ picLabels[visiblePicLabelIndex].getText() 
+													+ "\" and all of it's associated information?",
+													"Confirm Delete",
+													JOptionPane.YES_NO_OPTION,
+													JOptionPane.WARNING_MESSAGE);
+		}//if root is ancestor of selected
+		if(decision == 0)
+		{
+			p(new Exception().getStackTrace()[0], "entered");
+			switch(visiblePicLabelIndex)
+			{
+			case -1:
+				JOptionPane.showMessageDialog(this, "No Pics to remove!");
+				break;
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				picLabels[visiblePicLabelIndex].setVisible(false);
+				pics[visiblePicLabelIndex] = null;
+				visiblePicLabelIndex -= 1;
+				break;
+			}//switch
+		}//if decision 0
 	}
 	
 	public void //chassis for listener methods
@@ -1889,6 +2029,7 @@ private static boolean successfulWrite;
 	public void
 	setLastPicOpened(ImageIcon newPic)
 	{
+		p(new Exception().getStackTrace()[0], "entered");
 		pics[lastPicOpened] = newPic;
 		JLabel clickedTipLabel;
 		if(newPic == null)
@@ -1918,9 +2059,9 @@ private static boolean successfulWrite;
 					break;
 			}//switch
 			clickedTipLabel.setIcon(labelEmptyIcon);
-			p(this, "WISPT: "+clickedTipLabel.getText() + " isNullIcon");
+			p(new Exception().getStackTrace()[0], clickedTipLabel.getText() + " isNullIcon");
 			clickedTipLabel.setText(clickedTipLabel.getText()+emptyTipLabelString);
-			p(this, "WISPT: "+clickedTipLabel.getText());
+			p(new Exception().getStackTrace()[0], clickedTipLabel.getText());
 		}//if null
 	}//setLastPicOpened
 	
@@ -1954,7 +2095,7 @@ private static boolean successfulWrite;
 		} 
 		catch (ClassNotFoundException | IOException e) 
 		{
-			e.printStackTrace(ps);
+			p(new Exception().getStackTrace()[0], e);
 			model = new DefaultTreeModel(new DefaultMutableTreeNode(new WISPTNodeObject("Title", "Content")));
 		}
 
@@ -1973,7 +2114,7 @@ private static boolean successfulWrite;
 	 * 
 	 * 	@param callingClass
 	 * 	<p style="padding-left: 15px; display=inline-block">
-	 * 		Always put the keyword "this" here, unless in a static context. Then put a anonymous object.
+	 * 		Always put the keyword "this" here, unless in a static context. Then put an anonymous object.
 	 * 		<br>This is only here for the purpose of logs.
 	 * 	</p>
 	 * 	@param showUserDialog
@@ -2010,47 +2151,67 @@ private static boolean successfulWrite;
 	 * 
 	 */
 	public static Object
-	loadSerializedObject(Object callingClass, boolean showUserDialog, String folderPath, String fileNameOnly, String fileNameExtensionFilterType, String fileNameExtensionFilterExtension)
+	loadSerializedObject(Class<?> callingClass, boolean showUserDialog, String folderPath, String fileNameOnly, String fileNameExtensionFilterType, String fileNameExtensionFilterExtension)
 	{
 		Object objectToReturn = null;
+		p(new Exception().getStackTrace()[0],"objectToReturn set to: null");
 		try 
 		{
+	        p(new Exception().getStackTrace()[0],"try entered");
 			File currentDirectoryFile = new File(folderPath);//creates a empty file in that directory
+	        p(new Exception().getStackTrace()[0], "currentDirectoryFile instantiated");
 			currentDirectoryFile.mkdir();
+	        p(new Exception().getStackTrace()[0], "currentDirectoryFile.mkdir() called");
 			objectPath = folderPath+File.separator+fileNameOnly+"."+fileNameExtensionFilterExtension;
+	        p(new Exception().getStackTrace()[0],"objectPath defined");
 			if(showUserDialog)
 			{
+		        p(new Exception().getStackTrace()[0],"if(showUserDialog) entered");
 				JFileChooser fc = new JFileChooser(currentDirectoryFile);//passes the file to the filechooser, which uses the file's path as the displayed directory.
+				p(new Exception().getStackTrace()[0],"JFileChooser instantiated");
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(fileNameExtensionFilterType, fileNameExtensionFilterExtension);
+				p(new Exception().getStackTrace()[0],"FileNameExtensionFilter instantiated");
 				fc.setFileFilter(filter);
+				p(new Exception().getStackTrace()[0],"FileNameExtensionFilter set to JFileChooser");
 				int val = fc.showOpenDialog(null);//opens an open file dialog
+				p(new Exception().getStackTrace()[0],"JFileChooser opened, integer returned to int val");
 				if(val == JFileChooser.APPROVE_OPTION)//if the user hits okay,
 				{
+					p(new Exception().getStackTrace()[0],"if(val == JFileChooser.APPROVE_OPTION) entered, \n\t\tnext is selectedFile");
 					File selectedFile = fc.getSelectedFile();//grabs the selected file
+			        p(new Exception().getStackTrace()[0],"selectedFile instantiated, \n\t\tnext is fileIn");
 					FileInputStream fileIn = new FileInputStream(selectedFile);
-			        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
-			        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
-			        in.close();
+			        p(new Exception().getStackTrace()[0],"fileIn instantiated, \n\t\tnext is objectIn");
+			        ObjectInputStream objectIn = new ObjectInputStream(fileIn); //processes it as a serialized object
+			        p(new Exception().getStackTrace()[0],"objectIn instantiated, \n\t\tnext is objectToReturn");
+			        objectToReturn = objectIn.readObject();//grabs the object and assigns to the returned variable
+			        p(new Exception().getStackTrace()[0],"objectToReturn instantiated from objectIn.readObject()");
+			        objectIn.close();
 			        fileIn.close();
-			        p(callingClass,"Object read from "+selectedFile.getName());
+			        p(new Exception().getStackTrace()[0],"Object read from "+selectedFile.getName());
 				}//end if
 				objectPath = fc.getSelectedFile().toString();//FIXME might have broken something here
 			}
 			else
 			{
-				p(callingClass,objectPath);
+		        p(new Exception().getStackTrace()[0],"if(showUserDialog)ELSE entered, \n\t\tnext is fileIn");
 				FileInputStream fileIn = new FileInputStream(objectPath);
-		        ObjectInputStream in = new ObjectInputStream(fileIn); //processes it as a serialized object
-		        objectToReturn = in.readObject();//grabs the object and assigns to the returned variable
-		        in.close();
+				p(new Exception().getStackTrace()[0],"fileIn instantiated with " + objectPath + ", \n\t\tnext is objectIn");
+		        ObjectInputStream objectIn = new ObjectInputStream(fileIn); //processes it as a serialized object
+				p(new Exception().getStackTrace()[0],"objectIn instantiated with fileIn, \n\t\tnext is objectToReturn");
+		        objectToReturn = objectIn.readObject();//grabs the object and assigns to the returned variable
+				p(new Exception().getStackTrace()[0],"objectToReturn instantiated with objectIn.readObject()");
+		        objectIn.close();
 		        fileIn.close();
-		        p(callingClass,"Object read from "+objectPath);
+		        p(new Exception().getStackTrace()[0],"Object read from "+objectPath);
 			}
+			p(new Exception().getStackTrace()[0],"end of try reached, object must be non-null");
 			return objectToReturn;
 	    }//try
 		catch(Exception ex)
 		{
-			ex.printStackTrace(ps);
+			p(new Exception().getStackTrace()[0],"catch entered, will return: null");
+			p(new Exception().getStackTrace()[0], ex);
 			return null;
 		}//end try/catch
 	}//end loadSerializedObject()
@@ -2066,7 +2227,7 @@ private static boolean successfulWrite;
 	 * @param serializeableObject
 	 */
 	public static void
-	saveSerializedObject(Object callingClass, boolean showUserDialog, String folderPath, String fileName, String fileType, String fileTypeExtension, Object serializeableObject)
+	saveSerializedObject(Class<?> callingClass, boolean showUserDialog, String folderPath, String fileName, String fileType, String fileTypeExtension, Object serializeableObject)
 	{
 		try 
 		{
@@ -2088,7 +2249,7 @@ private static boolean successfulWrite;
 						FileInputStream fileIn = new FileInputStream(selectedCurrentDirectoryFile);//if successful, tries to open the location
 				        ObjectInputStream in = new ObjectInputStream(fileIn); //if opened, tries to processes it as a serialized object
 				        Object testObject = in.readObject();//if processed, tries to assign it to a variable
-				        p(callingClass, testObject.toString());
+				        p(new Exception().getStackTrace()[0], testObject.toString());
 				        in.close();
 				        fileIn.close();
 				        	//if the file does not exist, or is not a valid serialized java file, this point will not be reached
@@ -2119,13 +2280,13 @@ private static boolean successfulWrite;
 					        out.close();
 					        fileOut.flush();
 					        fileOut.close();
-					        p(callingClass, "Object saved in "+fileName+"."+fileTypeExtension);
+					        p(new Exception().getStackTrace()[0], "Object saved in "+fileName+"."+fileTypeExtension);
 					    }//end inner if
 					}//try
 					catch(Exception ex)
 					{
 						JOptionPane.showMessageDialog(null, "Save Failed! Contact the administrator.");
-						p(callingClass, ex.getStackTrace().toString());
+						p(new Exception().getStackTrace()[0], ex.getStackTrace().toString());
 						successfulWrite = false;
 					}//end inner try/catch
 				}//end if approve option
@@ -2139,39 +2300,50 @@ private static boolean successfulWrite;
 		        out.close();
 		        fileOut.flush();
 		        fileOut.close();
-		        p(null, "Object saved in "+currentDirectoryFile.toString());
+		        p(new Exception().getStackTrace()[0], "Object saved in "+currentDirectoryFile.toString());
 			}
 			
 		}//try
 		catch(Exception ex)
 		{
-			ex.printStackTrace(ps);
+			p(new Exception().getStackTrace()[0], ex);
 		}//end outer try/catch
 	}//end saveSerializedObject()
 	
-	public void 
+	public boolean 
+	getEditorModeEnabled() 
+	{
+		return editorModeEnabled;
+	}
+	
+	public static boolean
+	getSuccessfulWrite()
+	{
+		return successfulWrite;
+	}
+	
+	/*public void 
 	setAsideNodeWithWISPTNodeBuilder(boolean isEditedNode)
 	{
 		successfulWrite = false;
-		//FIXME should have an if/else tied to whether it should be edit or new execution. Right now edit and new look identical, confusing
 		if(isEditedNode)
 		{
-			saveSerializedObject(this, false, "temp", "node", "Serial File", "ser", selectedNode);
+			saveSerializedObject(this.getClass(), false, "temp", "node", "Serial File", "ser", selectedNode);
 		}
 		else
 		{
-			saveSerializedObject(this, false, "temp", "node", "Serial File", "ser", new DefaultMutableTreeNode(new WISPTNodeObject("Title", "Content")));
+			saveSerializedObject(this.getClass(), false, "temp", "node", "Serial File", "ser", new DefaultMutableTreeNode(new WISPTNodeObject("Title", "Content")));
 		}
 		
 		if(successfulWrite)
 		{
 			WISPTNodeBuilder.main(null);
-			p(this, "WISPTNodeBuilder passed.");
+			p(new Exception().getStackTrace()[0], "WISPTNodeBuilder passed.");
 		}//if successful write
 		
-		clipboardNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(this, false, "temp", "node", "Serial File", "ser");
-		p(this, "clipboardNode set");
-	}
+		clipboardNode = (DefaultMutableTreeNode)WISPT.loadSerializedObject(this.getClass(), false, "temp", "node", "Serial File", "ser");
+		p(new Exception().getStackTrace()[0], "clipboardNode set");
+	}*/
 	
 	public void 
 	wipeButtons()
@@ -2196,12 +2368,13 @@ private static boolean successfulWrite;
 		{
 			picLabels[i].setVisible(false);
 		}
-		p(this,"Buttons Wiped");
+		p(new Exception().getStackTrace()[0], "Buttons Wiped");
 	}
 
 	public void
 	incrementCounter()
 	{
+		p(new Exception().getStackTrace()[0], "Counter Incremented");
 		if(trainingModeEnabled)
 		{
 			if(selectedWTNO.getCounter()<WISPTNodeObject.getUserMax())
@@ -2231,13 +2404,13 @@ private static boolean successfulWrite;
 				picLabels[indexOfLabelAndPic].setIcon(labelIcon);
 				
 				String newText = picLabels[indexOfLabelAndPic].getText();
-				p(this,"WISPT: "+newText);
+				p(new Exception().getStackTrace()[0], newText);
 				if(newText.contains(emptyTipLabelString))
 					newText = newText.replace(emptyTipLabelString, "");
 				
-				p(this,"WISPT: "+newText + " isIcon");
+				p(new Exception().getStackTrace()[0], newText + " isIcon");
 				picLabels[indexOfLabelAndPic].setText(newText);
-				p(this,"WISPT: "+newText);
+				p(new Exception().getStackTrace()[0], newText);
 			}
 		}
 		catch(Exception ex){}
@@ -2246,39 +2419,39 @@ private static boolean successfulWrite;
 	public void
 	saveChangesToNodeWTNO()
 	{//navigating is removing already existing tips
+		p(new Exception().getStackTrace()[0], "Entered");
 		if(selectedWTNO != null)
 		{
-				selectedWTNO.setTitle(titleArea.getText());
-				selectedWTNO.setContent(contentArea.getText());
-				selectedWTNO.setTips(new String[12]);
-				selectedWTNO.setTipTitles(new String[12]);
+			WISPTNodeObject newlyConstructedWTNO = new WISPTNodeObject(titleArea.getText(), contentArea.getText());
+				newlyConstructedWTNO.setTips(new String[12]);
+				newlyConstructedWTNO.setTipTitles(new String[12]);
 				for(int i = 0; i < tipChecks.length; ++i)
 				{
 					if(tipChecks[i].isVisible())
 					{
-						selectedWTNO.setTip(i, tipAreas[i].getText());
-						selectedWTNO.setTipTitle(i, tipChecks[i].getText());
+						newlyConstructedWTNO.setTip(i, tipAreas[i].getText());
+						newlyConstructedWTNO.setTipTitle(i, tipChecks[i].getText());
 					}
 					else
 					{
 						break;
 					}
 				}
-				selectedWTNO.setPics(new ImageIcon[12]);
-				selectedWTNO.setPicTitles(new String[12]);
+				newlyConstructedWTNO.setPics(new ImageIcon[12]);
+				newlyConstructedWTNO.setPicTitles(new String[12]);
 				for(int i = 0; i < picLabels.length; ++i)
 				{
 					if(picLabels[i].isVisible())
 					{
-						selectedWTNO.setPic(i, pics[i]);
-						selectedWTNO.setPicTitle(i, picLabels[i].getText());
+						newlyConstructedWTNO.setPic(i, pics[i]);
+						newlyConstructedWTNO.setPicTitle(i, picLabels[i].getText());
 					}
 					else
 					{
 						break;
 					}
 				}
-			selectedNode.setUserObject(selectedWTNO);
+			selectedNode.setUserObject(newlyConstructedWTNO);
 			model.nodeChanged(selectedNode);
 		}
 	}
@@ -2308,7 +2481,7 @@ private static boolean successfulWrite;
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(WISPT.ps);
+				p(new Exception().getStackTrace()[0], e);
 			}
 			//p(userProfile.getLastSelectedNodePath().toString());
 			//training mode if/else below
@@ -2338,6 +2511,7 @@ private static boolean successfulWrite;
 			contentArea.setText(selectedWTNO.getContent());
 			titleArea.setText(selectedWTNO.toString());
 			String[] wtnoTips = selectedWTNO.getTips();
+			String[] wtnoPicTitles = selectedWTNO.getPicTitles();
 			pics = selectedWTNO.getPics();
 			DefaultMutableTreeNode child;
 			WISPTNodeObject childObject;
@@ -2351,7 +2525,7 @@ private static boolean successfulWrite;
 				}
 				centerCenterPane.revalidate();
 				centerCenterPane.repaint();
-				p(this,"WISPT: "+selectedWTNO.getContent());
+				p(new Exception().getStackTrace()[0], selectedWTNO.getContent());
 			}
 			
 			try
@@ -2394,19 +2568,23 @@ private static boolean successfulWrite;
 			} 
 			catch (Exception ex) 
 			{
-				ex.printStackTrace(WISPT.ps);
+				p(new Exception().getStackTrace()[0], ex);
 			}
 			try
 			{
-				for(int i = 0; i < tipChecks.length;++i)
+				p(new Exception().getStackTrace()[0], wtnoTips[0] + " == non-null value?");
+				for(int i = 0; i < tipChecks.length; ++i)
 				{
-					if(!wtnoTips[i].equals(""))
+					try
 					{
-						tipChecks[i].setVisible(true);
-						tipChecks[i].setText(wtnoTips[i].split(":")[0]);
-						tipAreas[i].setText(wtnoTips[i]);
+						if(!wtnoTips[i].equals(""))
+						{
+							tipChecks[i].setVisible(true);
+							tipChecks[i].setText(wtnoTips[i].split(":")[0]);
+							tipAreas[i].setText(wtnoTips[i]);
+						}
 					}
-					else
+					catch(Exception ex)
 					{
 						visibleTipCheckIndex = i-1;
 						break;
@@ -2415,9 +2593,28 @@ private static boolean successfulWrite;
 			}//try
 			catch (Exception ex) 
 			{
-				ex.printStackTrace(WISPT.ps);
+				p(new Exception().getStackTrace()[0], ex);
 			}//catch
-			
+			try
+			{
+				for(int i = 0; i < picLabels.length;++i)
+				{
+					if(pics[i] != null)
+					{
+						picLabels[i].setVisible(true);
+						picLabels[i].setText(wtnoPicTitles[i]);
+					}
+					else
+					{
+						visiblePicLabelIndex = i-1;
+						break;
+					}//if else
+				}//for
+			}//try
+			catch (Exception ex) 
+			{
+				p(new Exception().getStackTrace()[0], ex);
+			}//catch
 		}
 	}
 	/**
@@ -2426,21 +2623,36 @@ private static boolean successfulWrite;
 	 * @param stringToPrint
 	 */
 	public static void
-	p(Object callingClass, String stringToPrint)
+	p(StackTraceElement st, String stringToPrint)
 	{
-		
-		WISPT.ps.println(callingClass.getClass().getName()+": "+stringToPrint);
-		System.out.println(callingClass.getClass().getName()+": "+stringToPrint);
+		try
+		{
+			WISPT.ps.println(st.getClassName()+"."+st.getMethodName()+":"+st.getLineNumber()+"\n\t\t\t"+stringToPrint);
+			System.out.println(st.getClassName()+"."+st.getMethodName()+":"+st.getLineNumber()+"\n\t\t\t"+stringToPrint);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 
 	 * @param exception
 	 */
 	public static void
-	p(Exception exception)
+	p(StackTraceElement st, Exception exception)
 	{
-		exception.printStackTrace();
-		exception.printStackTrace(ps);
+		try
+		{
+			System.out.println(st.getClassName()+"."+st.getMethodName()+":"+st.getLineNumber()+"\n");
+			exception.printStackTrace();
+			WISPT.ps.println(st.getClassName()+"."+st.getMethodName()+":"+st.getLineNumber()+"\n");
+			exception.printStackTrace(ps);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
 
@@ -2546,8 +2758,8 @@ class LoginDialog extends JDialog
 	{
 		String pathOfFolder = "User Profiles";
 		String fileName = LID_username.getText()+".user";
-		WISPT.p(this, pathOfFolder+File.separator+fileName);
-		WISPTUserProfile profile = (WISPTUserProfile)WISPT.loadSerializedObject(this, 
+		WISPT.p(new Exception().getStackTrace()[0], pathOfFolder+File.separator+fileName);
+		WISPTUserProfile profile = (WISPTUserProfile)WISPT.loadSerializedObject(this.getClass(), 
 				false, 
 				pathOfFolder, 
 				fileName,
@@ -2569,7 +2781,7 @@ class LoginDialog extends JDialog
 		catch(Exception ex)
 		{
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.OK_OPTION);
-			ex.printStackTrace(WISPT.ps);
+			WISPT.p(new Exception().getStackTrace()[0], ex);
 		}
 		
 	}//end LID_okayBtn_AP
@@ -2704,7 +2916,7 @@ class UserProfileBuilder extends JDialog
 		WISPTUserProfile profile = new WISPTUserProfile(UPB_isAdmin.isSelected(), "User Profiles", UPB_username.getText()+".user");
 		profile.setEditorModeEnabled(UPB_editorModeEnabled.isSelected());
 		
-		DefaultTreeModel model = (DefaultTreeModel)WISPT.loadSerializedObject(this, true, "Tree Saves", null, "Serialized Tree File", "tree");
+		DefaultTreeModel model = (DefaultTreeModel)WISPT.loadSerializedObject(this.getClass(), true, "Tree Saves", null, "Serialized Tree File", "tree");
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
 		TreePath rootChildPath = new TreePath(((DefaultMutableTreeNode)root.getChildAt(0)).getPath());
 		
@@ -2719,7 +2931,7 @@ class UserProfileBuilder extends JDialog
 		profile.setUserPassword(UPB_userPassword.getText());
 		profile.setUserUnlocks((int)UPB_userUnlocks.getValue());
 		
-		WISPT.saveSerializedObject(this, false, "User Profiles", UPB_username.getText()+".user", "User Profile", ".user", profile);
+		WISPT.saveSerializedObject(this.getClass(), false, "User Profiles", UPB_username.getText()+".user", "User Profile", ".user", profile);
 		mainWindow.setUser(profile);
 		
 		this.dispose();
@@ -2729,5 +2941,156 @@ class UserProfileBuilder extends JDialog
 	UPB_cancelBtn_actionPerformed(ActionEvent e)
 	{
 		this.dispose();
+	}
+}
+
+class ScreenShotViewer extends JDialog
+{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8593804664630134410L;
+	
+	private JPanel 
+		SSV_contentPane,
+		SSV_centerPane,
+		SSV_southPane;
+	private JLabel 
+		SSV_picHolder;
+	private JButton
+		SSV_deletePicture,
+		SSV_done;
+	private JTextField
+		SSV_picTitle;
+	private int 
+		SSV_screenWidth,
+		SSV_screenHeight;
+	private ImageIcon
+		SSV_pic;
+	private static JLabel
+		SSV_labelToReturn;
+	
+	
+	public ScreenShotViewer(JLabel p, WISPT wisptInstance, boolean isEditorModeEnabled)
+	{
+		super();
+		SSV_labelToReturn = p;
+		setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		SSV_pic = (ImageIcon)p.getIcon();
+		SSV_fitWindowToScreen(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice(), this);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			 
+			SSV_contentPane = new JPanel(new BorderLayout());
+		setContentPane(SSV_contentPane);
+		
+				SSV_picTitle = new JTextField(p.getText());
+				SSV_picTitle.setEditable(isEditorModeEnabled);
+			SSV_contentPane.add(SSV_picTitle, BorderLayout.NORTH);
+			
+				SSV_centerPane = new JPanel(new GridLayout(1,1));
+			SSV_contentPane.add(SSV_centerPane, BorderLayout.CENTER);
+				
+				
+					SSV_picHolder = new JLabel();
+					SSV_picHolder.setIcon(SSV_pic);
+					SSV_picHolder.addComponentListener
+						(new ComponentListener()
+						{
+
+							@Override
+							public void componentHidden(ComponentEvent ce) {}
+							@Override
+							public void componentMoved(ComponentEvent ce) {}
+							@Override
+							public void 
+							componentResized(ComponentEvent ce) 
+							{
+								SSV_picHolder_componentResized(ce);
+							}
+							@Override
+							public void componentShown(ComponentEvent ce) {}
+							
+						}
+						);
+				SSV_centerPane.add(SSV_picHolder);
+				
+				SSV_southPane = new JPanel(new GridLayout(2,1));
+			SSV_contentPane.add(SSV_southPane, BorderLayout.SOUTH);
+				
+					SSV_deletePicture = new JButton("Delete");
+					SSV_deletePicture.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent ae)
+							{
+								SSV_deletePicture_actionPerformed(ae, wisptInstance);
+							}//actionPerformed
+						}//new ActionListener
+						);//addActionListener
+					SSV_deletePicture.setEnabled(isEditorModeEnabled);
+				SSV_southPane.add(SSV_deletePicture);
+			
+					SSV_done = new JButton("Done");
+					SSV_done.addActionListener
+						(new ActionListener()
+						{
+							@Override
+							public void
+							actionPerformed(ActionEvent ae)
+							{
+								SSV_labelToReturn.setText(SSV_picTitle.getText());
+								dispose();
+							}
+						}
+						);
+				SSV_southPane.add(SSV_done);
+			
+		pack();
+		setVisible(true);
+	}
+	
+	public static JLabel
+	SSV_displayScreenShot(JLabel p, WISPT wisptInstance, boolean isEditorModeEnabled)
+	{
+		ScreenShotViewer ssv = new ScreenShotViewer(p, wisptInstance, isEditorModeEnabled);
+		return ScreenShotViewer.SSV_labelToReturn;
+	}
+	
+	public void
+	SSV_deletePicture_actionPerformed(ActionEvent e, WISPT wisptInstance)
+	{
+		int userChoice = JOptionPane.showConfirmDialog
+				(SSV_deletePicture, 
+				"Are you sure you want to delete this screenshot?", 
+				"Confirm Delete", 
+				JOptionPane.OK_CANCEL_OPTION, 
+				JOptionPane.QUESTION_MESSAGE);
+		if(userChoice == 0)//XXX not sure how to better do this.
+		{
+			wisptInstance.setLastPicOpened(null);
+		}//if
+		dispose();
+	}
+	
+	public void
+	SSV_picHolder_componentResized(ComponentEvent ce)
+	{
+		if(SSV_picHolder.getSize() != new Dimension(SSV_pic.getIconWidth(), SSV_pic.getIconHeight()));
+		{
+			Image image = SSV_pic.getImage();
+			image = image.getScaledInstance(SSV_picHolder.getWidth(), SSV_picHolder.getHeight(), Image.SCALE_SMOOTH);
+			SSV_picHolder.setIcon(new ImageIcon(image));
+		}
+	}//end picHolder resize
+	
+	public void
+	SSV_fitWindowToScreen(GraphicsDevice gd, Component affectedComp)
+	{
+		SSV_screenWidth = gd.getDisplayMode().getWidth()-7;
+		SSV_screenHeight = gd.getDisplayMode().getHeight()-42;
+		affectedComp.setPreferredSize(new Dimension(SSV_screenWidth, SSV_screenHeight));
 	}
 }
