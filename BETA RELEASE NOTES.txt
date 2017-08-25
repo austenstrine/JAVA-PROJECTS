@@ -1,29 +1,30 @@
--------RELEASE NOTES for WISP-T BETA 1.1-------
+-------RELEASE NOTES for WISP-T BETA 1.2-------
 
-Basic functionality:
-The program should start up with an automatically generated empty tree & profile, and editor mode on. The editor mode pane on the left includes 5 buttons that alter whatever branch or leaf (hereafter referred to collectively as "Node") is currently selected. 
-The plus adds a node as a child to the currently selected node. 
-The minus deletes the node, and all children/content. 
-The pencil alters the currently selected node. 
-The up arrow moves the currently selected node up one, so that it appears one node higher than its siblings. 
-The down arrow does the same, but makes it appear one node lower than its siblings.
+BETA 1.2, the Editor's update, is now ready. Any and all editor functionality has been integrated into the WISPT.java file and its GUI as much as logical and possible.
 
-Note that in order to change the title and content of the node, to add screenshots, or to add tips, a separate window is opened, and the text is entered into that window. This will change in Beta 1.2 - it will all be done directly from within WISP-T while editor mode is active, no separate window.
-Note also that in order for the changes you have made to a node to appear, you must completely de-select, then re-select that node. This will also be patched in Beta 1.2 .
-Editor mode may be turned on/off from Settings, under insertUsernameHere Preferences. 
+Big changes:
 
-Settings also allows you to define node behavior while in "Training Mode". It lists the User password, the Admin Password, the Locked Message, and the number of times a user can "Unlock" a node with their user password.
-When enabled, Training Mode will replace the main text of a node with the Locked Message after that node has been accessed more than the administrator wants. Right now there's not much distinction between a regular user and an administrator, and the administrator has no control over how many times a node may be accessed before it gets locked. This will be patched in future releases.
+When editor mode is active now, all node, tip, and pic editing functionality is done at an editor bar at the bottom. You can define the title of pics now - tip titles still function similar as before where whatever is before the first colon will be the title. This will change in future releases, see TODO below. Node titles and contents are directly editable when editor mode is on, also, node titles now appear above their contents. For pics, after the initial load, you must still click on the specific pic icon to view the pic you selected AND edit the title. Work in progress, this will change in a similar way as the tips will be as shown in TODO below. Tips and pics are no longer linked, although they appear in the same JPanel. You can also add up to 12 pics and tips per node. (Although you may not be able to display all of the tips simultaneously. Neither should you, no need for information overload.)
+Your changes are saved as soon as you navigate away from the node in question. No undo as of yet, aside from re-loading from the last save. No save button (not sure its necessary, actually.)
+Nodes can now be cut and pasted, buttons have been added for this functionality. Regular ctrl+C and ctrl+V functionality will not affect this, for simplicity and also to avoid accidentally destroying huge swaths of your tree in the process of reorginizing it. Future releases will have additional safeguards to avoid accidental loss of data, see TODO.
 
-User profile functionality is incomplete. Right now WISP-T tries to load a "default" profile, and if one does not exist in the user profiles folder, it will create one. In the future, the default profile will be a static object that either: 
-A. exists, or 
-B. is created if it does not exist. 
-There will be no external files for default profiles.
-When user profile functionality is complete, WISP-T will save user profiles(and related content such as screenshots and tree files) on a server, so that they are accessible from any computer. Admin profiles will have power over certain properties of non-admin profiles. The state of WISP-T will be saved to the currently loaded profile when WISP-T: 
-A. exits, and 
-B. changes profiles, including which tree was opened, which node was selected, whether the tree and/or tips panes are expanded/collapsed, and anything else I find to be relevant.
+Other stuff:
+Cancel button in settings works now.
 
-Note that the cancel button in settings does nothing right now. You have to click the X in the corner to close without saving changes.
-Still investigating miscellaneus bugs and necessary interface optimizations.
+Paths of the .java and .class files has changed, so if you created any user profiles or trees with beta 1.1, you'll need to send them to me for conversion. This should be a one-time dealio - not anticipating any other path changes in the future.
+
+
+TODO:
+User profile functionality 
+	I'm going to add a jspinner to the settings area that allows the administrator to have control over how many times a node may be accessed before it gets locked. Will also have a universal "Standard Settings" file that all standard user profiles are subject to onload that only administrators have power to change - this will be how administrators affect user profiles. It will be designed so that if the file does not exist, no standard users will be able to log in until an administrator logs in and creates one to avoid users kind of...hacking the darn thing. Default profiles will be scrapped - instead, WISP-T will only allow you to sign in, or create a profile. One of those must happen in order to open WISP-T. If I'm being that strict, I may have to include password recovery options as well...
+
+Tip checkboxes
+	I'm thinking of trying to nest the jcheckbox horizontally next to a jtextfield in a jFrame, and then put that jFrame where the checkboxes currently are. The checkboxes would have no text, any text functionality that existed previously will be handled through the jtextfields instead. When editor mode is on, those text boxes would be directly editable similar to the node title and content. I've already updated the WISPTNodeObject to include getters and setters for an array of 12 strings for tip titles, I only just now figured out an acceptably 'elegant' solution.
+
+Node cut/paste
+	I'm going to try to have it so that the paste button is disabled until the cut button has been pressed, and the cut button will be disabled after being pressed, until the paste button is pressed. Essentially, they will never both be available simultaneously. Might also have the paste button change color to red when it's filled with a node - certainly won't hurt. Also, will include an auto-save that ensures that when you close the program absent mindedly, it will attach that node as a child of the root and save the tree as "savenameBackup.tree". Thinking about allowing the cut/paste to span from one tree to another, so you can cut from one tree, load another, and paste in the new tree, potentially saving a lot of time that would otherwise be spent duplicating similar or identical steps. I think that's currently possible, although unintentionally so - haven't thought about possible consequences of that quite yet though. Might be better to have a copy button that works from one tree to another, but not cut. Also might be better for the cut function to block any attempt at exiting until something is done with that node in the nodeClipboard. Still thinking about what would be more elegant/appropriate.
+
+Radio button navigation
+	Currently there are only 4 radio buttons, which limits you to 4 child nodes per node that can be selected via this method. That needs to change to 12, and include visual space management - might have to have some kind of limiation on the number of characters that appear in the title(32? 48?), not sure. Will have to implement it similar to how I've re-done tips and pics, where the relevant items are located in an array instead of being individually named variables. Also need to include compatibility with the add node button so that it notifies the user when they cannot add more than 12 children per node instead of adding another child.
 
 That's all! E-mail me at austenstrine@gmail.com if you have any questions.
