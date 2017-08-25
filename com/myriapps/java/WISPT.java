@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+
+/*
+ * Beta 1.2 ready.
+ * WRITE RELEASE NOTES!
+ * Send Beta 1.2 to co-workers
+ * Don't forget to include converters for tree saves and user profiles that anyone may have made.
+ */
+
 package com.myriapps.java;
 
 import java.util.*;
