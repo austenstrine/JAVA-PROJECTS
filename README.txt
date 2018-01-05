@@ -2,7 +2,8 @@ Synopsis
 
 This is a program that uses a custom-built troubleshooting tree interface 
 to teach tech support representatives how to troubleshoot with customers 
-over the phone. It's 100% java, and was built with Eclipse.
+over the phone. It's 100% java, and was built with Eclipse. It also 100% 
+represents my work - every line of code so far is my own.
 The primary program is WISP-T.java. It uses a serialized TreeModel as the 
 troubleshooting tree. It has a built in "Editor Mode" that allows 
 administrators to create content in the same format it is viewed. 
@@ -11,6 +12,9 @@ times a user can access a given portion of a tree. Navigation will still
 work, but the content will be 'locked' unless it is unlocked by an 
 administrator. Administrators can also allow the user a certain number of 
 unlocks to use at their discretion.
+It is a bit unrefined, but the basic functionality works great - the only 
+thing its really lacking at this point is the ability to lock users who 
+shouldn't have access to admin controls out of admin settings.
 
 Why?
 
@@ -34,14 +38,15 @@ rather than spending a few hours every day, for ONE person's training.
 Furthermore, in the case of outsourced IT support, it gives the WISP an 
 opportunity to send them an installer with a preconfigured default tree for 
 those who don't need to 'learn' so much as 'perform at a basic capacity'. The 
-company they outource to need only have their employees open the application.
+company they outsource to need only have their employees open the application.
 
 Installation
 
-Find the WISPTRunnable.zip in this project, download it, and unzip it. It 
-includes a few images and a runnable .jar file. I'm not sure when I will be 
-making an installer - my goal with this project was to get to beta status
-as quickly as possible so I can move on to the next project.
+There are two .zip files in this project that correspond to different beta 
+releases. Choose one, download it, and unzip it. It includes a few images and 
+a runnable .jar file. My goal with this project was to get to beta status as 
+quickly as possible, especially since I was doing this 100% on my own, so the
+.jar file seemed like a perfect and quick solution.
 
 Participation
 
